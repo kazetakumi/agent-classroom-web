@@ -4,7 +4,7 @@
     {
       "id": "FEAT-001",
       "type": "feat",
-      "title": "Agentic Classroom — JEE Revision Feed",
+      "title": "Agentic Classroom \u2014 JEE Revision Feed",
       "status": "todo",
       "blocked": [],
       "children": [
@@ -12,7 +12,7 @@
           "id": "US-001",
           "type": "user-story",
           "title": "Project scaffold, question bank, and bare card render",
-          "status": "todo",
+          "status": "done",
           "blocked": [],
           "children": []
         },
@@ -21,23 +21,29 @@
           "type": "user-story",
           "title": "Answer tap, feedback animation, and auto-advance",
           "status": "todo",
-          "blocked": ["US-001"],
+          "blocked": [
+            "US-001"
+          ],
           "children": []
         },
         {
           "id": "US-003",
           "type": "user-story",
-          "title": "Swipe gestures — skip forward, go back, and infinite loop",
+          "title": "Swipe gestures \u2014 skip forward, go back, and infinite loop",
           "status": "todo",
-          "blocked": ["US-002"],
+          "blocked": [
+            "US-002"
+          ],
           "children": []
         },
         {
           "id": "US-004",
           "type": "user-story",
-          "title": "CompanionSheet — pull-up chat with Pause and End Session",
+          "title": "CompanionSheet \u2014 pull-up chat with Pause and End Session",
           "status": "todo",
-          "blocked": ["US-003"],
+          "blocked": [
+            "US-003"
+          ],
           "children": []
         },
         {
@@ -45,7 +51,9 @@
           "type": "user-story",
           "title": "Results screen and full session lifecycle",
           "status": "todo",
-          "blocked": ["US-004"],
+          "blocked": [
+            "US-004"
+          ],
           "children": []
         }
       ]
