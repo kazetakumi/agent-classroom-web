@@ -20,7 +20,7 @@
           "id": "US-002",
           "type": "user-story",
           "title": "Answer tap, feedback animation, and auto-advance",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-001"
           ],

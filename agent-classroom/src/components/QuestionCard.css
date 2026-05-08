@@ -51,3 +51,17 @@
 .option-text {
   flex: 1;
 }
+
+.option-btn[data-state="selected"] {
+  border-color: #a78bfa;
+  background: #2d2b4e;
+  font-weight: 700;
+}
+
+.option-btn:disabled {
+  opacity: 0.5;
+}
+
+.option-btn:disabled[data-state="selected"] {
+  opacity: 1;
+}
