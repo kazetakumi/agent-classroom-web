@@ -1,0 +1,54 @@
+{
+  "project": "AgentClassroom",
+  "tasks": [
+    {
+      "id": "FEAT-001",
+      "type": "feat",
+      "title": "Agentic Classroom — JEE Revision Feed",
+      "status": "todo",
+      "blocked": [],
+      "children": [
+        {
+          "id": "US-001",
+          "type": "user-story",
+          "title": "Project scaffold, question bank, and bare card render",
+          "status": "todo",
+          "blocked": [],
+          "children": []
+        },
+        {
+          "id": "US-002",
+          "type": "user-story",
+          "title": "Answer tap, feedback animation, and auto-advance",
+          "status": "todo",
+          "blocked": ["US-001"],
+          "children": []
+        },
+        {
+          "id": "US-003",
+          "type": "user-story",
+          "title": "Swipe gestures — skip forward, go back, and infinite loop",
+          "status": "todo",
+          "blocked": ["US-002"],
+          "children": []
+        },
+        {
+          "id": "US-004",
+          "type": "user-story",
+          "title": "CompanionSheet — pull-up chat with Pause and End Session",
+          "status": "todo",
+          "blocked": ["US-003"],
+          "children": []
+        },
+        {
+          "id": "US-005",
+          "type": "user-story",
+          "title": "Results screen and full session lifecycle",
+          "status": "todo",
+          "blocked": ["US-004"],
+          "children": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+Agentic Classroom reimagines exam practice as an infinite mobile learning experience. Students solve one question at a time in a fast swipe-based flow, while a chat-based AI companion can be pulled up from the bottom whenever they need help, guidance, or deeper learning. Instead of feeling like a traditional quiz app, it feels like training with an intelligent coach.
