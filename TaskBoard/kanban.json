@@ -40,7 +40,7 @@
           "id": "US-004",
           "type": "user-story",
           "title": "CompanionSheet \u2014 pull-up chat with Pause and End Session",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-003"
           ],

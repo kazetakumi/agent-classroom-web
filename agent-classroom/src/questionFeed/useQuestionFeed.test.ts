@@ -89,6 +89,35 @@ describe('useQuestionFeed', () => {
     expect(result.current.currentIndex).toBe(0)
   })
 
+  it('pause() sets status to paused', () => {
+    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    expect(result.current.status).toBe('active')
+    act(() => { result.current.pause() })
+    expect(result.current.status).toBe('paused')
+  })
+
+  it('resume() sets status back to active', () => {
+    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    act(() => { result.current.pause() })
+    expect(result.current.status).toBe('paused')
+    act(() => { result.current.resume() })
+    expect(result.current.status).toBe('active')
+  })
+
+  it('skip() is a no-op when status is paused', () => {
+    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    act(() => { result.current.pause() })
+    act(() => { result.current.skip() })
+    expect(result.current.currentIndex).toBe(0)
+    expect(result.current.session).toHaveLength(0)
+  })
+
+  it('endSession() sets status to ended', () => {
+    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    act(() => { result.current.endSession() })
+    expect(result.current.status).toBe('ended')
+  })
+
   it('advancing past the last question wraps to index 0 with re-shuffled questions', () => {
     const reshuffled: Question[] = [
       { id: 'q003', subject: 'Math', question: 'Q3?', options: { A: 'A3', B: 'B3', C: 'C3', D: 'D3' }, correctOption: 'C' },

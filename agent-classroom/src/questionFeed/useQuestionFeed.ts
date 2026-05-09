@@ -11,7 +11,8 @@ interface FeedState {
   questions: Question[]
   currentIndex: number
   session: SessionRecord[]
-  status: 'active'
+  status: 'active' | 'paused' | 'ended'
+  sessionEndTime: number | null
 }
 
 function nextStateWithAdvance(prev: FeedState): FeedState {
@@ -28,6 +29,7 @@ export function useQuestionFeed(initialQuestions: Question[]) {
     currentIndex: 0,
     session: [],
     status: 'active',
+    sessionEndTime: null,
   })
 
   const currentQuestion = state.questions[state.currentIndex]
@@ -67,14 +69,30 @@ export function useQuestionFeed(initialQuestions: Question[]) {
     }))
   }
 
+  function pause() {
+    setState((prev) => ({ ...prev, status: 'paused' }))
+  }
+
+  function resume() {
+    setState((prev) => ({ ...prev, status: 'active' }))
+  }
+
+  function endSession() {
+    setState((prev) => ({ ...prev, status: 'ended', sessionEndTime: Date.now() }))
+  }
+
   return {
     currentQuestion,
     currentIndex: state.currentIndex,
     questions: state.questions,
     session: state.session,
+    status: state.status,
     submitAnswer,
     advance,
     skip,
     goBack,
+    pause,
+    resume,
+    endSession,
   }
 }
