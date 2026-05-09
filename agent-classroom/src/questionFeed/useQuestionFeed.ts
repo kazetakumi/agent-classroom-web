@@ -23,6 +23,8 @@ interface FeedState {
   sessionStartTime: number | null
   sessionEndTime: number | null
   summary: SessionSummary | null
+  view: 'summary' | 'review' | 'explanation'
+  selectedQuestionId: string | null
 }
 
 const IDLE_STATE: FeedState = {
@@ -33,6 +35,8 @@ const IDLE_STATE: FeedState = {
   sessionStartTime: null,
   sessionEndTime: null,
   summary: null,
+  view: 'summary',
+  selectedQuestionId: null,
 }
 
 function nextStateWithAdvance(prev: FeedState): FeedState {
@@ -135,6 +139,26 @@ export function useQuestionFeed() {
     setState((prev) => ({ ...prev, status: 'active' }))
   }
 
+  function openReview() {
+    if (state.status !== 'ended') return
+    setState((prev) => ({ ...prev, view: 'review' }))
+  }
+
+  function closeReview() {
+    if (state.status !== 'ended') return
+    setState((prev) => ({ ...prev, view: 'summary' }))
+  }
+
+  function openExplanation(questionId: string) {
+    if (state.status !== 'ended') return
+    setState((prev) => ({ ...prev, view: 'explanation', selectedQuestionId: questionId }))
+  }
+
+  function closeExplanation() {
+    if (state.status !== 'ended') return
+    setState((prev) => ({ ...prev, view: 'review', selectedQuestionId: null }))
+  }
+
   function endSession() {
     setState((prev) => {
       const endTime = Date.now()
@@ -150,6 +174,8 @@ export function useQuestionFeed() {
     session: state.session,
     status: state.status,
     summary: state.summary,
+    view: state.view,
+    selectedQuestionId: state.selectedQuestionId,
     startSession,
     startAgain,
     returnToIdle,
@@ -160,5 +186,9 @@ export function useQuestionFeed() {
     pause,
     resume,
     endSession,
+    openReview,
+    closeReview,
+    openExplanation,
+    closeExplanation,
   }
 }

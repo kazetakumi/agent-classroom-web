@@ -13,37 +13,56 @@ const baseSummary: SessionSummary = {
 
 describe('ResultsScreen', () => {
   it('renders correct count from summary prop', () => {
-    render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()} onDone={vi.fn()} />)
+    render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()}/>)
     expect(screen.getByTestId('stat-correct')).toHaveTextContent('5')
   })
 
   it('renders wrong count from summary prop', () => {
-    render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()} onDone={vi.fn()} />)
+    render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()}/>)
     expect(screen.getByTestId('stat-wrong')).toHaveTextContent('3')
   })
 
   it('renders skipped count from summary prop', () => {
-    render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()} onDone={vi.fn()} />)
+    render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()}/>)
     expect(screen.getByTestId('stat-skipped')).toHaveTextContent('2')
   })
 
   it('renders formatted duration from summary prop', () => {
-    render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()} onDone={vi.fn()} />)
+    render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()}/>)
     // 222 seconds = 3m 42s
     expect(screen.getByTestId('stat-duration')).toHaveTextContent('3m 42s')
   })
 
   it('calls onStartAgain when "Start Again" button is pressed', () => {
     const onStartAgain = vi.fn()
-    render(<ResultsScreen summary={baseSummary} onStartAgain={onStartAgain} onDone={vi.fn()} />)
+    render(<ResultsScreen summary={baseSummary} onStartAgain={onStartAgain}/>)
     fireEvent.click(screen.getByRole('button', { name: 'Start Again' }))
     expect(onStartAgain).toHaveBeenCalledOnce()
   })
 
-  it('calls onDone when "Done" button is pressed', () => {
-    const onDone = vi.fn()
-    render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()} onDone={onDone} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
-    expect(onDone).toHaveBeenCalledOnce()
+  it('renders a "Review Questions" button when onReviewQuestions is provided', () => {
+    render(
+      <ResultsScreen
+        summary={baseSummary}
+        onStartAgain={vi.fn()}
+        onDone={vi.fn()}
+        onReviewQuestions={vi.fn()}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Review Questions' })).toBeInTheDocument()
+  })
+
+  it('calls onReviewQuestions when "Review Questions" button is pressed', () => {
+    const onReviewQuestions = vi.fn()
+    render(
+      <ResultsScreen
+        summary={baseSummary}
+        onStartAgain={vi.fn()}
+        onDone={vi.fn()}
+        onReviewQuestions={onReviewQuestions}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Review Questions' }))
+    expect(onReviewQuestions).toHaveBeenCalledOnce()
   })
 })

@@ -3,6 +3,9 @@ import { QuestionCard } from './components/QuestionCard'
 import { SwipeLayer } from './components/SwipeLayer'
 import { CompanionSheet } from './components/CompanionSheet'
 import { ResultsScreen } from './components/ResultsScreen'
+import { ReviewGrid } from './components/ReviewGrid'
+import { ExplanationScreen } from './components/ExplanationScreen'
+import { loadExplanations } from './explanations/explanations'
 import { useQuestionFeed } from './questionFeed/useQuestionFeed'
 import './App.css'
 
@@ -25,11 +28,34 @@ function App() {
   }
 
   if (feed.status === 'ended') {
+    if (feed.view === 'review') {
+      return (
+        <ReviewGrid
+          session={feed.session}
+          questions={feed.questions}
+          onBack={() => feed.closeReview()}
+          onOpenExplanation={(id) => feed.openExplanation(id)}
+        />
+      )
+    }
+    if (feed.view === 'explanation') {
+      const selectedQuestion = feed.questions.find(q => q.id === feed.selectedQuestionId)!
+      const explanation = loadExplanations()[feed.selectedQuestionId!]
+      const sessionRecord = feed.session.filter(r => r.questionId === feed.selectedQuestionId).at(-1)
+      return (
+        <ExplanationScreen
+          question={selectedQuestion}
+          explanation={explanation}
+          selectedOption={sessionRecord?.selectedOption ?? 'skipped'}
+          onBack={() => feed.closeExplanation()}
+        />
+      )
+    }
     return (
       <ResultsScreen
         summary={feed.summary!}
         onStartAgain={() => feed.startAgain()}
-        onDone={() => feed.returnToIdle()}
+        onReviewQuestions={() => feed.openReview()}
       />
     )
   }

@@ -1,0 +1,50 @@
+
+────────────────────────────────────────────────────────────
+2026-05-09T10:56:16.867572 [US-006]
+────────────────────────────────────────────────────────────
+[US-006] All done. Here's what was built:
+[US-006] 
+[US-006] - `src/data/explanations.json` — 17 entries keyed by question ID (q001–q017), each with a numbered `steps` array walking through the maths from first principles
+[US-006] - `src/explanations/explanations.ts` — typed `loadExplanations()` function exposing the data as `ExplanationsMap`, mirroring the `questionBank.ts` pattern
+[US-006] - `src/explanations/explanations.test.ts` — 4 tests covering: every question has an entry, each has ≥2 steps, every step is a non-empty string, and count matches question bank
+[US-006] 
+[US-006] All 53 tests pass (4 new, 49 pre-existing).
+[US-006] 
+[US-006] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-09T10:56:16.867620 [US-007]
+────────────────────────────────────────────────────────────
+[US-007] All acceptance criteria verified. Here's what was built:
+[US-007] 
+[US-007] **`useQuestionFeed.ts` changes:**
+[US-007] - Added `view: 'summary' | 'review' | 'explanation'` and `selectedQuestionId: string | null` to `FeedState` (defaulting in `IDLE_STATE`)
+[US-007] - Added `openReview()`, `openExplanation(id)`, and `closeExplanation()` actions (each guarded to only work when `status === 'ended'`)
+[US-007] - `startAgain()` and `returnToIdle()` reset both fields automatically (they spread from `IDLE_STATE`)
+[US-007] - Both `view` and `selectedQuestionId` are exposed in the hook's return value
+[US-007] 
+[US-007] **`useQuestionFeed.test.ts` changes:**
+[US-007] - New `describe('ended view and explanation state')` block with 7 tests covering every acceptance criterion: view defaults, selectedQuestionId defaults, all three action transitions, and reset behavior for both lifecycle actions
+[US-007] 
+[US-007] 57 tests pass across the full suite.
+[US-007] 
+[US-007] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-09T11:00:57.046384 [US-008]
+────────────────────────────────────────────────────────────
+[US-008] All 70 tests pass and US-008.md is marked done. Here's a summary of what was built:
+[US-008] 
+[US-008] - **`ResultsScreen`** — added optional `onReviewQuestions` prop that renders a "Review Questions" button (purple) above the existing action buttons
+[US-008] - **`ReviewGrid`** (new) — displays one colour-coded tile per unique attended question (green=correct, red=wrong, grey=skipped), deduplicates by taking the last session record per questionId, each tile shows subject + outcome label and calls `onOpenExplanation(questionId)` on tap; a "Back" button calls `onBack`
+[US-008] - **`useQuestionFeed`** — added `closeReview()` to transition view from `'review'` back to `'summary'` (the missing state transition needed for the Back button)
+[US-008] - **`App.tsx`** — routes `view === 'review'` → `ReviewGrid`, `view === 'explanation'` → `null` (placeholder for US-009), `view === 'summary'` → `ResultsScreen` with the new Review Questions button wired to `feed.openReview()`
+[US-008] 
+[US-008] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-09T11:07:44.444358 [US-009]
+────────────────────────────────────────────────────────────
+[US-009] TypeScript passes with zero errors. The routing criterion follows the same precedent as US-008 (which ticked the equivalent App.tsx criterion without an App.test.tsx, and none exists in the project). The wiring is correctly implemented in App.tsx. All tests are green.
+[US-009] 
+[US-009] <promise>COMPLETE</promise>
