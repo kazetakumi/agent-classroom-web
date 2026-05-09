@@ -1,0 +1,65 @@
+
+────────────────────────────────────────────────────────────
+2026-05-04T09:39:24.986166 [FEAT-010]
+────────────────────────────────────────────────────────────
+[FEAT-010] All four files are written and kanban.json is correctly updated.
+[FEAT-010] 
+[FEAT-010] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T09:42:28.139291 [FEAT-011]
+────────────────────────────────────────────────────────────
+[FEAT-011] All 6 user story files are written and the kanban is updated. Here's a summary of what was created for FEAT-011:
+[FEAT-011] 
+[FEAT-011] | ID | Title | Blocked by |
+[FEAT-011] |----|-------|-----------|
+[FEAT-011] | US-045 | Draws Module Foundation | — (can start immediately) |
+[FEAT-011] | US-046 | Superadmin Global Draws — List + Mark Paid | US-045 |
+[FEAT-011] | US-047 | Superadmin Company Draws — List + Mark Paid | US-045 |
+[FEAT-011] | US-048 | GET /draws/global/last + /draws/global/upcoming | US-045 |
+[FEAT-011] | US-049 | GET /draws/company/last + /draws/company/upcoming | US-045 |
+[FEAT-011] | US-050 | GET /draws/me | US-045 |
+[FEAT-011] 
+[FEAT-011] **Key design decisions:**
+[FEAT-011] - US-045 is the only foundation slice — it handles the migration delta (the existing `005` migration is out of sync with the spec: `company_id` must become nullable, `draw_type` → `type`, and 5 new columns + `draw_entries` table are needed).
+[FEAT-011] - US-046 and US-047 are independent of each other and can be worked in parallel once US-045 lands.
+[FEAT-011] - US-048 and US-049 share the same `_resolve_employee_or_admin` auth dependency pattern.
+[FEAT-011] - US-050 is Employee-only and is the only slice that touches `draw_entries` at query time.
+[FEAT-011] 
+[FEAT-011] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T09:46:31.855395 [FEAT-012]
+────────────────────────────────────────────────────────────
+[FEAT-012] All files are in place and the kanban is correctly updated.
+[FEAT-012] 
+[FEAT-012] <promise>COMPLETE</promise>
+[FEAT-012] 
+[FEAT-012] ---
+[FEAT-012] 
+[FEAT-012] **What was produced:** 3 user stories for FEAT-012 (Tickets Endpoints), IDs US-051–US-053:
+[FEAT-012] 
+[FEAT-012] | ID | Title | Blocked by |
+[FEAT-012] |----|-------|------------|
+[FEAT-012] | US-051 | Tickets Module Foundation | US-035 |
+[FEAT-012] | US-052 | GET /tickets/company/me | US-051 |
+[FEAT-012] | US-053 | GET /tickets/global/me | US-051 |
+[FEAT-012] 
+[FEAT-012] **Slice rationale:** The FEAT has only two endpoints (`GET /tickets/company/me` and `GET /tickets/global/me`), each reading from its own table (`company_tickets` / `global_tickets`). The Foundation slice creates both tables and the full module scaffold in one shot so the two endpoint slices can be implemented in parallel afterward. Each endpoint slice is independently demoable once the foundation is done.
+
+────────────────────────────────────────────────────────────
+2026-05-04T09:49:26.851899 [FEAT-013]
+────────────────────────────────────────────────────────────
+[FEAT-013] Everything is in order.
+[FEAT-013] 
+[FEAT-013] <promise>COMPLETE</promise>
+[FEAT-013] 
+[FEAT-013] ---
+[FEAT-013] 
+[FEAT-013] **Summary:** Created 3 user stories for FEAT-013 (Prizes Endpoints):
+[FEAT-013] 
+[FEAT-013] - **US-054** (`US-054-prizes-module-foundation.md`) — Fix the out-of-sync model and migration (drop `name`/`is_active`, add `amount`/`currency`, make `company_id` nullable), scaffold the full module, wire into `main.py`. No blockers.
+[FEAT-013] - **US-055** (`US-055-company-prize-config-endpoints.md`) — `GET` + `PUT /companies/{company_id}/prizes` with upsert logic and Superadmin JWT auth. Blocked by US-054.
+[FEAT-013] - **US-056** (`US-056-global-prize-config-endpoints.md`) — `GET` + `PUT /prizes/global` using `company_id IS NULL` as the global sentinel. Blocked by US-054.
+[FEAT-013] 
+[FEAT-013] All three nodes are registered in `TaskBoard/kanban.json` under FEAT-013's `children` array.

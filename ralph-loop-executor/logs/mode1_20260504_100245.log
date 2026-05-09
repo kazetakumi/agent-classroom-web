@@ -1,0 +1,171 @@
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:02:45.952107 [US-041]
+────────────────────────────────────────────────────────────
+[US-041] All 298 tests pass and US-041 is complete. Here's what was built:
+[US-041] 
+[US-041] - `bank_connections/__init__.py` — package marker
+[US-041] - `bank_connections/models.py` — `BankConnection` (8 columns, FK→employees) and `BankAccount` (9 columns, FK→bank_connections+employees, UNIQUE on finexer_account_id)
+[US-041] - `bank_connections/exceptions.py` — `BankConnectionNotFoundError`, `DuplicateBankConnectionError`
+[US-041] - `bank_connections/repository.py` — `get_by_employee_id`, `create` (inserts with `status="pending"`), `get_accounts_by_employee_id`
+[US-041] - `bank_connections/schemas.py` — `BankConnectionOut`, `BankAccountOut`
+[US-041] - `alembic/versions/009_create_bank_connections_and_accounts_tables.py` — creates both tables with FKs and UNIQUE constraint, full downgrade
+[US-041] - `alembic/env.py` — updated to import `bank_connections.models`
+[US-041] - `tests/bank_connections/test_bank_connections_model.py` — 23 tests covering all acceptance criteria
+[US-041] 
+[US-041] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:10:36.113367 [US-044]
+────────────────────────────────────────────────────────────
+[US-044] All tasks complete. Here's a summary of what was built:
+[US-044] 
+[US-044] - **`bank_connections/service.py`** — `list_accounts(db, employee_id)` delegates to `repository.get_accounts_by_employee_id`, returns empty list when no accounts exist.
+[US-044] - **`bank_connections/router.py`** — `GET /bank-accounts/me` authenticated with `Depends(require_employee)`, extracts `actor.id` from the JWT and passes it to the service.
+[US-044] - **`main.py`** — includes `bank_accounts_router`.
+[US-044] - **`tests/bank_connections/test_list_accounts.py`** — 4 tests covering all 4 acceptance criteria (401 without JWT, empty list, correct fields, employee ID isolation).
+[US-044] 
+[US-044] All 302 tests pass with no regressions.
+[US-044] 
+[US-044] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:10:36.113284 [US-042]
+────────────────────────────────────────────────────────────
+[US-042] All done. Here's a summary of what was implemented:
+[US-042] 
+[US-042] - `core/config.py` — added `FINEXER_BASE_URL` and `FINEXER_API_KEY` settings
+[US-042] - `bank_connections/finexer_client.py` — new file with `create_customer()` and `create_consent()` async functions using `httpx.AsyncClient`
+[US-042] - `bank_connections/service.py` — added `initiate_connection()` function that checks for duplicates, calls Finexer, persists the connection, commits and refreshes
+[US-042] - `bank_connections/router.py` — added `POST /bank-connections` endpoint with `require_employee` auth, 201 response, and 409 duplicate mapping
+[US-042] - `main.py` — registered `bank_connections_router`
+[US-042] - `tests/bank_connections/test_initiate.py` — 7 tests covering all 5 ACs (all green, 309 total tests pass)
+[US-042] 
+[US-042] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:20:24.928415 [US-043]
+────────────────────────────────────────────────────────────
+[US-043] All done. 324 tests pass, no regressions.
+[US-043] 
+[US-043] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:26:47.447622 [US-045]
+────────────────────────────────────────────────────────────
+[US-045] All done. Here's what was implemented for US-045:
+[US-045] 
+[US-045] - **`alembic/versions/010_update_draws_and_draw_entries.py`** — migration that alters the `draws` table (renames `draw_type`→`type`, makes `company_id` nullable, adds server defaults on timestamps, adds 5 new nullable columns) and creates `draw_entries` with proper FKs; downgrade reverses all changes
+[US-045] - **`draws/models.py`** — rewrote `Draw` with all spec columns + added `DrawEntry` model
+[US-045] - **`draws/exceptions.py`**, **`repository.py`**, **`service.py`**, **`schemas.py`** (`DrawOut`, `DrawEntryOut`), **`router.py`** — full module scaffold
+[US-045] - **`main.py`** — draws router wired in
+[US-045] - **`tests/draws/test_draws_migration.py`** + **`tests/draws/test_draws_model.py`** — 28 tests covering all acceptance criteria, all green (352 total pass)
+[US-045] 
+[US-045] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:33:20.729519 [US-048]
+────────────────────────────────────────────────────────────
+[US-048] All 9 tests green. US-048 is complete.
+[US-048] 
+[US-048] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:33:20.731143 [US-050]
+────────────────────────────────────────────────────────────
+[US-050] All 8 tests for US-050 pass. Here's a summary of what was implemented:
+[US-050] 
+[US-050] - **`draws/repository.py`**: Added `list_draws_for_employee(db, employee_id, *, skip, limit)` — joins `draws` to `draw_entries`, filters by `employee_id`, orders by `scheduled_at DESC`.
+[US-050] - **`draws/service.py`**: Added `list_employee_draws(db, employee_id, skip, limit)` — thin delegation to the repository.
+[US-050] - **`draws/router.py`**: Added `GET /draws/me` endpoint using `require_employee` dependency — returns 401 for CompanyAdmin, Superadmin, or unauthenticated requests; extracts `actor.id` and passes it to the service.
+[US-050] - **`tests/draws/test_draws_me.py`**: 8 integration + unit tests covering all 7 acceptance criteria.
+[US-050] - **`US-050-draws-me.md`**: Status set to `done`, all criteria ticked.
+[US-050] 
+[US-050] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:33:20.729658 [US-047]
+────────────────────────────────────────────────────────────
+[US-047] All 7 acceptance criteria are ticked and status is `done`. US-047 is fully implemented and verified.
+[US-047] 
+[US-047] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:33:20.729629 [US-049]
+────────────────────────────────────────────────────────────
+[US-049] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:33:20.729564 [US-046]
+────────────────────────────────────────────────────────────
+[US-046] All 10 tests pass. US-046 is fully implemented:
+[US-046] 
+[US-046] - `draws/repository.py`: added `list_global` (filters `company_id IS NULL`) and `get_global_by_id` (filters both `id` and `company_id IS NULL`)
+[US-046] - `draws/service.py`: added `list_global_draws` and `mark_global_draw_paid` (raises `DrawNotFoundError` / `DrawAlreadyPaidError`)
+[US-046] - `draws/router.py`: added `GET /draws/global` and `POST /draws/global/{draw_id}/mark-paid` (both require Superadmin JWT)
+[US-046] - `draws/schemas.py`: replaced `ListDrawsQuery` with proper FastAPI dependency class using `Query()` params
+[US-046] - `tests/draws/test_superadmin_global_draws.py`: 10 tests covering all 7 acceptance criteria
+[US-046] - `TaskBoard/user-stories/US-046-superadmin-global-draws.md`: status set to `done`, all ACs ticked
+[US-046] 
+[US-046] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:40:28.290221 [US-051]
+────────────────────────────────────────────────────────────
+[US-051] All acceptance criteria are met and verified. 423 tests pass with no regressions.
+[US-051] 
+[US-051] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:45:33.812326 [US-052]
+────────────────────────────────────────────────────────────
+[US-052] All acceptance criteria are met: `GET /tickets/company/me` is fully implemented with repository, service, and router; 5 new tests cover all 4 ACs; 428 tests pass with no regressions; US-052 spec is updated to done.
+[US-052] 
+[US-052] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:45:33.812410 [US-053]
+────────────────────────────────────────────────────────────
+[US-053] All acceptance criteria are satisfied and verified. Here's what was implemented:
+[US-053] 
+[US-053] - **`tickets/repository.py`**: Added `get_global_ticket_count` — queries `global_tickets` by `employee_id`, returns 0 if no row exists
+[US-053] - **`tickets/service.py`**: Added `get_global_ticket_count` delegating to the repository
+[US-053] - **`tickets/router.py`**: Added `GET /tickets/global/me` endpoint requiring `EmployeeActor`, calling service with `actor.id` cast to UUID, returning `TicketCountOut`
+[US-053] - **`tests/tickets/test_get_global_tickets.py`**: 6 tests covering all acceptance criteria — no JWT → 401, superadmin → 401, employee with row → 200 + correct count, employee no row → 200 + 0, actor ID forwarded as UUID, and both endpoints coexisting
+[US-053] 
+[US-053] All 434 tests pass.
+[US-053] 
+[US-053] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:49:54.821592 [US-054]
+────────────────────────────────────────────────────────────
+[US-054] All 23 prizes tests pass, 457 total tests pass with no regressions. US-054 is complete.
+[US-054] 
+[US-054] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:54:25.239271 [US-056]
+────────────────────────────────────────────────────────────
+[US-056] All 11 tests pass and the spec is updated. Here's what was implemented:
+[US-056] 
+[US-056] - **`prizes/exceptions.py`** — `PrizeNotFoundError`
+[US-056] - **`prizes/repository.py`** — `get_global(db)` (SELECT WHERE company_id IS NULL) and `upsert_global(db, amount, currency)` (update if exists, insert if not)
+[US-056] - **`prizes/service.py`** — `get_global_prize(db)` (raises `PrizeNotFoundError` on miss) and `upsert_global_prize(db, data)` (delegates to repo, commits)
+[US-056] - **`prizes/router.py`** — `GET /prizes/global` and `PUT /prizes/global`, both protected by `require_superadmin`
+[US-056] - **`tests/prizes/test_global_prizes.py`** — 11 tests covering all acceptance criteria
+[US-056] 
+[US-056] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T10:54:25.238454 [US-055]
+────────────────────────────────────────────────────────────
+[US-055] All 478 tests pass. US-055 is fully implemented:
+[US-055] 
+[US-055] - `prizes/repository.py` — added `get_by_company_id` and `upsert_company` (insert on first call, update on subsequent calls)
+[US-055] - `prizes/service.py` — added `get_company_prize` (raises `PrizeNotFoundError` when missing) and `upsert_company_prize`
+[US-055] - `prizes/router.py` — added `companies_prizes_router` with `GET /companies/{company_id}/prizes` and `PUT /companies/{company_id}/prizes`, both requiring Superadmin JWT
+[US-055] - `main.py` — wired `companies_prizes_router`
+[US-055] - `tests/prizes/test_company_prizes.py` — 10 tests covering all 5 acceptance criteria
+[US-055] 
+[US-055] <promise>COMPLETE</promise>

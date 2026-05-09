@@ -1,0 +1,42 @@
+
+────────────────────────────────────────────────────────────
+2026-05-04T09:21:04.559658 [FEAT-007]
+────────────────────────────────────────────────────────────
+[FEAT-007] All done. 34 tests pass, the 3 pre-existing failures in `test_config` and `test_differ` are unrelated to this feature. Deliverables:
+[FEAT-007] 
+[FEAT-007] - `schemas/bank_connections.yaml` — 8-column table with unique employee_id FK index
+[FEAT-007] - `schemas/bank_accounts.yaml` — 7-column table with numeric balance, varchar(3) currency, and two indexes
+[FEAT-007] - `tests/test_bank_connections_schema.py` — 34 tests covering both tables
+[FEAT-007] - `TaskBoard/feats/FEAT-007.md` — updated with `**Status:** done` and all acceptance criteria ticked
+[FEAT-007] 
+[FEAT-007] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T09:25:09.688818 [FEAT-008]
+────────────────────────────────────────────────────────────
+[FEAT-008] All 38 new tests pass, the full suite shows no new regressions (3 pre-existing failures unrelated to this feature), and the FEAT-008.md is updated to `done` with all acceptance criteria ticked.
+[FEAT-008] 
+[FEAT-008] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T09:28:01.020213 [FEAT-009]
+────────────────────────────────────────────────────────────
+[FEAT-009] All done. Here's what was implemented:
+[FEAT-009] 
+[FEAT-009] - **RED**: Wrote `tests/test_prizes_schema.py` with 15 tests covering all acceptance criteria — all failed because `schemas/prizes.yaml` didn't exist
+[FEAT-009] - **GREEN**: Created `schemas/prizes.yaml` with the `prizes` table: 6 columns (`id`, `company_id`, `amount`, `currency`, `created_at`, `updated_at`), 1 index on `company_id`, and 1 FK to `companies.id`
+[FEAT-009] - All 15 new tests pass; no regressions in the existing 273 passing tests
+[FEAT-009] - Updated `TaskBoard/feats/FEAT-009.md` with acceptance criteria (all checked) and status set to `done`
+[FEAT-009] 
+[FEAT-009] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-04T09:30:10.701972 [FEAT-010]
+────────────────────────────────────────────────────────────
+[FEAT-010] All 13 tests green. Implementation complete:
+[FEAT-010] 
+[FEAT-010] - `schemas/app_logs.yaml` — 6-column table (id, service, level, message, context, created_at) with correct types and constraints
+[FEAT-010] - `tests/test_app_logs_schema.py` — 13 tests covering every acceptance criterion
+[FEAT-010] - `TaskBoard/feats/FEAT-010.md` — updated with `**Status:** done` and all criteria ticked
+[FEAT-010] 
+[FEAT-010] <promise>COMPLETE</promise>

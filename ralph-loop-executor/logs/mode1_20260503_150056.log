@@ -1,0 +1,44 @@
+
+────────────────────────────────────────────────────────────
+2026-05-03T15:00:57.001869
+────────────────────────────────────────────────────────────
+All done:
+- `schemas/plans.yaml` created with the exact schema from the FEAT-002 spec
+- `tests/test_plans_schema.py` written with 14 tests covering every column, index, and structural constraint — all pass
+- The 3 pre-existing test failures are unrelated and were failing before my changes
+- `TaskBoard/feats/FEAT-002.md` updated to `**Status:** done`
+
+```
+<promise>COMPLETE</promise>
+```
+
+────────────────────────────────────────────────────────────
+2026-05-03T15:03:45.972586
+────────────────────────────────────────────────────────────
+All 16 tests pass, no regressions introduced, and the spec is updated to done.
+
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T15:05:20.083613
+────────────────────────────────────────────────────────────
+All 16 tokens schema tests pass, the schema file is created exactly per spec, and the FEAT-004.md is marked done. The 3 pre-existing failures in `test_config` and `test_differ` are unrelated to this implementation.
+
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T15:07:08.223459
+────────────────────────────────────────────────────────────
+All 22 tests pass, no regressions introduced. The 3 pre-existing failures are unrelated to this work.
+
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T15:09:01.234767
+────────────────────────────────────────────────────────────
+All done:
+- `tests/test_employees_schema.py` — 21 tests covering all schema aspects (columns, nullability, indexes, FK, triggers)
+- `schemas/employees.yaml` — updated to match spec: nullable `first_name`/`last_name`/`password_hash`, added `invited_at`/`onboarded_at`/`deleted_at` columns, removed incorrect `on_delete: RESTRICT`
+- `TaskBoard/feats/FEAT-006.md` — status updated to `done`
+
+<promise>COMPLETE</promise>

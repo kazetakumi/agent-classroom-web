@@ -1,0 +1,27 @@
+
+────────────────────────────────────────────────────────────
+2026-05-03T17:10:01.416037
+────────────────────────────────────────────────────────────
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T17:13:18.999738
+────────────────────────────────────────────────────────────
+Two user stories written and kanban updated:
+
+- **US-014** — Add subscriptions table schema (`schemas/subscriptions.yaml`); no blockers within the FEAT
+- **US-015** — Add subscriptions seed data rows (`data/subscriptions.csv`); blocked by US-014 (schema) and US-013 (plans CSV must be seeded first so FK references resolve)
+
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T17:15:04.386692
+────────────────────────────────────────────────────────────
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T17:16:59.670648
+────────────────────────────────────────────────────────────
+Both files are in place and the kanban is updated. Done.
+
+<promise>COMPLETE</promise>

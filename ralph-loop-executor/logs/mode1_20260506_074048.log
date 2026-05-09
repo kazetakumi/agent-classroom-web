@@ -1,0 +1,96 @@
+
+────────────────────────────────────────────────────────────
+2026-05-06T07:40:48.231876 [US-002]
+────────────────────────────────────────────────────────────
+[US-002] All 6 tests pass, all acceptance criteria are met:
+[US-002] 
+[US-002] - `pyproject.toml` — `uv sync` installs asyncpg, httpx, python-dotenv, tenacity, pytest without errors
+[US-002] - `src/balance_sync/config.py` — raises `ValueError` with the missing var name on startup if any of the 4 required env vars are absent; returns a `Settings` dataclass when all are present
+[US-002] - `src/balance_sync/db.py` — `create_pool()` returns an asyncpg pool connected to PostgreSQL
+[US-002] - `.env.example` — documents all 4 required variables
+[US-002] - `tests/test_config.py` — 5 tests covering missing-var errors and successful load
+[US-002] - `tests/test_db.py` — smoke test executes `SELECT 1` against the real Supabase PostgreSQL instance
+[US-002] 
+[US-002] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-06T07:40:48.231811 [US-001]
+────────────────────────────────────────────────────────────
+[US-001] All done. Here's a summary of what was implemented:
+[US-001] 
+[US-001] **Files created:**
+[US-001] - `prizebnk-api/alembic/versions/013_add_last_synced_at_to_bank_accounts.py` — Alembic migration that adds `last_synced_at TIMESTAMP WITH TZ NULL` to `bank_accounts` with a clean downgrade that drops the column
+[US-001] - `prizebnk-api/tests/bank_connections/test_bank_accounts_migration_013.py` — 11 TDD tests covering all 5 acceptance criteria
+[US-001] 
+[US-001] **Files updated:**
+[US-001] - `prizebnk-api/bank_connections/models.py` — `BankAccount` model gains `last_synced_at: Mapped[Optional[datetime]]` (nullable, timezone-aware)
+[US-001] - `prizebnk-api/tests/bank_connections/test_bank_connections_model.py` — `_BANK_ACCOUNT_COLUMNS` updated to include `last_synced_at`; nullability check now excludes the new nullable column
+[US-001] - `TaskBoard/user-stories/US-001.md` — all criteria ticked, status set to `done`
+[US-001] 
+[US-001] Full suite: **489 passed, 0 failed**.
+[US-001] 
+[US-001] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-06T07:44:33.609357 [US-003]
+────────────────────────────────────────────────────────────
+[US-003] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-06T07:50:16.422563 [US-004]
+────────────────────────────────────────────────────────────
+[US-004] All good. Implementation is complete.
+[US-004] 
+[US-004] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-06T08:08:20.409019 [US-005]
+────────────────────────────────────────────────────────────
+[US-005] All acceptance criteria ticked and status marked done. 18/18 tests pass.
+[US-005] 
+[US-005] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-06T08:17:27.711326 [US-006]
+────────────────────────────────────────────────────────────
+[US-006] All 22 tests green, US-006.md updated. Here's a summary of what was built:
+[US-006] 
+[US-006] **`src/balance_sync/runner.py`** — added `run_sync_job(db: Pool, finexer_client)`:
+[US-006] - Queries `bank_connections WHERE status = 'active'` for distinct employee IDs
+[US-006] - Spawns one `asyncio.Task` per employee via `asyncio.gather(..., return_exceptions=True)`
+[US-006] - Each task acquires its own connection from the pool (safe concurrent use)
+[US-006] - Prints a summary; raises `RuntimeError` only for truly unexpected (non-Finexer) exceptions
+[US-006] 
+[US-006] **`src/balance_sync/__main__.py`** — new entry point:
+[US-006] - Loads settings from env vars, creates pool + `FinexerClient`, calls `run_sync_job`
+[US-006] - Returns 0 on success, 1 on any unexpected exception; pool always closed via `finally`
+[US-006] 
+[US-006] **`tests/test_runner.py`** — two new TDD cycles:
+[US-006] - Cycle 4: seeds 2 active + 1 inactive employee; asserts only active rows get `last_synced_at` updated
+[US-006] - Cycle 5: seeds 2 active employees where one's Finexer calls always fail; asserts the healthy employee still completes (3s real backoff accepted by design)
+[US-006] 
+[US-006] **`tests/test_main.py`** — two unit tests verifying exit-code logic via mocked pool and `run_sync_job`
+[US-006] 
+[US-006] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-06T08:32:11.447747 [US-007]
+────────────────────────────────────────────────────────────
+[US-007] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-06T08:41:56.175116 [US-008]
+────────────────────────────────────────────────────────────
+[US-008] All done. Here's what was delivered:
+[US-008] 
+[US-008] **Files created:**
+[US-008] - `scripts/run_balance_sync.sh` — activates the venv, sources `.env` (with `set -a`/`set +a` for export), runs `python -m balance_sync` with stdout/stderr appended to the log file, and exits with the Python process's exit code. All three paths (`VENV_PATH`, `ENV_FILE`, `LOG_FILE`) are configurable via env vars with sensible defaults.
+[US-008] - `scripts/install_cron.sh` — idempotent cron installer; accepts an optional schedule argument (default `0 * * * *`).
+[US-008] - `README.md` — covers venv setup, all four required env vars, cron installation/removal, and a SQL-based verification checklist for `last_synced_at`.
+[US-008] - `tests/test_scripts.py` — 7 TDD tests covering all five automated acceptance criteria (executable bit, exit-0 propagation, non-zero exit propagation, log appending, `.env` sourcing, install_cron.sh existence, README content).
+[US-008] 
+[US-008] **Test results:** 23/23 passed, zero regressions.
+[US-008] 
+[US-008] ```
+[US-008] <promise>COMPLETE</promise>
+[US-008] ```

@@ -1,0 +1,61 @@
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:01:09.130676 [US-012]
+────────────────────────────────────────────────────────────
+[US-012] All done. Summary:
+[US-012] 
+[US-012] - **RED**: Wrote `tests/test_us012.py` with 4 tests covering all acceptance criteria — all failed before the file existed.
+[US-012] - **GREEN**: Created `schemas/plans.yaml` (7 columns, exact content from FEAT-002 spec) — all 4 tests now pass.
+[US-012] - **Full suite**: 59/59 tests pass, no regressions.
+[US-012] - **US-012.md**: Status set to `done`, all 5 acceptance criteria ticked.
+[US-012] 
+[US-012] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:03:13.521197 [US-013]
+────────────────────────────────────────────────────────────
+[US-013] Clean UTF-8 with LF line endings, no BOM. All good.
+[US-013] 
+[US-013] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:10:38.603790 [US-014]
+────────────────────────────────────────────────────────────
+[US-014] All acceptance criteria verified and the user story is marked done. 68 tests pass with no regressions.
+[US-014] 
+[US-014] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:12:20.166923 [US-015]
+────────────────────────────────────────────────────────────
+[US-015] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:14:36.570517 [US-016]
+────────────────────────────────────────────────────────────
+[US-016] All acceptance criteria satisfied: `schemas/company_admins.yaml` created with 12 columns (4 auto-generated, 1 FK to `companies`), 4 TDD tests written and passing, full suite 71/71 green, US-016.md updated to `done`.
+[US-016] 
+[US-016] ```
+[US-016] <promise>COMPLETE</promise>
+[US-016] ```
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:16:42.395936 [US-017]
+────────────────────────────────────────────────────────────
+[US-017] All work is complete: `data/company_admins.csv` created with 2 rows, 5 tests written and passing, full suite 82/82 green, user story marked done.
+[US-017] 
+[US-017] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:19:19.134803 [US-018]
+────────────────────────────────────────────────────────────
+[US-018] All 5 acceptance criteria verified by tests, all 81 tests passing, user story marked done.
+[US-018] 
+[US-018] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:20:31.501172 [US-019]
+────────────────────────────────────────────────────────────
+[US-019] All 93 tests pass with no regressions. US-019 is fully implemented: `data/employees.csv` replaced with the canonical 3-row dataset (correct header, UUIDs, values), tests verified RED→GREEN via TDD, and the user story marked done.
+[US-019] 
+[US-019] <promise>COMPLETE</promise>

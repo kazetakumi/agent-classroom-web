@@ -1,0 +1,15 @@
+
+────────────────────────────────────────────────────────────
+2026-05-06T07:23:55.598603 [FEAT-001]
+────────────────────────────────────────────────────────────
+[FEAT-001] All 8 user story files are written and the kanban is updated. Here's the dependency graph:
+[FEAT-001] 
+[FEAT-001] ```
+[FEAT-001] US-001 (DB migration)    ──┐
+[FEAT-001] US-002 (scaffold/DB)     ──┼──► US-004 (core sync) ──► US-005 (retry+log) ──► US-006 (concurrent) ──► US-007 (file lock) ──► US-008 (cron)
+[FEAT-001] US-003 (Finexer client)  ──┘
+[FEAT-001] ```
+[FEAT-001] 
+[FEAT-001] US-001 and US-002 can start in parallel immediately. US-003 unblocks after US-002. US-004 through US-008 form a linear chain after that.
+[FEAT-001] 
+[FEAT-001] <promise>COMPLETE</promise>

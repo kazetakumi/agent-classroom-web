@@ -1,0 +1,26 @@
+[project]
+# Absolute path to the project Claude will work inside
+path = "../agent-classroom"
+
+# Absolute path to the kanban.json file
+kanban = "../TaskBoard/kanban.json"
+
+[task]
+# Mode to run:
+#   1 = Implement all open feats from the kanban automatically (item field ignored)
+#   2 = Write user stories for all open feats with no stories (item field ignored)
+#   3 = Implement a specific user story by ID
+mode = "1"
+
+# The backlog item name or user story ID to work on (ignored for mode 1)
+# Mode 2 → backlog item name  (e.g. "User Authentication")
+# Mode 3 → user story ID     (e.g. "US-001")
+item = ""
+
+[loop]
+# Maximum iterations before Ralph gives up
+max_iterations = 2
+
+[claude]
+# Max parallel Claude workers per wave (mode 1 only)
+max_workers = 5

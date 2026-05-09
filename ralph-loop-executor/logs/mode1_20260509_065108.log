@@ -1,0 +1,24 @@
+
+────────────────────────────────────────────────────────────
+2026-05-09T06:51:08.144222 [US-003]
+────────────────────────────────────────────────────────────
+[US-003] All 22 tests pass and every acceptance criterion is satisfied. Here's what was built:
+[US-003] 
+[US-003] - **`useQuestionFeed.ts`** — Added `skip()` (records `'skipped'` + advances), `goBack()` (decrements, floors at 0), infinite loop via `loadQuestions()` when advancing past the last index, exposed `questions` for test assertions
+[US-003] - **`SwipeLayer.tsx`** — New wrapper component using pointer events; right swipe (>80px) → `onSkip`, left swipe (<−80px) → `onGoBack`, upward swipe (>60px) → `onOpenCompanion`
+[US-003] - **`App.tsx`** — `QuestionCard` wrapped in `SwipeLayer` with feed actions wired
+[US-003] - **`US-003.md`** — Status set to `done`, all 5 acceptance criteria ticked
+[US-003] 
+[US-003] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-09T06:56:34.259650 [US-004]
+────────────────────────────────────────────────────────────
+[US-004] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-09T07:00:35.438140 [US-005]
+────────────────────────────────────────────────────────────
+[US-005] 45/45 green. All acceptance criteria are covered. The user story file is already updated to `done` with all criteria ticked.
+[US-005] 
+[US-005] <promise>COMPLETE</promise>

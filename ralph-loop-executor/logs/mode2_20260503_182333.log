@@ -1,0 +1,56 @@
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:23:33.595596
+────────────────────────────────────────────────────────────
+Everything looks correct. All files are saved and the kanban is updated.
+
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:27:58.153022
+────────────────────────────────────────────────────────────
+Everything is in order.
+
+<promise>COMPLETE</promise>
+
+---
+
+**Summary of what was created:**
+
+Three vertical-slice user stories for FEAT-004 Subscriptions Management:
+
+| ID | Title | Blocked By |
+|----|-------|------------|
+| **US-014** | Subscriptions Module Foundation + GET Subscription | US-009 (plans table FK target) |
+| **US-015** | PATCH Subscription (Update Plan / Validity) | US-014 |
+| **US-016** | Cancel Subscription | US-014 |
+
+**Key design decisions:**
+- **US-014** is the tracer bullet — builds the full `subscriptions/` module stack (model → migration → repo → service → router) and proves `GET` works end-to-end before any mutation endpoint is added. It blocks on US-009 because the plans table is an FK target.
+- **US-015 and US-016** both unblock from US-014 independently, so they can be worked in parallel. US-015 carries the most complex business logic (the `plan_id` → `valid_until` auto-calculation rule), tested with 4 targeted cases including the rule that `valid_until` in the request is ignored when `plan_id` is supplied.
+- The migration ordering dependency on a future `companies` table (FEAT-005) is called out explicitly in US-014 so the engineer knows to set `down_revision` correctly when FEAT-005 lands.
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:32:12.994317
+────────────────────────────────────────────────────────────
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:38:12.987151
+────────────────────────────────────────────────────────────
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:40:42.109577
+────────────────────────────────────────────────────────────
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:44:37.104144
+────────────────────────────────────────────────────────────
+<promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-03T18:49:31.039204
+────────────────────────────────────────────────────────────
+<promise>COMPLETE</promise>
