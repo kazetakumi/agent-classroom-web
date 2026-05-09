@@ -49,24 +49,25 @@ function computeSummary(
   sessionStartTime: number | null,
   endTime: number,
 ): SessionSummary {
+  const questionMap = new Map(questions.map((q) => [q.id, q]))
+  // Deduplicate by questionId — last record for a revisited question wins
   const recordMap = new Map(session.map((r) => [r.questionId, r]))
   let correct = 0
   let wrong = 0
   let skipped = 0
-  for (const question of questions) {
-    const record = recordMap.get(question.id)
-    if (!record) {
+  for (const record of recordMap.values()) {
+    if (record.selectedOption === 'skipped') {
       skipped++
-    } else if (record.selectedOption === question.correctOption) {
-      correct++
     } else {
-      wrong++
+      const question = questionMap.get(record.questionId)
+      if (question && record.selectedOption === question.correctOption) correct++
+      else wrong++
     }
   }
   const durationSeconds = sessionStartTime
     ? Math.round((endTime - sessionStartTime) / 1000)
     : 0
-  return { correct, wrong, skipped, totalAttempted: correct + wrong + skipped, durationSeconds }
+  return { correct, wrong, skipped, totalAttempted: recordMap.size, durationSeconds }
 }
 
 export function useQuestionFeed() {

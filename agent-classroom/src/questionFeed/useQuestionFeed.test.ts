@@ -182,7 +182,7 @@ describe('useQuestionFeed', () => {
       expect(result.current.summary!.correct).toBe(2)
     })
 
-    it('summary.wrong counts SessionRecord entries where selectedOption !== question.correctOption', () => {
+    it('summary.wrong counts only incorrectly answered questions, not explicitly skipped ones', () => {
       const { result } = renderHook(() => useQuestionFeed())
       act(() => { result.current.startSession() })
       // q001 — answer wrongly
@@ -191,34 +191,46 @@ describe('useQuestionFeed', () => {
       // q002 — answer correctly
       act(() => { result.current.submitAnswer('B') })
       act(() => { result.current.advance() })
-      // q003 — skip (recorded as 'skipped', still a mismatch → wrong)
+      // q003 — explicitly swiped past (skipped, not wrong)
       act(() => { result.current.skip() })
       act(() => { result.current.endSession() })
 
-      expect(result.current.summary!.wrong).toBe(2)
+      expect(result.current.summary!.wrong).toBe(1)
     })
 
-    it('summary.skipped counts questions in the bank that have no SessionRecord', () => {
+    it('summary.skipped counts only questions explicitly swiped past, not questions never reached', () => {
       const { result } = renderHook(() => useQuestionFeed())
       act(() => { result.current.startSession() })
-      // Only answer q001, leave q002 and q003 unrecorded
+      // Only answer q001 then end — q002 and q003 were never navigated to
       act(() => { result.current.submitAnswer('A') })
       act(() => { result.current.endSession() })
 
-      expect(result.current.summary!.skipped).toBe(2)
+      expect(result.current.summary!.skipped).toBe(0)
     })
 
-    it('summary.totalAttempted equals the sum of correct + wrong + skipped', () => {
+    it('summary.totalAttempted equals only the number of questions attended (answered or explicitly skipped)', () => {
       const { result } = renderHook(() => useQuestionFeed())
       act(() => { result.current.startSession() })
       act(() => { result.current.submitAnswer('A') }) // correct
       act(() => { result.current.advance() })
       act(() => { result.current.submitAnswer('A') }) // wrong (q002 correctOption is B)
-      act(() => { result.current.endSession() })     // q003 has no record → skipped
+      act(() => { result.current.endSession() })     // q003 never reached — not counted
 
       const s = result.current.summary!
       expect(s.totalAttempted).toBe(s.correct + s.wrong + s.skipped)
-      expect(s.totalAttempted).toBe(3)
+      expect(s.totalAttempted).toBe(2)
+    })
+
+    it('ending a session immediately after starting shows all zeros, not full bank size', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.endSession() })
+
+      const s = result.current.summary!
+      expect(s.totalAttempted).toBe(0)
+      expect(s.correct).toBe(0)
+      expect(s.wrong).toBe(0)
+      expect(s.skipped).toBe(0)
     })
 
     it('endSession() from paused state produces a valid summary', () => {

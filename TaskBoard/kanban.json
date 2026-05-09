@@ -5,7 +5,7 @@
       "id": "FEAT-001",
       "type": "feat",
       "title": "Agentic Classroom \u2014 JEE Revision Feed",
-      "status": "todo",
+      "status": "done",
       "blocked": [],
       "children": [
         {
@@ -55,6 +55,40 @@
             "US-004"
           ],
           "children": []
+        }
+      ]
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-002",
+      "type": "bug",
+      "title": "Results totals always equal full question bank size (17)",
+      "status": "done",
+      "blocked": [],
+      "children": [
+        {
+          "id": "HOTFIX-002",
+          "type": "hotfix",
+          "title": "Fix computeSummary to iterate session records instead of full question bank",
+          "status": "done",
+          "blocked": []
+        }
+      ]
+    },
+    {
+      "id": "BUG-001",
+      "type": "bug",
+      "title": "Swipe gestures broken on iPhone Chrome",
+      "status": "done",
+      "blocked": [],
+      "children": [
+        {
+          "id": "HOTFIX-001",
+          "type": "hotfix",
+          "title": "Replace setPointerCapture with Touch Event fallback for iOS WebKit",
+          "status": "done",
+          "blocked": []
         }
       ]
     }
