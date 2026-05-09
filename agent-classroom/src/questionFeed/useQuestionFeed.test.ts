@@ -245,6 +245,73 @@ describe('useQuestionFeed', () => {
     })
   })
 
+  describe('ended view and explanation state', () => {
+    it('view defaults to "summary" when a session ends', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.endSession() })
+      expect(result.current.view).toBe('summary')
+    })
+
+    it('selectedQuestionId defaults to null when a session ends', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.endSession() })
+      expect(result.current.selectedQuestionId).toBeNull()
+    })
+
+    it('openReview() sets view to "review"', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.endSession() })
+      act(() => { result.current.openReview() })
+      expect(result.current.view).toBe('review')
+    })
+
+    it('openExplanation(id) sets view to "explanation" and selectedQuestionId to the given id', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.endSession() })
+      act(() => { result.current.openReview() })
+      act(() => { result.current.openExplanation('q002') })
+      expect(result.current.view).toBe('explanation')
+      expect(result.current.selectedQuestionId).toBe('q002')
+    })
+
+    it('closeExplanation() sets view back to "review" and clears selectedQuestionId', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.endSession() })
+      act(() => { result.current.openReview() })
+      act(() => { result.current.openExplanation('q001') })
+      act(() => { result.current.closeExplanation() })
+      expect(result.current.view).toBe('review')
+      expect(result.current.selectedQuestionId).toBeNull()
+    })
+
+    it('startAgain() resets view to "summary" and selectedQuestionId to null', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.endSession() })
+      act(() => { result.current.openReview() })
+      act(() => { result.current.openExplanation('q003') })
+      act(() => { result.current.startAgain() })
+      expect(result.current.view).toBe('summary')
+      expect(result.current.selectedQuestionId).toBeNull()
+    })
+
+    it('returnToIdle() resets view to "summary" and selectedQuestionId to null', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.endSession() })
+      act(() => { result.current.openReview() })
+      act(() => { result.current.openExplanation('q001') })
+      act(() => { result.current.returnToIdle() })
+      expect(result.current.view).toBe('summary')
+      expect(result.current.selectedQuestionId).toBeNull()
+    })
+  })
+
   describe('lifecycle transitions', () => {
     it('startAgain() from ended resets session, index, and summary and returns to active', () => {
       const { result } = renderHook(() => useQuestionFeed())

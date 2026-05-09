@@ -1,0 +1,31 @@
+
+────────────────────────────────────────────────────────────
+2026-05-09T10:56:16.867572 [US-006]
+────────────────────────────────────────────────────────────
+[US-006] All done. Here's what was built:
+[US-006] 
+[US-006] - `src/data/explanations.json` — 17 entries keyed by question ID (q001–q017), each with a numbered `steps` array walking through the maths from first principles
+[US-006] - `src/explanations/explanations.ts` — typed `loadExplanations()` function exposing the data as `ExplanationsMap`, mirroring the `questionBank.ts` pattern
+[US-006] - `src/explanations/explanations.test.ts` — 4 tests covering: every question has an entry, each has ≥2 steps, every step is a non-empty string, and count matches question bank
+[US-006] 
+[US-006] All 53 tests pass (4 new, 49 pre-existing).
+[US-006] 
+[US-006] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-09T10:56:16.867620 [US-007]
+────────────────────────────────────────────────────────────
+[US-007] All acceptance criteria verified. Here's what was built:
+[US-007] 
+[US-007] **`useQuestionFeed.ts` changes:**
+[US-007] - Added `view: 'summary' | 'review' | 'explanation'` and `selectedQuestionId: string | null` to `FeedState` (defaulting in `IDLE_STATE`)
+[US-007] - Added `openReview()`, `openExplanation(id)`, and `closeExplanation()` actions (each guarded to only work when `status === 'ended'`)
+[US-007] - `startAgain()` and `returnToIdle()` reset both fields automatically (they spread from `IDLE_STATE`)
+[US-007] - Both `view` and `selectedQuestionId` are exposed in the hook's return value
+[US-007] 
+[US-007] **`useQuestionFeed.test.ts` changes:**
+[US-007] - New `describe('ended view and explanation state')` block with 7 tests covering every acceptance criterion: view defaults, selectedQuestionId defaults, all three action transitions, and reset behavior for both lifecycle actions
+[US-007] 
+[US-007] 57 tests pass across the full suite.
+[US-007] 
+[US-007] <promise>COMPLETE</promise>

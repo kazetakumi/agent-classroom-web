@@ -2,6 +2,53 @@
   "project": "AgentClassroom",
   "tasks": [
     {
+      "id": "FEAT-002",
+      "type": "feat",
+      "title": "Detailed Results View \u2014 ticket grid and per-question explanation screen",
+      "status": "inprogress",
+      "blocked": [],
+      "children": [
+        {
+          "id": "US-006",
+          "type": "user-story",
+          "title": "Explanations data file",
+          "status": "done",
+          "blocked": [],
+          "children": []
+        },
+        {
+          "id": "US-007",
+          "type": "user-story",
+          "title": "State machine extension (useQuestionFeed) \u2014 review and explanation views",
+          "status": "done",
+          "blocked": [],
+          "children": []
+        },
+        {
+          "id": "US-008",
+          "type": "user-story",
+          "title": "\"Review Questions\" button + Detailed Results grid",
+          "status": "todo",
+          "blocked": [
+            "US-007"
+          ],
+          "children": []
+        },
+        {
+          "id": "US-009",
+          "type": "user-story",
+          "title": "Explanation screen \u2014 per-question answer highlighting and explanation text",
+          "status": "todo",
+          "blocked": [
+            "US-006",
+            "US-007",
+            "US-008"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
       "id": "FEAT-001",
       "type": "feat",
       "title": "Agentic Classroom \u2014 JEE Revision Feed",
