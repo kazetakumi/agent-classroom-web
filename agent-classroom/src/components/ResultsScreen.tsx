@@ -4,6 +4,7 @@ interface Props {
   summary: SessionSummary
   onStartAgain: () => void
   onDone: () => void
+  onReviewQuestions?: () => void
 }
 
 function formatDuration(seconds: number): string {
@@ -12,7 +13,7 @@ function formatDuration(seconds: number): string {
   return `${m}m ${s}s`
 }
 
-export function ResultsScreen({ summary, onStartAgain, onDone }: Props) {
+export function ResultsScreen({ summary, onStartAgain, onDone, onReviewQuestions }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh', padding: '32px 24px', boxSizing: 'border-box' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '32px' }}>Session Complete</h1>
@@ -40,6 +41,14 @@ export function ResultsScreen({ summary, onStartAgain, onDone }: Props) {
       </div>
 
       <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {onReviewQuestions && (
+          <button
+            onClick={onReviewQuestions}
+            style={{ width: '100%', padding: '16px', borderRadius: '12px', border: 'none', background: '#7c3aed', color: '#fff', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}
+          >
+            Review Questions
+          </button>
+        )}
         <button
           onClick={onStartAgain}
           style={{ width: '100%', padding: '16px', borderRadius: '12px', border: 'none', background: '#2563eb', color: '#fff', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}

@@ -268,6 +268,16 @@ describe('useQuestionFeed', () => {
       expect(result.current.view).toBe('review')
     })
 
+    it('closeReview() sets view back to "summary"', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.endSession() })
+      act(() => { result.current.openReview() })
+      expect(result.current.view).toBe('review')
+      act(() => { result.current.closeReview() })
+      expect(result.current.view).toBe('summary')
+    })
+
     it('openExplanation(id) sets view to "explanation" and selectedQuestionId to the given id', () => {
       const { result } = renderHook(() => useQuestionFeed())
       act(() => { result.current.startSession() })

@@ -144,6 +144,11 @@ export function useQuestionFeed() {
     setState((prev) => ({ ...prev, view: 'review' }))
   }
 
+  function closeReview() {
+    if (state.status !== 'ended') return
+    setState((prev) => ({ ...prev, view: 'summary' }))
+  }
+
   function openExplanation(questionId: string) {
     if (state.status !== 'ended') return
     setState((prev) => ({ ...prev, view: 'explanation', selectedQuestionId: questionId }))
@@ -182,6 +187,7 @@ export function useQuestionFeed() {
     resume,
     endSession,
     openReview,
+    closeReview,
     openExplanation,
     closeExplanation,
   }

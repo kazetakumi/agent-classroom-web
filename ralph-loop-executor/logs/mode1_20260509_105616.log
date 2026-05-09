@@ -29,3 +29,15 @@
 [US-007] 57 tests pass across the full suite.
 [US-007] 
 [US-007] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-09T11:00:57.046384 [US-008]
+────────────────────────────────────────────────────────────
+[US-008] All 70 tests pass and US-008.md is marked done. Here's a summary of what was built:
+[US-008] 
+[US-008] - **`ResultsScreen`** — added optional `onReviewQuestions` prop that renders a "Review Questions" button (purple) above the existing action buttons
+[US-008] - **`ReviewGrid`** (new) — displays one colour-coded tile per unique attended question (green=correct, red=wrong, grey=skipped), deduplicates by taking the last session record per questionId, each tile shows subject + outcome label and calls `onOpenExplanation(questionId)` on tap; a "Back" button calls `onBack`
+[US-008] - **`useQuestionFeed`** — added `closeReview()` to transition view from `'review'` back to `'summary'` (the missing state transition needed for the Back button)
+[US-008] - **`App.tsx`** — routes `view === 'review'` → `ReviewGrid`, `view === 'explanation'` → `null` (placeholder for US-009), `view === 'summary'` → `ResultsScreen` with the new Review Questions button wired to `feed.openReview()`
+[US-008] 
+[US-008] <promise>COMPLETE</promise>

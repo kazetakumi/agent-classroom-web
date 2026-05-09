@@ -3,6 +3,7 @@ import { QuestionCard } from './components/QuestionCard'
 import { SwipeLayer } from './components/SwipeLayer'
 import { CompanionSheet } from './components/CompanionSheet'
 import { ResultsScreen } from './components/ResultsScreen'
+import { ReviewGrid } from './components/ReviewGrid'
 import { useQuestionFeed } from './questionFeed/useQuestionFeed'
 import './App.css'
 
@@ -25,11 +26,25 @@ function App() {
   }
 
   if (feed.status === 'ended') {
+    if (feed.view === 'review') {
+      return (
+        <ReviewGrid
+          session={feed.session}
+          questions={feed.questions}
+          onBack={() => feed.closeReview()}
+          onOpenExplanation={(id) => feed.openExplanation(id)}
+        />
+      )
+    }
+    if (feed.view === 'explanation') {
+      return null
+    }
     return (
       <ResultsScreen
         summary={feed.summary!}
         onStartAgain={() => feed.startAgain()}
         onDone={() => feed.returnToIdle()}
+        onReviewQuestions={() => feed.openReview()}
       />
     )
   }

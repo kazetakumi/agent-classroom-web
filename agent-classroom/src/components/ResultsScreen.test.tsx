@@ -46,4 +46,30 @@ describe('ResultsScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Done' }))
     expect(onDone).toHaveBeenCalledOnce()
   })
+
+  it('renders a "Review Questions" button when onReviewQuestions is provided', () => {
+    render(
+      <ResultsScreen
+        summary={baseSummary}
+        onStartAgain={vi.fn()}
+        onDone={vi.fn()}
+        onReviewQuestions={vi.fn()}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Review Questions' })).toBeInTheDocument()
+  })
+
+  it('calls onReviewQuestions when "Review Questions" button is pressed', () => {
+    const onReviewQuestions = vi.fn()
+    render(
+      <ResultsScreen
+        summary={baseSummary}
+        onStartAgain={vi.fn()}
+        onDone={vi.fn()}
+        onReviewQuestions={onReviewQuestions}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Review Questions' }))
+    expect(onReviewQuestions).toHaveBeenCalledOnce()
+  })
 })

@@ -28,7 +28,7 @@
           "id": "US-008",
           "type": "user-story",
           "title": "\"Review Questions\" button + Detailed Results grid",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-007"
           ],
