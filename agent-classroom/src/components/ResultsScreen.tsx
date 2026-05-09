@@ -13,7 +13,7 @@ function formatDuration(seconds: number): string {
   return `${m}m ${s}s`
 }
 
-export function ResultsScreen({ summary, onStartAgain, onDone, onReviewQuestions }: Props) {
+export function ResultsScreen({ summary, onStartAgain, onReviewQuestions }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh', padding: '32px 24px', boxSizing: 'border-box' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '32px' }}>Session Complete</h1>
