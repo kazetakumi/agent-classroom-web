@@ -30,7 +30,7 @@
           "id": "US-003",
           "type": "user-story",
           "title": "Swipe gestures \u2014 skip forward, go back, and infinite loop",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-002"
           ],

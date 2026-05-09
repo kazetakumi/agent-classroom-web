@@ -1,7 +1,13 @@
-import { describe, it, expect } from 'vitest'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useQuestionFeed } from './useQuestionFeed'
 import type { Question } from '../questionBank/questionBank'
+
+vi.mock('../questionBank/questionBank', () => ({
+  loadQuestions: vi.fn(),
+}))
+
+import { loadQuestions } from '../questionBank/questionBank'
 
 const mockQuestions: Question[] = [
   {
@@ -26,6 +32,10 @@ const mockQuestions: Question[] = [
     correctOption: 'C',
   },
 ]
+
+beforeEach(() => {
+  vi.mocked(loadQuestions).mockReturnValue([...mockQuestions])
+})
 
 describe('useQuestionFeed', () => {
   it('currentIndex increments by 1 after advance() is called', () => {
@@ -54,5 +64,49 @@ describe('useQuestionFeed', () => {
     expect(result.current.session[0]).toEqual({ questionId: 'q001', selectedOption: 'A' })
     expect(result.current.session[1]).toEqual({ questionId: 'q002', selectedOption: 'B' })
     expect(result.current.session[2]).toEqual({ questionId: 'q003', selectedOption: 'C' })
+  })
+
+  it('skip() records "skipped" for the current question and increments the index', () => {
+    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    act(() => { result.current.skip() })
+    expect(result.current.session).toHaveLength(1)
+    expect(result.current.session[0]).toEqual({ questionId: 'q001', selectedOption: 'skipped' })
+    expect(result.current.currentIndex).toBe(1)
+  })
+
+  it('goBack() decrements the index by 1', () => {
+    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    act(() => { result.current.advance() })
+    expect(result.current.currentIndex).toBe(1)
+    act(() => { result.current.goBack() })
+    expect(result.current.currentIndex).toBe(0)
+  })
+
+  it('goBack() at index 0 stays at 0 and does not go negative', () => {
+    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    expect(result.current.currentIndex).toBe(0)
+    act(() => { result.current.goBack() })
+    expect(result.current.currentIndex).toBe(0)
+  })
+
+  it('advancing past the last question wraps to index 0 with re-shuffled questions', () => {
+    const reshuffled: Question[] = [
+      { id: 'q003', subject: 'Math', question: 'Q3?', options: { A: 'A3', B: 'B3', C: 'C3', D: 'D3' }, correctOption: 'C' },
+      { id: 'q001', subject: 'Math', question: 'Q1?', options: { A: 'A1', B: 'B1', C: 'C1', D: 'D1' }, correctOption: 'A' },
+      { id: 'q002', subject: 'Math', question: 'Q2?', options: { A: 'A2', B: 'B2', C: 'C2', D: 'D2' }, correctOption: 'B' },
+    ]
+    vi.mocked(loadQuestions).mockReturnValueOnce(reshuffled)
+
+    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    act(() => { result.current.advance() }) // 0 → 1
+    act(() => { result.current.advance() }) // 1 → 2 (last)
+    act(() => { result.current.advance() }) // 2 → wrap → 0
+
+    expect(result.current.currentIndex).toBe(0)
+    expect(result.current.questions).toHaveLength(3)
+    expect(result.current.questions.map((q) => q.id)).toEqual(
+      expect.arrayContaining(['q001', 'q002', 'q003'])
+    )
+    expect(result.current.currentQuestion.id).toBe('q003')
   })
 })
