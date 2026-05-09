@@ -1,0 +1,144 @@
+{
+  "q001": {
+    "steps": [
+      "Step 1 — Identify the roots using Vieta's formulas. For x² − 5x + 6 = 0, the sum of the roots is α + β = 5 (the negative of the coefficient of x) and the product is αβ = 6 (the constant term).",
+      "Step 2 — Use the algebraic identity α² + β² = (α + β)² − 2αβ. This avoids finding the roots individually.",
+      "Step 3 — Substitute the known values: α² + β² = (5)² − 2(6) = 25 − 12 = 13.",
+      "Step 4 — The answer is 13, which matches option A."
+    ]
+  },
+  "q002": {
+    "steps": [
+      "Step 1 — Recall the standard limit: lim(x→0) sin(kx) / (kx) = 1 for any constant k. This is a fundamental trigonometric limit.",
+      "Step 2 — Rewrite the given expression to match this form: sin(3x) / (5x) = (3/5) · [sin(3x) / (3x)].",
+      "Step 3 — As x → 0, the bracket sin(3x) / (3x) → 1, so the whole expression approaches (3/5) · 1 = 3/5.",
+      "Step 4 — The answer is 3/5, which matches option B."
+    ]
+  },
+  "q003": {
+    "steps": [
+      "Step 1 — Write 75° as a sum of two standard angles: 75° = 45° + 30°.",
+      "Step 2 — Apply the sine addition formula: sin(A + B) = sin A cos B + cos A sin B.",
+      "Step 3 — Substitute: sin 75° = sin 45° cos 30° + cos 45° sin 30°. Using known exact values: sin 45° = cos 45° = √2/2, cos 30° = √3/2, sin 30° = 1/2.",
+      "Step 4 — Multiply out: sin 75° = (√2/2)(√3/2) + (√2/2)(1/2) = √6/4 + √2/4 = (√6 + √2)/4.",
+      "Step 5 — The answer is (√6 + √2)/4, which matches option A."
+    ]
+  },
+  "q004": {
+    "steps": [
+      "Step 1 — Write the general equation of a circle: x² + y² + Dx + Ey + F = 0.",
+      "Step 2 — Substitute (0, 0): 0 + 0 + 0 + 0 + F = 0, so F = 0.",
+      "Step 3 — Substitute (1, 0): 1 + 0 + D + 0 + 0 = 0, so D = −1.",
+      "Step 4 — Substitute (0, 1): 0 + 1 + 0 + E + 0 = 0, so E = −1.",
+      "Step 5 — Replace D, E, F into the general form: x² + y² − x − y = 0, which matches option A."
+    ]
+  },
+  "q005": {
+    "steps": [
+      "Step 1 — The Binomial Theorem states (1 + x)ⁿ = Σ C(n, r) xʳ. The coefficient of xʳ is C(n, r) = n! / (r! (n − r)!).",
+      "Step 2 — Here n = 8, r = 5. Calculate C(8, 5) = 8! / (5! · 3!).",
+      "Step 3 — Simplify: C(8, 5) = (8 × 7 × 6) / (3 × 2 × 1) = 336 / 6 = 56.",
+      "Step 4 — The coefficient of x⁵ is 56, which matches option B."
+    ]
+  },
+  "q006": {
+    "steps": [
+      "Step 1 — Recognize the pattern for ∫ eˣ [f(x) + f′(x)] dx = eˣ f(x) + C. This is a standard result derived from the product rule.",
+      "Step 2 — Match the integrand eˣ(x + 1) to the pattern: f(x) = x, f′(x) = 1, so f(x) + f′(x) = x + 1. ✓",
+      "Step 3 — Apply the formula directly: ∫ eˣ(x + 1) dx = x eˣ + C.",
+      "Step 4 — The answer is x eˣ + C, which matches option A."
+    ]
+  },
+  "q007": {
+    "steps": [
+      "Step 1 — For a 2×2 matrix A = [[a, b], [c, d]], the determinant is det(A) = ad − bc.",
+      "Step 2 — Identify the entries: a = 1, b = 2, c = 3, d = 4.",
+      "Step 3 — Calculate: det(A) = (1)(4) − (2)(3) = 4 − 6 = −2.",
+      "Step 4 — The answer is −2, which matches option C."
+    ]
+  },
+  "q008": {
+    "steps": [
+      "Step 1 — The dot product of two vectors a = a₁î + a₂ĵ and b = b₁î + b₂ĵ is a · b = a₁b₁ + a₂b₂.",
+      "Step 2 — Identify components: a = 2î + 3ĵ (so a₁ = 2, a₂ = 3) and b = î − ĵ (so b₁ = 1, b₂ = −1).",
+      "Step 3 — Compute: a · b = (2)(1) + (3)(−1) = 2 − 3 = −1.",
+      "Step 4 — The answer is −1, which matches option B."
+    ]
+  },
+  "q009": {
+    "steps": [
+      "Step 1 — A standard deck has 52 cards in total.",
+      "Step 2 — There are 4 kings in a deck (one per suit: hearts, diamonds, clubs, spades).",
+      "Step 3 — Probability = favourable outcomes / total outcomes = 4 / 52.",
+      "Step 4 — Simplify: 4/52 = 1/13.",
+      "Step 5 — The answer is 1/13, which matches option C."
+    ]
+  },
+  "q010": {
+    "steps": [
+      "Step 1 — The slope of the tangent to a curve y = f(x) at a point is given by the derivative f′(x).",
+      "Step 2 — Differentiate: if y = x³, then dy/dx = 3x².",
+      "Step 3 — Evaluate at x = 2: dy/dx = 3(2²) = 3 × 4 = 12.",
+      "Step 4 — The slope of the tangent is 12, which matches option C."
+    ]
+  },
+  "q011": {
+    "steps": [
+      "Step 1 — Rewrite using double-angle identities: 2sin²x = 1 − cos 2x and sin 2x = sin 2x.",
+      "Step 2 — Substitute into the equation: (1 − cos 2x) + sin 2x = 2, which simplifies to sin 2x − cos 2x = 1.",
+      "Step 3 — Write the left side in the form R sin(2x − π/4): sin 2x − cos 2x = √2 sin(2x − π/4). So √2 sin(2x − π/4) = 1, giving sin(2x − π/4) = 1/√2.",
+      "Step 4 — Solve: 2x − π/4 = π/4 or 2x − π/4 = 3π/4 (general solutions in the range that keeps x ∈ [0, π]).",
+      "Step 5 — From 2x − π/4 = π/4: 2x = π/2, x = π/4. From 2x − π/4 = 3π/4: 2x = π, x = π/2. Both lie in [0, π], giving 2 solutions.",
+      "Step 6 — The answer is 2, which matches option B."
+    ]
+  },
+  "q012": {
+    "steps": [
+      "Step 1 — The magnitude of a vector î + ĵ + k̂ is calculated using the formula |v| = √(v₁² + v₂² + v₃²).",
+      "Step 2 — Here v₁ = 1, v₂ = 1, v₃ = 1.",
+      "Step 3 — Compute: |a⃗| = √(1² + 1² + 1²) = √(1 + 1 + 1) = √3.",
+      "Step 4 — The answer is √3, which matches option C."
+    ]
+  },
+  "q013": {
+    "steps": [
+      "Step 1 — When two events A and B are independent, the probability of both occurring is P(A ∩ B) = P(A) × P(B).",
+      "Step 2 — Substitute the given values: P(A ∩ B) = (1/3) × (1/4).",
+      "Step 3 — Multiply the fractions: 1/3 × 1/4 = 1/12.",
+      "Step 4 — The answer is 1/12, which matches option B."
+    ]
+  },
+  "q014": {
+    "steps": [
+      "Step 1 — Rewrite the integrand using polynomial long division: x² / (1 + x) = x − 1 + 1/(1 + x). Verify: (x − 1)(1 + x) + 1 = x + x² − 1 − x + 1 = x². ✓",
+      "Step 2 — Split the integral: ∫₀¹ [x − 1 + 1/(1 + x)] dx = ∫₀¹ (x − 1) dx + ∫₀¹ 1/(1 + x) dx.",
+      "Step 3 — Evaluate the first part: [x²/2 − x]₀¹ = (1/2 − 1) − (0) = −1/2.",
+      "Step 4 — Evaluate the second part: [ln(1 + x)]₀¹ = ln 2 − ln 1 = ln 2.",
+      "Step 5 — Add the results: −1/2 + ln 2 = ln 2 − 1/2, which matches option A."
+    ]
+  },
+  "q015": {
+    "steps": [
+      "Step 1 — Differentiate f(x) = x³ − 3x² + 4 with respect to x using the power rule.",
+      "Step 2 — f′(x) = 3x² − 6x + 0 = 3x² − 6x.",
+      "Step 3 — Evaluate at x = 2: f′(2) = 3(2²) − 6(2) = 3(4) − 12 = 12 − 12 = 0.",
+      "Step 4 — The answer is 0, which matches option A."
+    ]
+  },
+  "q016": {
+    "steps": [
+      "Step 1 — Separate variables by rearranging: dy/y = dx/x.",
+      "Step 2 — Integrate both sides: ∫ dy/y = ∫ dx/x, giving ln|y| = ln|x| + C₀, where C₀ is the constant of integration.",
+      "Step 3 — Exponentiate both sides: |y| = e^(C₀) · |x|. Let C = ±e^(C₀) to absorb the absolute value, giving y = Cx.",
+      "Step 4 — The general solution is y = Cx, which matches option B."
+    ]
+  },
+  "q017": {
+    "steps": [
+      "Step 1 — Arranging n distinct objects in a row is a permutation problem. The number of arrangements is n! (n factorial).",
+      "Step 2 — There are 5 books, so we need 5! = 5 × 4 × 3 × 2 × 1.",
+      "Step 3 — Compute: 5 × 4 = 20, 20 × 3 = 60, 60 × 2 = 120, 120 × 1 = 120.",
+      "Step 4 — The answer is 120, which matches option C."
+    ]
+  }
+}
