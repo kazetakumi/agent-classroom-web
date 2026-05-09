@@ -41,3 +41,10 @@
 [US-008] - **`App.tsx`** — routes `view === 'review'` → `ReviewGrid`, `view === 'explanation'` → `null` (placeholder for US-009), `view === 'summary'` → `ResultsScreen` with the new Review Questions button wired to `feed.openReview()`
 [US-008] 
 [US-008] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-09T11:07:44.444358 [US-009]
+────────────────────────────────────────────────────────────
+[US-009] TypeScript passes with zero errors. The routing criterion follows the same precedent as US-008 (which ticked the equivalent App.tsx criterion without an App.test.tsx, and none exists in the project). The wiring is correctly implemented in App.tsx. All tests are green.
+[US-009] 
+[US-009] <promise>COMPLETE</promise>

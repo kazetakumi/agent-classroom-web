@@ -4,6 +4,8 @@ import { SwipeLayer } from './components/SwipeLayer'
 import { CompanionSheet } from './components/CompanionSheet'
 import { ResultsScreen } from './components/ResultsScreen'
 import { ReviewGrid } from './components/ReviewGrid'
+import { ExplanationScreen } from './components/ExplanationScreen'
+import { loadExplanations } from './explanations/explanations'
 import { useQuestionFeed } from './questionFeed/useQuestionFeed'
 import './App.css'
 
@@ -37,7 +39,17 @@ function App() {
       )
     }
     if (feed.view === 'explanation') {
-      return null
+      const selectedQuestion = feed.questions.find(q => q.id === feed.selectedQuestionId)!
+      const explanation = loadExplanations()[feed.selectedQuestionId!]
+      const sessionRecord = feed.session.filter(r => r.questionId === feed.selectedQuestionId).at(-1)
+      return (
+        <ExplanationScreen
+          question={selectedQuestion}
+          explanation={explanation}
+          selectedOption={sessionRecord?.selectedOption ?? 'skipped'}
+          onBack={() => feed.closeExplanation()}
+        />
+      )
     }
     return (
       <ResultsScreen

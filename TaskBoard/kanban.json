@@ -38,7 +38,7 @@
           "id": "US-009",
           "type": "user-story",
           "title": "Explanation screen \u2014 per-question answer highlighting and explanation text",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-006",
             "US-007",
