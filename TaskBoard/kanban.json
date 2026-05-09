@@ -50,7 +50,7 @@
           "id": "US-005",
           "type": "user-story",
           "title": "Results screen and full session lifecycle",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-004"
           ],

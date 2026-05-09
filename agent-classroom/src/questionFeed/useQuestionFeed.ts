@@ -7,12 +7,32 @@ export interface SessionRecord {
   selectedOption: string
 }
 
+export interface SessionSummary {
+  correct: number
+  wrong: number
+  skipped: number
+  totalAttempted: number
+  durationSeconds: number
+}
+
 interface FeedState {
   questions: Question[]
   currentIndex: number
   session: SessionRecord[]
-  status: 'active' | 'paused' | 'ended'
+  status: 'idle' | 'active' | 'paused' | 'ended'
+  sessionStartTime: number | null
   sessionEndTime: number | null
+  summary: SessionSummary | null
+}
+
+const IDLE_STATE: FeedState = {
+  questions: [],
+  currentIndex: 0,
+  session: [],
+  status: 'idle',
+  sessionStartTime: null,
+  sessionEndTime: null,
+  summary: null,
 }
 
 function nextStateWithAdvance(prev: FeedState): FeedState {
@@ -23,21 +43,54 @@ function nextStateWithAdvance(prev: FeedState): FeedState {
   return { ...prev, currentIndex: nextIndex }
 }
 
-export function useQuestionFeed(initialQuestions: Question[]) {
-  const [state, setState] = useState<FeedState>({
-    questions: initialQuestions,
-    currentIndex: 0,
-    session: [],
-    status: 'active',
-    sessionEndTime: null,
-  })
+function computeSummary(
+  questions: Question[],
+  session: SessionRecord[],
+  sessionStartTime: number | null,
+  endTime: number,
+): SessionSummary {
+  const recordMap = new Map(session.map((r) => [r.questionId, r]))
+  let correct = 0
+  let wrong = 0
+  let skipped = 0
+  for (const question of questions) {
+    const record = recordMap.get(question.id)
+    if (!record) {
+      skipped++
+    } else if (record.selectedOption === question.correctOption) {
+      correct++
+    } else {
+      wrong++
+    }
+  }
+  const durationSeconds = sessionStartTime
+    ? Math.round((endTime - sessionStartTime) / 1000)
+    : 0
+  return { correct, wrong, skipped, totalAttempted: correct + wrong + skipped, durationSeconds }
+}
+
+export function useQuestionFeed() {
+  const [state, setState] = useState<FeedState>(IDLE_STATE)
 
   const currentQuestion = state.questions[state.currentIndex]
+
+  function startSession() {
+    setState({ ...IDLE_STATE, questions: loadQuestions(), status: 'active' })
+  }
+
+  function startAgain() {
+    setState({ ...IDLE_STATE, questions: loadQuestions(), status: 'active' })
+  }
+
+  function returnToIdle() {
+    setState(IDLE_STATE)
+  }
 
   function submitAnswer(selectedOption: string) {
     if (state.status !== 'active') return
     setState((prev) => ({
       ...prev,
+      sessionStartTime: prev.sessionStartTime ?? Date.now(),
       session: [
         ...prev.session,
         { questionId: prev.questions[prev.currentIndex].id, selectedOption },
@@ -57,7 +110,11 @@ export function useQuestionFeed(initialQuestions: Question[]) {
         questionId: prev.questions[prev.currentIndex].id,
         selectedOption: 'skipped',
       }
-      return nextStateWithAdvance({ ...prev, session: [...prev.session, record] })
+      return nextStateWithAdvance({
+        ...prev,
+        sessionStartTime: prev.sessionStartTime ?? Date.now(),
+        session: [...prev.session, record],
+      })
     })
   }
 
@@ -78,7 +135,11 @@ export function useQuestionFeed(initialQuestions: Question[]) {
   }
 
   function endSession() {
-    setState((prev) => ({ ...prev, status: 'ended', sessionEndTime: Date.now() }))
+    setState((prev) => {
+      const endTime = Date.now()
+      const summary = computeSummary(prev.questions, prev.session, prev.sessionStartTime, endTime)
+      return { ...prev, status: 'ended', sessionEndTime: endTime, summary }
+    })
   }
 
   return {
@@ -87,6 +148,10 @@ export function useQuestionFeed(initialQuestions: Question[]) {
     questions: state.questions,
     session: state.session,
     status: state.status,
+    summary: state.summary,
+    startSession,
+    startAgain,
+    returnToIdle,
     submitAnswer,
     advance,
     skip,

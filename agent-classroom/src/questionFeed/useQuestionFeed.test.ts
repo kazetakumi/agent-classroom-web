@@ -38,22 +38,37 @@ beforeEach(() => {
 })
 
 describe('useQuestionFeed', () => {
+  it('starts in idle status', () => {
+    const { result } = renderHook(() => useQuestionFeed())
+    expect(result.current.status).toBe('idle')
+  })
+
+  it('startSession() transitions to active and loads questions', () => {
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
+    expect(result.current.status).toBe('active')
+    expect(result.current.questions).toHaveLength(3)
+  })
+
   it('currentIndex increments by 1 after advance() is called', () => {
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     expect(result.current.currentIndex).toBe(0)
     act(() => { result.current.advance() })
     expect(result.current.currentIndex).toBe(1)
   })
 
   it('submitAnswer appends a SessionRecord with the correct questionId and selectedOption', () => {
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     act(() => { result.current.submitAnswer('A') })
     expect(result.current.session).toHaveLength(1)
     expect(result.current.session[0]).toEqual({ questionId: 'q001', selectedOption: 'A' })
   })
 
   it('session accumulates one entry per answered question across multiple advances', () => {
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     act(() => { result.current.submitAnswer('A') })
     act(() => { result.current.advance() })
     act(() => { result.current.submitAnswer('B') })
@@ -67,7 +82,8 @@ describe('useQuestionFeed', () => {
   })
 
   it('skip() records "skipped" for the current question and increments the index', () => {
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     act(() => { result.current.skip() })
     expect(result.current.session).toHaveLength(1)
     expect(result.current.session[0]).toEqual({ questionId: 'q001', selectedOption: 'skipped' })
@@ -75,7 +91,8 @@ describe('useQuestionFeed', () => {
   })
 
   it('goBack() decrements the index by 1', () => {
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     act(() => { result.current.advance() })
     expect(result.current.currentIndex).toBe(1)
     act(() => { result.current.goBack() })
@@ -83,21 +100,24 @@ describe('useQuestionFeed', () => {
   })
 
   it('goBack() at index 0 stays at 0 and does not go negative', () => {
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     expect(result.current.currentIndex).toBe(0)
     act(() => { result.current.goBack() })
     expect(result.current.currentIndex).toBe(0)
   })
 
   it('pause() sets status to paused', () => {
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     expect(result.current.status).toBe('active')
     act(() => { result.current.pause() })
     expect(result.current.status).toBe('paused')
   })
 
   it('resume() sets status back to active', () => {
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     act(() => { result.current.pause() })
     expect(result.current.status).toBe('paused')
     act(() => { result.current.resume() })
@@ -105,7 +125,8 @@ describe('useQuestionFeed', () => {
   })
 
   it('skip() is a no-op when status is paused', () => {
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     act(() => { result.current.pause() })
     act(() => { result.current.skip() })
     expect(result.current.currentIndex).toBe(0)
@@ -113,7 +134,8 @@ describe('useQuestionFeed', () => {
   })
 
   it('endSession() sets status to ended', () => {
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     act(() => { result.current.endSession() })
     expect(result.current.status).toBe('ended')
   })
@@ -124,9 +146,13 @@ describe('useQuestionFeed', () => {
       { id: 'q001', subject: 'Math', question: 'Q1?', options: { A: 'A1', B: 'B1', C: 'C1', D: 'D1' }, correctOption: 'A' },
       { id: 'q002', subject: 'Math', question: 'Q2?', options: { A: 'A2', B: 'B2', C: 'C2', D: 'D2' }, correctOption: 'B' },
     ]
-    vi.mocked(loadQuestions).mockReturnValueOnce(reshuffled)
+    // First call for startSession, second call for the wrap-around reshuffle
+    vi.mocked(loadQuestions)
+      .mockReturnValueOnce([...mockQuestions])
+      .mockReturnValueOnce(reshuffled)
 
-    const { result } = renderHook(() => useQuestionFeed(mockQuestions))
+    const { result } = renderHook(() => useQuestionFeed())
+    act(() => { result.current.startSession() })
     act(() => { result.current.advance() }) // 0 → 1
     act(() => { result.current.advance() }) // 1 → 2 (last)
     act(() => { result.current.advance() }) // 2 → wrap → 0
@@ -137,5 +163,120 @@ describe('useQuestionFeed', () => {
       expect.arrayContaining(['q001', 'q002', 'q003'])
     )
     expect(result.current.currentQuestion.id).toBe('q003')
+  })
+
+  describe('session summary', () => {
+    it('summary.correct counts SessionRecord entries where selectedOption === question.correctOption', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      // q001 correctOption is 'A' — answer correctly
+      act(() => { result.current.submitAnswer('A') })
+      act(() => { result.current.advance() })
+      // q002 correctOption is 'B' — answer correctly
+      act(() => { result.current.submitAnswer('B') })
+      act(() => { result.current.advance() })
+      // q003 correctOption is 'C' — answer incorrectly
+      act(() => { result.current.submitAnswer('D') })
+      act(() => { result.current.endSession() })
+
+      expect(result.current.summary!.correct).toBe(2)
+    })
+
+    it('summary.wrong counts SessionRecord entries where selectedOption !== question.correctOption', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      // q001 — answer wrongly
+      act(() => { result.current.submitAnswer('B') })
+      act(() => { result.current.advance() })
+      // q002 — answer correctly
+      act(() => { result.current.submitAnswer('B') })
+      act(() => { result.current.advance() })
+      // q003 — skip (recorded as 'skipped', still a mismatch → wrong)
+      act(() => { result.current.skip() })
+      act(() => { result.current.endSession() })
+
+      expect(result.current.summary!.wrong).toBe(2)
+    })
+
+    it('summary.skipped counts questions in the bank that have no SessionRecord', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      // Only answer q001, leave q002 and q003 unrecorded
+      act(() => { result.current.submitAnswer('A') })
+      act(() => { result.current.endSession() })
+
+      expect(result.current.summary!.skipped).toBe(2)
+    })
+
+    it('summary.totalAttempted equals the sum of correct + wrong + skipped', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.submitAnswer('A') }) // correct
+      act(() => { result.current.advance() })
+      act(() => { result.current.submitAnswer('A') }) // wrong (q002 correctOption is B)
+      act(() => { result.current.endSession() })     // q003 has no record → skipped
+
+      const s = result.current.summary!
+      expect(s.totalAttempted).toBe(s.correct + s.wrong + s.skipped)
+      expect(s.totalAttempted).toBe(3)
+    })
+
+    it('endSession() from paused state produces a valid summary', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.submitAnswer('A') })
+      act(() => { result.current.pause() })
+      act(() => { result.current.endSession() })
+
+      expect(result.current.status).toBe('ended')
+      expect(result.current.summary).not.toBeNull()
+    })
+  })
+
+  describe('lifecycle transitions', () => {
+    it('startAgain() from ended resets session, index, and summary and returns to active', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.submitAnswer('A') })
+      act(() => { result.current.endSession() })
+
+      expect(result.current.status).toBe('ended')
+
+      act(() => { result.current.startAgain() })
+
+      expect(result.current.status).toBe('active')
+      expect(result.current.session).toHaveLength(0)
+      expect(result.current.currentIndex).toBe(0)
+      expect(result.current.summary).toBeNull()
+    })
+
+    it('returnToIdle() from ended resets to idle with empty session and no summary', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      act(() => { result.current.startSession() })
+      act(() => { result.current.submitAnswer('A') })
+      act(() => { result.current.endSession() })
+      act(() => { result.current.returnToIdle() })
+
+      expect(result.current.status).toBe('idle')
+      expect(result.current.session).toHaveLength(0)
+      expect(result.current.summary).toBeNull()
+    })
+
+    it('completes the full state machine loop: idle → active → ended → idle → active', () => {
+      const { result } = renderHook(() => useQuestionFeed())
+      expect(result.current.status).toBe('idle')
+
+      act(() => { result.current.startSession() })
+      expect(result.current.status).toBe('active')
+
+      act(() => { result.current.endSession() })
+      expect(result.current.status).toBe('ended')
+
+      act(() => { result.current.returnToIdle() })
+      expect(result.current.status).toBe('idle')
+
+      act(() => { result.current.startSession() })
+      expect(result.current.status).toBe('active')
+    })
   })
 })

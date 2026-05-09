@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { loadQuestions } from './questionBank/questionBank'
 import { QuestionCard } from './components/QuestionCard'
 import { SwipeLayer } from './components/SwipeLayer'
 import { CompanionSheet } from './components/CompanionSheet'
@@ -8,12 +7,31 @@ import { useQuestionFeed } from './questionFeed/useQuestionFeed'
 import './App.css'
 
 function App() {
-  const [questions] = useState(() => loadQuestions())
-  const feed = useQuestionFeed(questions)
+  const feed = useQuestionFeed()
   const [sheetOpen, setSheetOpen] = useState(false)
 
+  if (feed.status === 'idle') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh', gap: '16px' }}>
+        <h1>Agent Classroom</h1>
+        <button
+          onClick={() => feed.startSession()}
+          style={{ padding: '16px 32px', borderRadius: '12px', border: 'none', background: '#2563eb', color: '#fff', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}
+        >
+          Start Revision
+        </button>
+      </div>
+    )
+  }
+
   if (feed.status === 'ended') {
-    return <ResultsScreen />
+    return (
+      <ResultsScreen
+        summary={feed.summary!}
+        onStartAgain={() => feed.startAgain()}
+        onDone={() => feed.returnToIdle()}
+      />
+    )
   }
 
   const isPaused = feed.status === 'paused'
