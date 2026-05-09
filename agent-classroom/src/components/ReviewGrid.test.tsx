@@ -78,7 +78,7 @@ describe('ReviewGrid', () => {
     expect(screen.getByTestId('result-tile-q001')).toBeInTheDocument()
   })
 
-  it('correct tile displays subject and "Correct" label', () => {
+  it('correct tile displays question number and "Correct" label', () => {
     render(
       <ReviewGrid
         session={session}
@@ -88,11 +88,11 @@ describe('ReviewGrid', () => {
       />,
     )
     const tile = screen.getByTestId('result-tile-q001')
-    expect(tile).toHaveTextContent('Math')
+    expect(tile).toHaveTextContent('Q1')
     expect(tile).toHaveTextContent('Correct')
   })
 
-  it('wrong tile displays subject and "Wrong" label', () => {
+  it('wrong tile displays question number and "Wrong" label', () => {
     render(
       <ReviewGrid
         session={session}
@@ -102,11 +102,11 @@ describe('ReviewGrid', () => {
       />,
     )
     const tile = screen.getByTestId('result-tile-q002')
-    expect(tile).toHaveTextContent('Physics')
+    expect(tile).toHaveTextContent('Q2')
     expect(tile).toHaveTextContent('Wrong')
   })
 
-  it('skipped tile displays subject and "Skipped" label', () => {
+  it('skipped tile displays question number and "Skipped" label', () => {
     render(
       <ReviewGrid
         session={session}
@@ -116,7 +116,7 @@ describe('ReviewGrid', () => {
       />,
     )
     const tile = screen.getByTestId('result-tile-q003')
-    expect(tile).toHaveTextContent('Chemistry')
+    expect(tile).toHaveTextContent('Q3')
     expect(tile).toHaveTextContent('Skipped')
   })
 
@@ -143,7 +143,7 @@ describe('ReviewGrid', () => {
         onOpenExplanation={vi.fn()}
       />,
     )
-    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument()
   })
 
   it('clicking "Back" calls onBack', () => {
@@ -156,7 +156,7 @@ describe('ReviewGrid', () => {
         onOpenExplanation={vi.fn()}
       />,
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+    fireEvent.click(screen.getByRole('button', { name: /back/i }))
     expect(onBack).toHaveBeenCalledOnce()
   })
 
@@ -170,5 +170,83 @@ describe('ReviewGrid', () => {
       />,
     )
     expect(screen.queryAllByTestId(/^result-tile-/)).toHaveLength(0)
+  })
+
+  describe('filter', () => {
+    it('renders All / Correct / Incorrect / Skipped filter buttons', () => {
+      render(
+        <ReviewGrid
+          session={session}
+          questions={questions}
+          onBack={vi.fn()}
+          onOpenExplanation={vi.fn()}
+        />,
+      )
+      expect(screen.getByTestId('filter-all')).toBeInTheDocument()
+      expect(screen.getByTestId('filter-correct')).toBeInTheDocument()
+      expect(screen.getByTestId('filter-wrong')).toBeInTheDocument()
+      expect(screen.getByTestId('filter-skipped')).toBeInTheDocument()
+    })
+
+    it('filtering by Correct shows only correct tiles', () => {
+      render(
+        <ReviewGrid
+          session={session}
+          questions={questions}
+          onBack={vi.fn()}
+          onOpenExplanation={vi.fn()}
+        />,
+      )
+      fireEvent.click(screen.getByTestId('filter-correct'))
+      expect(screen.getByTestId('result-tile-q001')).toBeInTheDocument()
+      expect(screen.queryByTestId('result-tile-q002')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('result-tile-q003')).not.toBeInTheDocument()
+    })
+
+    it('filtering by Incorrect shows only wrong tiles', () => {
+      render(
+        <ReviewGrid
+          session={session}
+          questions={questions}
+          onBack={vi.fn()}
+          onOpenExplanation={vi.fn()}
+        />,
+      )
+      fireEvent.click(screen.getByTestId('filter-wrong'))
+      expect(screen.queryByTestId('result-tile-q001')).not.toBeInTheDocument()
+      expect(screen.getByTestId('result-tile-q002')).toBeInTheDocument()
+      expect(screen.queryByTestId('result-tile-q003')).not.toBeInTheDocument()
+    })
+
+    it('filtering by Skipped shows only skipped tiles', () => {
+      render(
+        <ReviewGrid
+          session={session}
+          questions={questions}
+          onBack={vi.fn()}
+          onOpenExplanation={vi.fn()}
+        />,
+      )
+      fireEvent.click(screen.getByTestId('filter-skipped'))
+      expect(screen.queryByTestId('result-tile-q001')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('result-tile-q002')).not.toBeInTheDocument()
+      expect(screen.getByTestId('result-tile-q003')).toBeInTheDocument()
+    })
+
+    it('switching back to All restores all tiles', () => {
+      render(
+        <ReviewGrid
+          session={session}
+          questions={questions}
+          onBack={vi.fn()}
+          onOpenExplanation={vi.fn()}
+        />,
+      )
+      fireEvent.click(screen.getByTestId('filter-correct'))
+      fireEvent.click(screen.getByTestId('filter-all'))
+      expect(screen.getByTestId('result-tile-q001')).toBeInTheDocument()
+      expect(screen.getByTestId('result-tile-q002')).toBeInTheDocument()
+      expect(screen.getByTestId('result-tile-q003')).toBeInTheDocument()
+    })
   })
 })

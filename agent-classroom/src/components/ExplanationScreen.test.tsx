@@ -17,7 +17,7 @@ const explanation: Explanation = {
 }
 
 describe('ExplanationScreen', () => {
-  it('renders the question subject as a heading', () => {
+  it('does not render the subject heading', () => {
     render(
       <ExplanationScreen
         question={question}
@@ -26,7 +26,19 @@ describe('ExplanationScreen', () => {
         onBack={vi.fn()}
       />,
     )
-    expect(screen.getByText('Mathematics')).toBeInTheDocument()
+    expect(screen.queryByText('Mathematics')).not.toBeInTheDocument()
+  })
+
+  it('renders the question number', () => {
+    render(
+      <ExplanationScreen
+        question={question}
+        explanation={explanation}
+        selectedOption="A"
+        onBack={vi.fn()}
+      />,
+    )
+    expect(screen.getByText('Q1')).toBeInTheDocument()
   })
 
   it('renders the question text', () => {
@@ -93,6 +105,46 @@ describe('ExplanationScreen', () => {
     expect(screen.getByTestId('option-D')).not.toHaveAttribute('data-state')
   })
 
+  it('wrong answer: shows "Your answer" badge on selected and "Correct answer" badge on correct', () => {
+    render(
+      <ExplanationScreen
+        question={question}
+        explanation={explanation}
+        selectedOption="A"
+        onBack={vi.fn()}
+      />,
+    )
+    expect(screen.getByTestId('badge-selected-A')).toHaveTextContent('Your answer')
+    expect(screen.getByTestId('badge-correct-B')).toHaveTextContent('Correct answer')
+  })
+
+  it('correct answer: shows "Correct answer" and "Your answer" badges on the same option', () => {
+    render(
+      <ExplanationScreen
+        question={question}
+        explanation={explanation}
+        selectedOption="B"
+        onBack={vi.fn()}
+      />,
+    )
+    expect(screen.getByTestId('badge-correct-B')).toHaveTextContent('Correct answer')
+    expect(screen.getByTestId('badge-selected-B')).toHaveTextContent('Your answer')
+    expect(screen.queryByTestId('badge-selected-A')).not.toBeInTheDocument()
+  })
+
+  it('skipped: only "Correct answer" badge shown, no "Your answer" badge', () => {
+    render(
+      <ExplanationScreen
+        question={question}
+        explanation={explanation}
+        selectedOption="skipped"
+        onBack={vi.fn()}
+      />,
+    )
+    expect(screen.getByTestId('badge-correct-B')).toHaveTextContent('Correct answer')
+    expect(screen.queryByText('Your answer')).not.toBeInTheDocument()
+  })
+
   it('when student answered correctly, only correct option has data-state, no wrong marker', () => {
     render(
       <ExplanationScreen
@@ -146,7 +198,7 @@ describe('ExplanationScreen', () => {
         onBack={onBack}
       />,
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+    fireEvent.click(screen.getByRole('button', { name: /back/i }))
     expect(onBack).toHaveBeenCalledOnce()
   })
 })

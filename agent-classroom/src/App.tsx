@@ -55,7 +55,6 @@ function App() {
       <ResultsScreen
         summary={feed.summary!}
         onStartAgain={() => feed.startAgain()}
-        onDone={() => feed.returnToIdle()}
         onReviewQuestions={() => feed.openReview()}
       />
     )

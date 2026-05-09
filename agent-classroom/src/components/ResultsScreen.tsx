@@ -3,7 +3,7 @@ import type { SessionSummary } from '../questionFeed/useQuestionFeed'
 interface Props {
   summary: SessionSummary
   onStartAgain: () => void
-  onDone: () => void
+  onDone?: () => void
   onReviewQuestions?: () => void
 }
 
@@ -54,12 +54,6 @@ export function ResultsScreen({ summary, onStartAgain, onDone, onReviewQuestions
           style={{ width: '100%', padding: '16px', borderRadius: '12px', border: 'none', background: '#2563eb', color: '#fff', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}
         >
           Start Again
-        </button>
-        <button
-          onClick={onDone}
-          style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #d1d5db', background: '#fff', color: '#374151', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}
-        >
-          Done
         </button>
       </div>
     </div>
