@@ -173,7 +173,7 @@ describe('ReviewGrid', () => {
   })
 
   describe('filter', () => {
-    it('renders All / Correct / Incorrect / Skipped filter buttons', () => {
+    it('renders All / Correct / Wrong / Skipped filter buttons', () => {
       render(
         <ReviewGrid
           session={session}
