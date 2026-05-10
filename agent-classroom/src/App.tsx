@@ -15,14 +15,25 @@ function App() {
 
   if (feed.status === 'idle') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh', gap: '16px' }}>
-        <h1>Agent Classroom</h1>
-        <button
-          onClick={() => feed.startSession()}
-          style={{ padding: '16px 32px', borderRadius: '12px', border: 'none', background: '#2563eb', color: '#fff', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}
-        >
+      <div className="idle-screen">
+        <span className="idle-chip" data-testid="idle-chip">Mathematics</span>
+        <h1 className="idle-headline">
+          Your next<br />
+          <em>revision</em><br />
+          session.
+        </h1>
+        <p className="idle-sub">
+          17 questions, randomised order. Swipe right to skip, left to go back.
+        </p>
+        <div className="idle-meta">
+          <span>📚 17 questions</span>
+          <span>⏱ ~8 min</span>
+        </div>
+        <div className="idle-spacer" />
+        <button className="idle-cta" onClick={() => feed.startSession()}>
           Start Revision
         </button>
+        <p className="idle-hint">Swipe up anytime to pause</p>
       </div>
     )
   }
