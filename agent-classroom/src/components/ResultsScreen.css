@@ -1,0 +1,114 @@
+.results-screen {
+  padding: 28px 22px 24px;
+  text-align: center;
+}
+
+.results-eyebrow {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--terracotta);
+  margin-bottom: 6px;
+}
+
+.results-score-hero {
+  font-family: var(--display);
+  font-size: 88px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.results-score-denom {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.results-score-sub {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.results-rule {
+  width: 32px;
+  height: 1.5px;
+  background: var(--border);
+  margin: 0 auto 16px;
+  border: none;
+}
+
+.results-stats {
+  display: flex;
+  margin-bottom: 24px;
+}
+
+.results-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.results-stat + .results-stat {
+  border-left: 1px solid var(--border);
+}
+
+.results-stat-number {
+  font-family: var(--display);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.results-stat-number--correct { color: var(--correct); }
+.results-stat-number--wrong   { color: var(--wrong); }
+.results-stat-number--skipped { color: var(--text-muted); }
+
+.results-stat-label {
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.results-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.results-btn-primary {
+  width: 100%;
+  padding: 11px;
+  border-radius: 6px;
+  border: none;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.results-btn-ghost {
+  width: 100%;
+  padding: 11px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+}

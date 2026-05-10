@@ -65,4 +65,14 @@ describe('ResultsScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Review Questions' }))
     expect(onReviewQuestions).toHaveBeenCalledOnce()
   })
+
+  it('renders with results-screen class', () => {
+    const { container } = render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()} />)
+    expect(container.querySelector('.results-screen')).toBeInTheDocument()
+  })
+
+  it('renders the score hero element', () => {
+    const { container } = render(<ResultsScreen summary={baseSummary} onStartAgain={vi.fn()} />)
+    expect(container.querySelector('.results-score-hero')).toBeInTheDocument()
+  })
 })

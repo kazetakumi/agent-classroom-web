@@ -1,4 +1,5 @@
 import type { SessionSummary } from '../questionFeed/useQuestionFeed'
+import './ResultsScreen.css'
 
 interface Props {
   summary: SessionSummary
@@ -15,44 +16,37 @@ function formatDuration(seconds: number): string {
 
 export function ResultsScreen({ summary, onStartAgain, onReviewQuestions }: Props) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh', padding: '32px 24px', boxSizing: 'border-box' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '32px' }}>Session Complete</h1>
+    <div className="screen results-screen">
+      <p className="results-eyebrow">Session Complete</p>
+      <div className="results-score-hero">{summary.correct}</div>
+      <p className="results-score-denom">out of {summary.totalAttempted}</p>
+      <p className="results-score-sub" data-testid="stat-duration">
+        correct answers · {formatDuration(summary.durationSeconds)}
+      </p>
+      <hr className="results-rule" />
 
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-        <div data-testid="stat-correct" style={{ flex: 1, padding: '16px', borderRadius: '12px', background: '#d1fae5', textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: '#065f46' }}>{summary.correct}</div>
-          <div style={{ fontSize: '0.875rem', color: '#065f46' }}>Correct</div>
+      <div className="results-stats">
+        <div className="results-stat" data-testid="stat-correct">
+          <span className="results-stat-number results-stat-number--correct">{summary.correct}</span>
+          <span className="results-stat-label">Correct</span>
         </div>
-        <div data-testid="stat-wrong" style={{ flex: 1, padding: '16px', borderRadius: '12px', background: '#fee2e2', textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: '#991b1b' }}>{summary.wrong}</div>
-          <div style={{ fontSize: '0.875rem', color: '#991b1b' }}>Wrong</div>
+        <div className="results-stat" data-testid="stat-wrong">
+          <span className="results-stat-number results-stat-number--wrong">{summary.wrong}</span>
+          <span className="results-stat-label">Wrong</span>
         </div>
-        <div data-testid="stat-skipped" style={{ flex: 1, padding: '16px', borderRadius: '12px', background: '#f3f4f6', textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: '#374151' }}>{summary.skipped}</div>
-          <div style={{ fontSize: '0.875rem', color: '#374151' }}>Skipped</div>
+        <div className="results-stat" data-testid="stat-skipped">
+          <span className="results-stat-number results-stat-number--skipped">{summary.skipped}</span>
+          <span className="results-stat-label">Skipped</span>
         </div>
       </div>
 
-      <div style={{ textAlign: 'center', marginBottom: '8px', color: '#6b7280' }}>
-        Total attempted: {summary.totalAttempted}
-      </div>
-      <div data-testid="stat-duration" style={{ textAlign: 'center', marginBottom: '32px', color: '#6b7280' }}>
-        {formatDuration(summary.durationSeconds)}
-      </div>
-
-      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div className="results-actions">
         {onReviewQuestions && (
-          <button
-            onClick={onReviewQuestions}
-            style={{ width: '100%', padding: '16px', borderRadius: '12px', border: 'none', background: '#7c3aed', color: '#fff', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}
-          >
+          <button className="results-btn-primary" onClick={onReviewQuestions}>
             Review Questions
           </button>
         )}
-        <button
-          onClick={onStartAgain}
-          style={{ width: '100%', padding: '16px', borderRadius: '12px', border: 'none', background: '#2563eb', color: '#fff', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}
-        >
+        <button className="results-btn-ghost" onClick={onStartAgain}>
           Start Again
         </button>
       </div>
