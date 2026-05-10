@@ -111,6 +111,8 @@ function App() {
             question={feed.currentQuestion}
             onAnswer={feed.submitAnswer}
             onAdvance={feed.advance}
+            currentIndex={feed.currentIndex}
+            totalQuestions={feed.questions.length}
           />
         </div>
       </SwipeLayer>

@@ -1,61 +1,108 @@
 .question-card {
-  display: flex;
-  flex-direction: column;
-  min-height: 100svh;
-  width: 100%;
-  max-width: 390px;
-  margin: 0 auto;
-  padding: 2rem 1.25rem 2rem;
-  box-sizing: border-box;
-  background: #0f0f1a;
-  color: #f5f5f5;
   overflow-x: hidden;
 }
 
-.question-text {
-  flex: 1;
-  font-size: 1.2rem;
-  line-height: 1.6;
-  margin: 0 0 2rem;
-  padding-top: 3rem;
+/* Progress section */
+.question-progress {
+  padding: 16px 20px 0;
 }
 
+.question-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.question-progress-track {
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.question-progress-fill {
+  height: 100%;
+  background: var(--terracotta);
+  border-radius: 1px;
+  transition: width 300ms ease;
+}
+
+/* Question text */
+.question-text {
+  font-family: var(--display);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+  padding: 0 20px 18px;
+  margin: 0;
+}
+
+/* Options */
 .options {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 8px;
+  padding: 4px 20px 20px;
 }
 
 .option-btn {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 10px;
   width: 100%;
-  padding: 1rem 1.25rem;
-  border: 1.5px solid #333;
-  border-radius: 12px;
-  background: #1a1a2e;
-  color: #f5f5f5;
-  font-size: 1rem;
-  text-align: left;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
   cursor: default;
   box-sizing: border-box;
+  text-align: left;
 }
 
 .option-label {
-  font-weight: 700;
-  min-width: 1.5rem;
-  color: #a78bfa;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--terracotta);
 }
 
 .option-text {
   flex: 1;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
 }
 
 .option-btn[data-state="selected"] {
-  border-color: #a78bfa;
-  background: #2d2b4e;
-  font-weight: 700;
+  border-color: var(--terracotta);
+  background: #fdf5f1;
+}
+
+.option-btn[data-state="selected"] .option-label {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  color: #fff;
+}
+
+.option-btn[data-state="selected"] .option-text {
+  color: var(--ink);
 }
 
 .option-btn:disabled {

@@ -6,9 +6,11 @@ interface Props {
   question: Question
   onAnswer: (selected: string) => void
   onAdvance: () => void
+  currentIndex: number
+  totalQuestions: number
 }
 
-export function QuestionCard({ question, onAnswer, onAdvance }: Props) {
+export function QuestionCard({ question, onAnswer, onAdvance, currentIndex, totalQuestions }: Props) {
   const labels = ['A', 'B', 'C', 'D'] as const
   const [selected, setSelected] = useState<string | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -36,8 +38,23 @@ export function QuestionCard({ question, onAnswer, onAdvance }: Props) {
     }, 1500)
   }
 
+  const progressPct = totalQuestions > 0 ? (currentIndex / totalQuestions) * 100 : 0
+
   return (
-    <div className="question-card">
+    <div className="screen question-card">
+      <div className="question-progress">
+        <div className="question-progress-meta" data-testid="progress-meta">
+          <span>{question.subject}</span>
+          <span>{currentIndex + 1} / {totalQuestions}</span>
+        </div>
+        <div className="question-progress-track">
+          <div
+            className="question-progress-fill"
+            data-testid="progress-rail"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+      </div>
       <p className="question-text">{question.question}</p>
       <div className="options">
         {labels.map((label) => (
