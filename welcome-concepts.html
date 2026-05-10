@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V2 Column — Begin Variations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 54px;
+      background: #111;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bar-left { display: flex; align-items: center; gap: 18px; }
+    .bar-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+    .btn-row { display: flex; gap: 3px; }
+    .cbtn {
+      background: transparent; border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px;
+      cursor: pointer; transition: all 0.14s;
+    }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+
+    /* ── Stage ── */
+    .stage {
+      padding-top: 76px; padding-bottom: 60px;
+      display: flex; justify-content: center; align-items: flex-start;
+      gap: 32px; min-height: 100vh;
+    }
+    .stage.single { gap: 0; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .col.hide { display: none; }
+    .col-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #888;
+    }
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09);
+    }
+    .info {
+      width: 390px; background: #1A1A1A;
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 18px;
+    }
+    .info-name {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.28); margin-bottom: 7px;
+    }
+    .info-desc { font-size: 12px; color: rgba(255,255,255,0.48); line-height: 1.6; margin-bottom: 10px; }
+    .pills { display: flex; gap: 5px; flex-wrap: wrap; }
+    .pill {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.09); border-radius: 3px; padding: 2px 7px;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       SHARED V2 COLUMN FOUNDATION
+       All three screens use this grid system.
+    ═══════════════════════════════════════════════ */
+
+    .screen {
+      background: #FFFFFF; height: 100%;
+      display: flex; flex-direction: column;
+    }
+
+    /* Top strip */
+    .top-strip {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .top-app {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .top-date {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D8D8D8;
+    }
+    .rule-h { height: 1px; background: #F0F0F0; margin: 20px 28px 0; flex-shrink: 0; }
+
+    /* Conversation turns — 3-column grid */
+    .transcript {
+      flex: 1; padding: 0 0 0;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      overflow: hidden;
+    }
+
+    .turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 20px 28px 0;
+    }
+    .turn:first-child { padding-top: 24px; }
+
+    .lbl-col {
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-top: 3px;
+    }
+    .lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .rule-v { background: #EFEFEF; width: 1px; }
+    .speech-col { }
+    .speech {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 300; line-height: 1.55; color: #111;
+    }
+
+    /* Session key-value in right col */
+    .session-list { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+    .session-row { display: flex; align-items: baseline; gap: 10px; }
+    .session-key {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+      letter-spacing: 0.08em; text-transform: uppercase; color: #D0D0D0;
+      min-width: 66px; flex-shrink: 0;
+    }
+    .session-val {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 17px; color: #666;
+    }
+
+    /* Redirect chips */
+    .chips-row {
+      padding: 12px 28px 10px;
+      display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0;
+    }
+    .chip {
+      background: transparent; border: 1px solid #EAEAEA; border-radius: 3px;
+      font-family: 'DM Sans', sans-serif; font-size: 11px; color: #AAAAAA;
+      padding: 5px 11px; cursor: pointer; white-space: nowrap; transition: all 0.12s;
+    }
+    .chip:hover { border-color: #999; color: #111; }
+
+    /* User input — continues the column grid */
+    .input-zone {
+      border-top: 1px solid #F2F2F2; flex-shrink: 0;
+      padding: 14px 0 34px;
+    }
+    .input-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 0 28px;
+      align-items: flex-start;
+    }
+    .you-col { display: flex; justify-content: flex-end; padding-top: 5px; }
+    .you-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .input-v { background: #EFEFEF; width: 1px; }
+    .ta-col { display: flex; flex-direction: column; gap: 6px; }
+    .ta {
+      background: transparent; border: none; border-bottom: 1px solid #EBEBEB;
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 19px; font-weight: 300; color: #111;
+      padding: 4px 0; outline: none; resize: none;
+      line-height: 1.4; min-height: 32px; overflow: hidden; width: 100%;
+    }
+    .ta::placeholder { color: #D4D4D4; }
+    .ta:focus { border-bottom-color: #AAA; }
+    .send-row { display: flex; justify-content: flex-end; }
+    .send-btn {
+      background: transparent; border: none; cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+      letter-spacing: 0.1em; text-transform: uppercase; color: #CCCCCC;
+      transition: color 0.14s;
+    }
+    .send-btn:hover { color: #111; }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION A — STAMP
+       "Begin" is a bordered rectangle that lives in
+       the right column — visually a pressable object,
+       like a rubber stamp or a formal chit. The border
+       makes it tactile without using any colour.
+       The left column shows "·" — a neutral mark that
+       says "this is a system moment, not speech."
+    ═══════════════════════════════════════════════ */
+
+    .stamp-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 20px 28px 0;
+    }
+    .stamp-lbl-col {
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-top: 14px;
+    }
+    .stamp-dot {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 16px; color: #E0E0E0; line-height: 1;
+    }
+    .stamp-rule-v { background: #EFEFEF; width: 1px; }
+    .stamp-col { }
+    .stamp-btn {
+      width: 100%; border: 1.5px solid #222;
+      background: transparent; cursor: pointer;
+      padding: 14px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.15s;
+    }
+    .stamp-btn:hover { background: #111; }
+    .stamp-btn:hover .stamp-text { color: #FFF; }
+    .stamp-btn:hover .stamp-arrow { color: rgba(255,255,255,0.5); }
+    .stamp-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #111; transition: color 0.15s;
+    }
+    .stamp-arrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px; color: #BDBDBD; transition: color 0.15s;
+    }
+    .stamp-session-hint {
+      margin-top: 8px;
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 14px; color: #C8C8C8; line-height: 1.5;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION B — BREAK
+       The two-column grid collapses for the begin
+       action. A full-width section appears below the
+       conversation — a structural break that signals
+       "you've left the dialogue, now act." The left
+       column disappears; the action occupies the
+       whole width. Clear visual mode shift.
+    ═══════════════════════════════════════════════ */
+
+    .break-section {
+      flex-shrink: 0;
+      margin: 20px 0 0;
+    }
+
+    .break-divider {
+      display: flex; align-items: center; gap: 0;
+      padding: 0 28px;
+    }
+    .break-line { flex: 1; height: 1px; background: #EFEFEF; }
+    .break-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #D4D4D4; padding: 0 12px;
+    }
+
+    .break-action {
+      padding: 18px 28px 0;
+    }
+    .break-session-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 300; color: #111;
+      margin-bottom: 4px;
+    }
+    .break-session-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; color: #C8C8C8; letter-spacing: 0.06em;
+      margin-bottom: 16px;
+    }
+    .break-btn {
+      width: 100%; background: #111; color: #FFF; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+      padding: 16px 22px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      letter-spacing: 0.02em; transition: background 0.14s;
+    }
+    .break-btn:hover { background: #333; }
+    .break-btn-arrow { opacity: 0.45; font-size: 18px; }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION C — INVERSION
+       The begin block is the only dark element on
+       screen. Everything else is white and light;
+       this one row inverts — dark background, white
+       text — making it immediately legible as the
+       primary action. It lives inside the column grid
+       but its background "bleeds" edge to edge.
+       Impossible to miss. Impossible to confuse.
+    ═══════════════════════════════════════════════ */
+
+    .invert-row {
+      margin-top: 20px;
+      flex-shrink: 0;
+    }
+
+    .invert-block {
+      background: #111;
+      padding: 22px 28px;
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .invert-block:hover { background: #1E1E1E; }
+
+    .invert-lbl-col {
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-top: 3px;
+    }
+    .invert-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+    .invert-rule-v { background: rgba(255,255,255,0.1); width: 1px; }
+    .invert-content { }
+    .invert-session {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); margin-bottom: 6px;
+    }
+    .invert-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 300; color: #FFFFFF;
+      line-height: 1.3; margin-bottom: 14px;
+    }
+    .invert-cta-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .invert-cta-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+    .invert-cta-arrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 18px; color: rgba(255,255,255,0.3);
+    }
+
+    /* ── B-specific redirect (replaces chips + column input) ── */
+    .b-redirect {
+      padding: 0 28px 40px;
+      flex-shrink: 0;
+    }
+    .b-redirect-inner {
+      display: flex; align-items: flex-end; gap: 12px;
+      border-top: 1px solid #F2F2F2;
+      padding-top: 18px;
+    }
+    .b-redirect-ta {
+      flex: 1; background: transparent; border: none;
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 18px; font-weight: 300; color: #111;
+      outline: none; resize: none; line-height: 1.55;
+      min-height: 28px; overflow: hidden;
+    }
+    .b-redirect-ta::placeholder { color: #CFCFCF; }
+    .b-redirect-ta:focus { border: none; outline: none; }
+    .b-redirect-send {
+      background: transparent; border: none; cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 16px; color: #D4D4D4; padding: 2px;
+      transition: color 0.14s; flex-shrink: 0; line-height: 1;
+    }
+    .b-redirect-send:hover { color: #111; }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Bar ── -->
+<div class="bar">
+  <div class="bar-left">
+    <span class="bar-title">V2 Column — Begin Variations</span>
+    <div class="bar-sep"></div>
+    <div class="btn-row" id="viewBtns">
+      <button class="cbtn on" data-v="all">All 3</button>
+      <button class="cbtn" data-v="a">Stamp</button>
+      <button class="cbtn" data-v="b">Break</button>
+      <button class="cbtn" data-v="c">Inversion</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Stage ── -->
+<div class="stage" id="stage">
+
+
+  <!-- ══ A: STAMP ══ -->
+  <div class="col" id="col-a">
+    <span class="col-label">A — Stamp</span>
+    <div class="phone">
+      <div class="screen">
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-date">10 May</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="transcript">
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Good morning, Kaze. I've prepared something for you today.</div>
+            </div>
+          </div>
+
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Here's your session —</div>
+              <div class="session-list">
+                <div class="session-row">
+                  <span class="session-key">Topic</span>
+                  <span class="session-val">Calculus Foundations</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Questions</span>
+                  <span class="session-val">12 · Level A2</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Duration</span>
+                  <span class="session-val">~9 minutes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Ready when you are.</div>
+            </div>
+          </div>
+
+          <!-- Stamp CTA — left col gets a neutral dot -->
+          <div class="stamp-turn">
+            <div class="stamp-lbl-col">
+              <span class="stamp-dot">·</span>
+            </div>
+            <div class="stamp-rule-v"></div>
+            <div class="stamp-col">
+              <button class="stamp-btn">
+                <span class="stamp-text">Begin Session</span>
+                <span class="stamp-arrow">↗</span>
+              </button>
+              <div class="stamp-session-hint">Calculus Foundations · 12 questions</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chips-row">
+          <button class="chip">Make it shorter</button>
+          <button class="chip">Something easier</button>
+          <button class="chip">Different topic</button>
+        </div>
+
+        <div class="input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="Tell Sage what you'd prefer…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">A — Stamp</div>
+      <div class="info-desc">The begin action is a bordered rectangle in the right column — like a rubber stamp or a formal chit you sign. The left column shows a neutral "·" instead of a speaker label, signalling a system moment. Hover fills it dark. The border alone makes it clearly pressable without colour.</div>
+      <div class="pills">
+        <span class="pill">1.5px border</span>
+        <span class="pill">Neutral dot label</span>
+        <span class="pill">Fills on hover</span>
+        <span class="pill">Inside the grid</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ B: BREAK ══ -->
+  <div class="col" id="col-b">
+    <span class="col-label">B — Break</span>
+    <div class="phone">
+      <div class="screen">
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-date">10 May</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="transcript">
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Good morning, Kaze. I've prepared something for you today.</div>
+            </div>
+          </div>
+
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Here's your session —</div>
+              <div class="session-list">
+                <div class="session-row">
+                  <span class="session-key">Topic</span>
+                  <span class="session-val">Calculus Foundations</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Questions</span>
+                  <span class="session-val">12 · Level A2</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Duration</span>
+                  <span class="session-val">~9 minutes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Ready when you are.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid collapses — full-width action zone -->
+        <div class="break-section">
+          <div class="break-divider">
+            <div class="break-line"></div>
+            <span class="break-label">Your move</span>
+            <div class="break-line"></div>
+          </div>
+          <div class="break-action">
+            <div class="break-session-name">Calculus Foundations</div>
+            <div class="break-session-meta">12 questions · ~9 min · Level A2</div>
+            <button class="break-btn">
+              Begin this session
+              <span class="break-btn-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="b-redirect">
+          <div class="b-redirect-inner">
+            <textarea class="b-redirect-ta" placeholder="Or tell Sage something different…" rows="1"></textarea>
+            <button class="b-redirect-send">↑</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">B — Break</div>
+      <div class="info-desc">The two-column grid deliberately collapses at the action point. A centred label "Your move" marks the transition from dialogue to decision. Below it, the session name and a full-width dark button occupy the entire width — the structural change signals "you've left conversation mode." Clear mode shift.</div>
+      <div class="pills">
+        <span class="pill">Grid collapses</span>
+        <span class="pill">"Your move" marker</span>
+        <span class="pill">Full-width button</span>
+        <span class="pill">Mode shift UX</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ C: INVERSION ══ -->
+  <div class="col" id="col-c">
+    <span class="col-label">C — Inversion</span>
+    <div class="phone">
+      <div class="screen">
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-date">10 May</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="transcript">
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Good morning, Kaze. I've prepared something for you today.</div>
+            </div>
+          </div>
+
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Here's your session —</div>
+              <div class="session-list">
+                <div class="session-row">
+                  <span class="session-key">Topic</span>
+                  <span class="session-val">Calculus Foundations</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Questions</span>
+                  <span class="session-val">12 · Level A2</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Duration</span>
+                  <span class="session-val">~9 minutes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Ready when you are.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inverted begin block — bleeds full width, keeps column grid inside -->
+        <div class="invert-row">
+          <div class="invert-block">
+            <div class="invert-lbl-col">
+              <span class="invert-lbl">Begin</span>
+            </div>
+            <div class="invert-rule-v"></div>
+            <div class="invert-content">
+              <div class="invert-session">Ready for you</div>
+              <div class="invert-title">Calculus<br>Foundations</div>
+              <div class="invert-cta-row">
+                <span class="invert-cta-text">Tap to start</span>
+                <span class="invert-cta-arrow">→</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chips-row" style="margin-top: 10px;">
+          <button class="chip">Make it shorter</button>
+          <button class="chip">Something easier</button>
+          <button class="chip">Different topic</button>
+        </div>
+
+        <div class="input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="Tell Sage what you'd prefer…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">C — Inversion</div>
+      <div class="info-desc">The entire screen is white — except this one block. The dark begin section bleeds edge to edge but preserves the column grid inside it: "Begin" in the left label column, session name and tap-to-start in the right. The inversion alone communicates action. One dark thing on a white screen. Unmissable.</div>
+      <div class="pills">
+        <span class="pill">Full-bleed dark block</span>
+        <span class="pill">Grid preserved inside</span>
+        <span class="pill">"Begin" as label</span>
+        <span class="pill">Single contrast moment</span>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<script>
+  const btns = document.querySelectorAll('#viewBtns .cbtn');
+  const stage = document.getElementById('stage');
+  const colMap = { a: 'col-a', b: 'col-b', c: 'col-c' };
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      const v = btn.dataset.v;
+      if (v === 'all') {
+        stage.classList.remove('single');
+        Object.values(colMap).forEach(id => document.getElementById(id).classList.remove('hide'));
+      } else {
+        stage.classList.add('single');
+        Object.entries(colMap).forEach(([k, id]) => {
+          document.getElementById(id).classList.toggle('hide', k !== v);
+        });
+      }
+    });
+  });
+
+  document.querySelectorAll('textarea').forEach(ta => {
+    ta.addEventListener('input', () => {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    });
+  });
+</script>
+</body>
+</html>
