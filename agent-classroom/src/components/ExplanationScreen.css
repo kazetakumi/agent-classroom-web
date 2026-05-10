@@ -1,0 +1,147 @@
+.explanation-screen {
+  overflow: hidden;
+}
+
+/* Header */
+.explanation-header {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.explanation-back {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 4px;
+}
+
+.explanation-meta {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--terracotta);
+  margin-bottom: 6px;
+}
+
+.explanation-question {
+  font-family: var(--display);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* Options */
+.explanation-options {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.explanation-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+}
+
+.explanation-option[data-state="correct"] {
+  border-color: var(--correct);
+  background: var(--correct-bg);
+  color: var(--correct);
+}
+
+.explanation-option[data-state="wrong"] {
+  border-color: var(--wrong);
+  background: var(--wrong-bg);
+  color: var(--wrong);
+}
+
+.explanation-option-label {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 12px;
+}
+
+.explanation-option-text {
+  flex: 1;
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.explanation-option[data-state="correct"] .explanation-option-text,
+.explanation-option[data-state="wrong"]   .explanation-option-text {
+  color: inherit;
+}
+
+.explanation-option-tag {
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: auto;
+  align-self: center;
+  white-space: nowrap;
+}
+
+/* Step cards */
+.explanation-steps {
+  padding: 10px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.explanation-steps-label {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--terracotta);
+  margin-bottom: 2px;
+}
+
+.explanation-step {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 10px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.explanation-step-number {
+  font-family: var(--display);
+  font-size: 16px;
+  color: var(--border);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.explanation-step-text {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}

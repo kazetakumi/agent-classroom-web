@@ -17,7 +17,7 @@ const explanation: Explanation = {
 }
 
 describe('ExplanationScreen', () => {
-  it('does not render the subject heading', () => {
+  it('renders subject and question number in the header meta', () => {
     render(
       <ExplanationScreen
         question={question}
@@ -26,7 +26,8 @@ describe('ExplanationScreen', () => {
         onBack={vi.fn()}
       />,
     )
-    expect(screen.queryByText('Mathematics')).not.toBeInTheDocument()
+    expect(screen.getByTestId('explanation-meta')).toHaveTextContent('Mathematics')
+    expect(screen.getByTestId('explanation-meta')).toHaveTextContent('Q1')
   })
 
   it('renders the question number', () => {
@@ -38,7 +39,7 @@ describe('ExplanationScreen', () => {
         onBack={vi.fn()}
       />,
     )
-    expect(screen.getByText('Q1')).toBeInTheDocument()
+    expect(screen.getByText(/Q1/)).toBeInTheDocument()
   })
 
   it('renders the question text', () => {
@@ -188,7 +189,7 @@ describe('ExplanationScreen', () => {
     expect(screen.getByText('Step 2 — The answer is four.')).toBeInTheDocument()
   })
 
-  it('"Back" button calls onBack', () => {
+  it('"Review" button calls onBack', () => {
     const onBack = vi.fn()
     render(
       <ExplanationScreen
@@ -198,7 +199,14 @@ describe('ExplanationScreen', () => {
         onBack={onBack}
       />,
     )
-    fireEvent.click(screen.getByRole('button', { name: /back/i }))
+    fireEvent.click(screen.getByRole('button', { name: /review/i }))
     expect(onBack).toHaveBeenCalledOnce()
+  })
+
+  it('renders with explanation-screen class', () => {
+    const { container } = render(
+      <ExplanationScreen question={question} explanation={explanation} selectedOption="A" onBack={vi.fn()} />
+    )
+    expect(container.querySelector('.explanation-screen')).toBeInTheDocument()
   })
 })
