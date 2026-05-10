@@ -35,7 +35,7 @@ const session: SessionRecord[] = [
 ]
 
 describe('ReviewGrid', () => {
-  it('renders a heading "Review Questions"', () => {
+  it('renders a heading "Review"', () => {
     render(
       <ReviewGrid
         session={session}
@@ -44,7 +44,7 @@ describe('ReviewGrid', () => {
         onOpenExplanation={vi.fn()}
       />,
     )
-    expect(screen.getByText('Review Questions')).toBeInTheDocument()
+    expect(screen.getByText('Review')).toBeInTheDocument()
   })
 
   it('renders one tile per unique attended question', () => {
@@ -134,7 +134,7 @@ describe('ReviewGrid', () => {
     expect(onOpenExplanation).toHaveBeenCalledWith('q002')
   })
 
-  it('renders a "Back" button', () => {
+  it('renders a "Results" back button', () => {
     render(
       <ReviewGrid
         session={session}
@@ -143,10 +143,10 @@ describe('ReviewGrid', () => {
         onOpenExplanation={vi.fn()}
       />,
     )
-    expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /results/i })).toBeInTheDocument()
   })
 
-  it('clicking "Back" calls onBack', () => {
+  it('clicking "Results" calls onBack', () => {
     const onBack = vi.fn()
     render(
       <ReviewGrid
@@ -156,7 +156,7 @@ describe('ReviewGrid', () => {
         onOpenExplanation={vi.fn()}
       />,
     )
-    fireEvent.click(screen.getByRole('button', { name: /back/i }))
+    fireEvent.click(screen.getByRole('button', { name: /results/i }))
     expect(onBack).toHaveBeenCalledOnce()
   })
 
@@ -203,7 +203,7 @@ describe('ReviewGrid', () => {
       expect(screen.queryByTestId('result-tile-q003')).not.toBeInTheDocument()
     })
 
-    it('filtering by Incorrect shows only wrong tiles', () => {
+    it('filtering by Wrong shows only wrong tiles', () => {
       render(
         <ReviewGrid
           session={session}
@@ -248,5 +248,12 @@ describe('ReviewGrid', () => {
       expect(screen.getByTestId('result-tile-q002')).toBeInTheDocument()
       expect(screen.getByTestId('result-tile-q003')).toBeInTheDocument()
     })
+  })
+
+  it('renders with review-grid class', () => {
+    const { container } = render(
+      <ReviewGrid session={session} questions={questions} onBack={vi.fn()} onOpenExplanation={vi.fn()} />
+    )
+    expect(container.querySelector('.review-grid')).toBeInTheDocument()
   })
 })
