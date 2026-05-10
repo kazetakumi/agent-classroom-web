@@ -15,7 +15,7 @@ function App() {
 
   if (feed.status === 'idle') {
     return (
-      <div className="idle-screen">
+      <div className="screen idle-screen">
         <span className="idle-chip" data-testid="idle-chip">Mathematics</span>
         <h1 className="idle-headline">
           Your next<br />
@@ -29,7 +29,6 @@ function App() {
           <span>📚 17 questions</span>
           <span>⏱ ~8 min</span>
         </div>
-        <div className="idle-spacer" />
         <button className="idle-cta" onClick={() => feed.startSession()}>
           Start Revision
         </button>
