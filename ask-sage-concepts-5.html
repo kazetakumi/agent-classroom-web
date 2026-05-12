@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Sage — Three Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { background: #0A0A0A; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 50px;
+      background: #0A0A0A; border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex; align-items: center; gap: 14px; padding: 0 32px; z-index: 100;
+    }
+    .bar-a { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+    .bar-b { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.09); }
+    .bar-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+
+    /* ── Stage ── */
+    .stage {
+      padding: 84px 40px 80px;
+      display: flex; justify-content: center; align-items: flex-start; gap: 44px;
+    }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+    /* ── Phone ── */
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 40px 100px rgba(0,0,0,0.7), 0 8px 24px rgba(0,0,0,0.35);
+      flex-shrink: 0;
+    }
+
+    /* ── Info ── */
+    .info {
+      width: 390px; background: #111; border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px; padding: 22px 24px;
+    }
+    .info-n { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.16); margin-bottom: 10px; }
+    .info-h { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.65); margin-bottom: 12px; }
+    .info-d { font-size: 12.5px; line-height: 1.75; color: rgba(255,255,255,0.28); border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px; margin-bottom: 14px; }
+    .spec { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+    .spec:last-child { margin-bottom: 0; }
+    .sk { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.15); }
+    .sv { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3); }
+
+    /* ════════════════════════════════════════════
+       SHARED SCREEN — Question card
+    ════════════════════════════════════════════ */
+
+    .screen { background: #FFF; height: 100%; display: flex; flex-direction: column; }
+    .sc-top { display: flex; align-items: center; justify-content: space-between; padding: 28px 28px 0; flex-shrink: 0; }
+    .sc-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .sc-num { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D4D4D4; }
+    .sc-rule { height: 1px; background: #F0F0F0; margin: 16px 28px 0; flex-shrink: 0; }
+    .sc-prog { height: 1px; background: #C0C0C0; margin: 0 28px; width: 25%; flex-shrink: 0; }
+    .sc-body { flex: 1; padding: 28px 28px 0; overflow: hidden; }
+    .sc-subj { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #C0C0C0; margin-bottom: 20px; }
+    .sc-q { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 300; line-height: 1.55; color: #111; margin-bottom: 24px; }
+    .sc-div { height: 1px; background: #F0F0F0; margin-bottom: 22px; }
+    .sc-opt { display: flex; gap: 14px; align-items: baseline; margin-bottom: 18px; }
+    .sc-opt.dim { opacity: 0.28; }
+    .sc-opt.sel .ol { color: #111; }
+    .sc-opt.sel .ot { color: #111; }
+    .ol { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D0D0D0; width: 12px; flex-shrink: 0; }
+    .ot { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 300; color: #999; line-height: 1.35; }
+
+    /* Nav — always separate */
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 44px; flex-shrink: 0; border-top: 1px solid #F5F5F5; }
+    .nl { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #DADADA; }
+
+
+    /* ════════════════════════════════════════════
+       CONCEPT 1 — THE VOICE
+       SAGE | Hmm.
+       The column grid. Sage's voice, already present.
+    ════════════════════════════════════════════ */
+
+    .sage-turn {
+      flex-shrink: 0; height: 72px;
+      border-top: 1px solid #EBEBEB;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      align-items: center;
+      padding: 0 28px;
+    }
+    .sage-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #C8C8C8; text-align: right;
+    }
+    .sage-vr { width: 1px; height: 28px; background: #EFEFEF; justify-self: center; }
+    .sage-msg {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 300; font-style: italic;
+      color: #AAAAAA; line-height: 1;
+    }
+
+
+    /* ════════════════════════════════════════════
+       CONCEPT 2 — YOUR NAME
+       Just "Kaze." Sage knows it.
+       Centered. Still. Intimate.
+    ════════════════════════════════════════════ */
+
+    .your-name {
+      flex-shrink: 0; height: 72px;
+      border-top: 1px solid #EBEBEB;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .name-word {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 300; font-style: italic;
+      color: #AAAAAA;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+
+    /* ════════════════════════════════════════════
+       CONCEPT 3 — THE ARRIVAL
+       Sage fades in. Slowly. After you've sat
+       with something long enough. Presence grows
+       with need.
+
+       Demo: 14s loop. Production: ~60s, no loop.
+    ════════════════════════════════════════════ */
+
+    @keyframes sage-arrive {
+      0%, 8%    { opacity: 0; }    /* invisible — Sage is waiting */
+      60%       { opacity: 1; }    /* fully arrived */
+      82%       { opacity: 1; }    /* holds */
+      100%      { opacity: 0; }    /* resets for demo loop */
+    }
+
+    .arrival-wrap {
+      flex-shrink: 0; height: 72px;
+      cursor: pointer;
+
+      /* The component itself fades in — border included */
+      opacity: 0;
+      animation: sage-arrive 14s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+
+      border-top: 1px solid #EBEBEB;
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      align-items: center;
+      padding: 0 28px;
+    }
+
+    /* Reuse same column styles */
+    .arrival-wrap .sage-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; text-align: right; }
+    .arrival-wrap .sage-vr { width: 1px; height: 28px; background: #EFEFEF; justify-self: center; }
+    .arrival-wrap .sage-msg { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 300; font-style: italic; color: #AAAAAA; line-height: 1; }
+
+    /* Demo timer label outside the phone */
+    .demo-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.18);
+      text-align: center;
+      margin-top: -16px;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="bar-a">Agent Classroom</span>
+  <div class="bar-dot"></div>
+  <span class="bar-b">Ask Sage · Three Concepts</span>
+</div>
+
+<div class="stage">
+
+
+  <!-- ══════════════ CONCEPT 1: THE VOICE ══════════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top"><span class="sc-app">Agent Classroom</span><span class="sc-num">3 / 12</span></div>
+        <div class="sc-rule"></div><div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+        <div class="nav"><span class="nl">← Prev</span><span class="nl">Next →</span></div>
+
+        <div class="sage-turn">
+          <span class="sage-lbl">Sage</span>
+          <div class="sage-vr"></div>
+          <span class="sage-msg">Hmm.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept 1</div>
+      <div class="info-h">The Voice</div>
+      <div class="info-d">
+        Sage's column grid turn — the same design language used everywhere
+        in the app — placed permanently at the bottom of every screen.
+        Sage is already in the conversation. Already present. "Hmm." is
+        what a teacher says while watching you think. Not an invitation to
+        ask for help. An acknowledgment that you're working. Tap when ready.
+      </div>
+      <div class="spec"><span class="sk">Structure</span><span class="sv">Column grid · 72px | 1px | 1fr</span></div>
+      <div class="spec"><span class="sk">Label</span><span class="sv">IBM Plex Mono 9px · SAGE</span></div>
+      <div class="spec"><span class="sk">Speech</span><span class="sv">Cormorant italic 19px · #AAAAAA</span></div>
+      <div class="spec"><span class="sk">Height</span><span class="sv">72px · full-width tap</span></div>
+      <div class="spec"><span class="sk">Variants</span><span class="sv">Hmm. / I'm here. / — / [silence]</span></div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════ CONCEPT 2: YOUR NAME ══════════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top"><span class="sc-app">Agent Classroom</span><span class="sc-num">3 / 12</span></div>
+        <div class="sc-rule"></div><div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+        <div class="nav"><span class="nl">← Prev</span><span class="nl">Next →</span></div>
+
+        <div class="your-name">
+          <span class="name-word">Kaze.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept 2</div>
+      <div class="info-h">Your Name</div>
+      <div class="info-d">
+        Not "Sage." Not "Ask." Your name — the way Sage has said it
+        since the welcome screen. At the bottom of every question, every
+        results page, every review. You look down and see yourself being
+        seen. That is the invitation. Sage is not asking you to come to them.
+        Sage is calling your name across a quiet room.
+      </div>
+      <div class="spec"><span class="sk">Content</span><span class="sv">User's first name · personalised</span></div>
+      <div class="spec"><span class="sk">Font</span><span class="sv">Cormorant italic 300 · 20px</span></div>
+      <div class="spec"><span class="sk">Color</span><span class="sv">#AAAAAA</span></div>
+      <div class="spec"><span class="sk">Layout</span><span class="sv">Centered · no column grid</span></div>
+      <div class="spec"><span class="sk">Height</span><span class="sv">72px · full-width tap</span></div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════ CONCEPT 3: THE ARRIVAL ══════════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top"><span class="sc-app">Agent Classroom</span><span class="sc-num">3 / 12</span></div>
+        <div class="sc-rule"></div><div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+        <div class="nav"><span class="nl">← Prev</span><span class="nl">Next →</span></div>
+
+        <div class="arrival-wrap">
+          <span class="sage-lbl">Sage</span>
+          <div class="sage-vr"></div>
+          <span class="sage-msg">I'm here.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-tag">↑ watch · Sage arrives · 14s demo loop</div>
+
+    <div class="info">
+      <div class="info-n">Concept 3</div>
+      <div class="info-h">The Arrival</div>
+      <div class="info-d">
+        Nothing at first. The bottom of the screen is clean.
+        Then — slowly, over about 60 seconds — Sage fades in.
+        A good teacher doesn't lean over the moment you sit down.
+        They wait. They read the room. Students who answer fast
+        never see Sage at all. Students who sit with something
+        long enough find that Sage has arrived, quietly, exactly
+        when needed. The component is Sage's timing made visible.
+      </div>
+      <div class="spec"><span class="sk">Trigger</span><span class="sv">Time on screen · ~60s in production</span></div>
+      <div class="spec"><span class="sk">Transition</span><span class="sv">opacity 0 → 1 · ease-out · no bounce</span></div>
+      <div class="spec"><span class="sk">Structure</span><span class="sv">Same column grid as Concept 1</span></div>
+      <div class="spec"><span class="sk">Speech</span><span class="sv">I'm here. · only said on arrival</span></div>
+      <div class="spec"><span class="sk">Demo speed</span><span class="sv">14s loop — production is 60s, no loop</span></div>
+    </div>
+  </div>
+
+
+</div>
+</body>
+</html>

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Card V2 — Annotated Variations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 54px;
+      background: #111;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bar-left { display: flex; align-items: center; gap: 18px; }
+    .bar-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+    .btn-row { display: flex; gap: 3px; }
+    .cbtn {
+      background: transparent; border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px;
+      cursor: pointer; transition: all 0.14s;
+    }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+
+    /* ── Stage ── */
+    .stage {
+      padding-top: 76px; padding-bottom: 60px;
+      display: flex; justify-content: center; align-items: flex-start;
+      gap: 32px; min-height: 100vh;
+    }
+    .stage.single { gap: 0; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .col.hide { display: none; }
+    .col-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #888;
+    }
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09);
+    }
+    .info {
+      width: 390px; background: #1A1A1A;
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 18px;
+    }
+    .info-name {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.28); margin-bottom: 7px;
+    }
+    .info-desc { font-size: 12px; color: rgba(255,255,255,0.48); line-height: 1.6; margin-bottom: 10px; }
+    .pills { display: flex; gap: 5px; flex-wrap: wrap; }
+    .pill {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.09); border-radius: 3px; padding: 2px 7px;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       SHARED — ANNOTATED FOUNDATION
+       Same in all 3 variations: top strip, progress,
+       subject label, question, rule, options.
+    ═══════════════════════════════════════════════ */
+
+    .screen {
+      background: #FFFFFF; height: 100%;
+      display: flex; flex-direction: column;
+    }
+
+    .top-strip {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .top-app {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .top-counter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.06em; color: #D0D0D0;
+    }
+    .progress-row { position: relative; margin: 20px 28px 0; flex-shrink: 0; }
+    .progress-track { height: 1px; background: #F0F0F0; }
+    .progress-fill { position: absolute; top: 0; left: 0; height: 1px; background: #BDBDBD; }
+
+    .c-body {
+      flex: 1; overflow: hidden;
+      padding: 26px 28px 16px;
+    }
+    .c-subject {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #CFCFCF; margin-bottom: 18px;
+    }
+    .c-question {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px; font-weight: 300; line-height: 1.52; color: #111;
+    }
+    .c-rule { height: 1px; background: #EFEFEF; margin: 24px 0 6px; }
+    .c-options { display: flex; flex-direction: column; }
+    .c-option {
+      display: flex; align-items: flex-start; gap: 18px;
+      padding: 12px 0;
+      border-bottom: 1px solid #F6F6F6; cursor: pointer;
+    }
+    .c-option:last-child { border-bottom: none; }
+    .c-opt-letter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #CFCFCF; min-width: 14px; padding-top: 5px; flex-shrink: 0;
+    }
+    .c-opt-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 300; color: #888; line-height: 1.4;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION 1 — FOOTER BAR
+       A single slim strip at the bottom holds all
+       three controls: ← Prev on the left, ↑ Ask Sage
+       in the centre, Next → on the right. One rule,
+       one zone, everything at thumb reach. The chat
+       affordance sits between the nav controls so it
+       reads as part of the same gesture vocabulary.
+    ═══════════════════════════════════════════════ */
+
+    .v1-footer {
+      border-top: 1px solid #F0F0F0;
+      padding: 0 28px;
+      height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .v1-nav-btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #ABABAB; background: none; border: none; cursor: pointer;
+      padding: 8px 0; transition: color 0.12s;
+    }
+    .v1-nav-btn:hover { color: #111; }
+    .v1-nav-btn.disabled { color: #DEDEDE; pointer-events: none; }
+
+    .v1-sage-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      background: none; border: none; cursor: pointer; padding: 6px 16px;
+      transition: opacity 0.12s;
+    }
+    .v1-sage-btn:hover { opacity: 0.6; }
+    .v1-sage-arrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px; color: #D0D0D0; line-height: 1;
+    }
+    .v1-sage-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #D0D0D0;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION 2 — PULL HANDLE
+       The bottom sheet is the hero. A full-width
+       B-Break-style strip — "Ask Sage" flanked by
+       rules — signals a draggable surface. An upward
+       chevron beneath it confirms the gesture. Prev /
+       Next sit below as bare arrows at the screen
+       corners — navigation is secondary, the dialogue
+       is primary.
+    ═══════════════════════════════════════════════ */
+
+    .v2-handle-zone {
+      flex-shrink: 0;
+      padding: 0 28px;
+      cursor: pointer;
+    }
+    .v2-handle-divider {
+      display: flex; align-items: center;
+    }
+    .v2-handle-line { flex: 1; height: 1px; background: #EFEFEF; }
+    .v2-handle-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #D4D4D4; padding: 0 12px;
+    }
+    .v2-handle-caret {
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; color: #DCDCDC;
+      padding: 5px 0 0;
+      letter-spacing: 0.06em;
+    }
+
+    .v2-nav-zone {
+      padding: 14px 28px 34px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .v2-nav-arrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 18px; color: #C8C8C8;
+      background: none; border: none; cursor: pointer;
+      padding: 6px; line-height: 1;
+      transition: color 0.12s;
+    }
+    .v2-nav-arrow:hover { color: #111; }
+    .v2-nav-arrow.disabled { color: #E8E8E8; pointer-events: none; }
+    .v2-nav-spacer {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; color: #E0E0E0;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION 3 — SAGE ROW
+       The chat affordance lives in the column grid —
+       same 72px | 1px | 1fr structure as the welcome
+       screen's redirect input. "Sage" is the left
+       label; a Cormorant italic placeholder occupies
+       the right column. It reads as a continuation of
+       the dialogue, not a separate UI widget. Prev /
+       Next sit below the grid line as minimal arrows.
+    ═══════════════════════════════════════════════ */
+
+    .v3-sage-zone {
+      border-top: 1px solid #F2F2F2;
+      flex-shrink: 0;
+    }
+    .v3-sage-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 16px 28px;
+      align-items: center;
+    }
+    .v3-sage-lbl-col {
+      display: flex; align-items: center; justify-content: flex-end;
+    }
+    .v3-sage-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .v3-sage-rule-v { width: 1px; background: #EFEFEF; align-self: stretch; }
+    .v3-sage-input-col {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .v3-sage-placeholder {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 17px; font-weight: 300; color: #D4D4D4; flex: 1;
+    }
+    .v3-sage-send {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px; color: #D8D8D8; background: none; border: none; cursor: pointer;
+      transition: color 0.12s; flex-shrink: 0; padding: 2px;
+    }
+    .v3-sage-send:hover { color: #111; }
+
+    .v3-nav-zone {
+      padding: 4px 28px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .v3-nav-btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #BBBBBB; background: none; border: none; cursor: pointer;
+      transition: color 0.12s;
+    }
+    .v3-nav-btn:hover { color: #111; }
+    .v3-nav-btn.disabled { color: #E4E4E4; pointer-events: none; }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Bar ── -->
+<div class="bar">
+  <div class="bar-left">
+    <span class="bar-title">Question Card — Annotated Variations</span>
+    <div class="bar-sep"></div>
+    <div class="btn-row" id="viewBtns">
+      <button class="cbtn on" data-v="all">All 3</button>
+      <button class="cbtn" data-v="1">Footer Bar</button>
+      <button class="cbtn" data-v="2">Pull Handle</button>
+      <button class="cbtn" data-v="3">Sage Row</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Stage ── -->
+<div class="stage" id="stage">
+
+
+  <!-- ══ V1: FOOTER BAR ══ -->
+  <div class="col" id="col-1">
+    <span class="col-label">1 — Footer Bar</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-counter">3 / 12</span>
+        </div>
+        <div class="progress-row">
+          <div class="progress-track"></div>
+          <div class="progress-fill" style="width: 25%"></div>
+        </div>
+
+        <div class="c-body">
+          <div class="c-subject">Calculus Foundations</div>
+          <div class="c-question">
+            A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?
+          </div>
+          <div class="c-rule"></div>
+          <div class="c-options">
+            <div class="c-option">
+              <span class="c-opt-letter">A</span>
+              <span class="c-opt-text">t = 0 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">B</span>
+              <span class="c-opt-text">t = 2 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">C</span>
+              <span class="c-opt-text">t = 0 and t = 2</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">D</span>
+              <span class="c-opt-text">t = 1 and t = 3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="v1-footer">
+          <button class="v1-nav-btn disabled">← Prev</button>
+          <button class="v1-sage-btn">
+            <span class="v1-sage-arrow">↑</span>
+            <span class="v1-sage-lbl">Ask Sage</span>
+          </button>
+          <button class="v1-nav-btn">Next →</button>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">1 — Footer Bar</div>
+      <div class="info-desc">One slim strip at the bottom holds all three controls. ← Prev and Next → sit at the outer edges; Ask Sage ↑ sits at the centre between them. Single rule, one zone. The chat affordance shares the same gesture vocabulary as navigation — it reads as an equal peer, not an afterthought.</div>
+      <div class="pills">
+        <span class="pill">Single footer zone</span>
+        <span class="pill">Chat in centre</span>
+        <span class="pill">Nav at edges</span>
+        <span class="pill">Equal priority</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ V2: PULL HANDLE ══ -->
+  <div class="col" id="col-2">
+    <span class="col-label">2 — Pull Handle</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-counter">3 / 12</span>
+        </div>
+        <div class="progress-row">
+          <div class="progress-track"></div>
+          <div class="progress-fill" style="width: 25%"></div>
+        </div>
+
+        <div class="c-body">
+          <div class="c-subject">Calculus Foundations</div>
+          <div class="c-question">
+            A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?
+          </div>
+          <div class="c-rule"></div>
+          <div class="c-options">
+            <div class="c-option">
+              <span class="c-opt-letter">A</span>
+              <span class="c-opt-text">t = 0 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">B</span>
+              <span class="c-opt-text">t = 2 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">C</span>
+              <span class="c-opt-text">t = 0 and t = 2</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">D</span>
+              <span class="c-opt-text">t = 1 and t = 3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="v2-handle-zone">
+          <div class="v2-handle-divider">
+            <div class="v2-handle-line"></div>
+            <span class="v2-handle-label">Ask Sage</span>
+            <div class="v2-handle-line"></div>
+          </div>
+          <div class="v2-handle-caret">↑</div>
+        </div>
+
+        <div class="v2-nav-zone">
+          <button class="v2-nav-arrow disabled">←</button>
+          <span class="v2-nav-spacer">· · ·</span>
+          <button class="v2-nav-arrow">→</button>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">2 — Pull Handle</div>
+      <div class="info-desc">The chat sheet is the dominant affordance. A full-width B-Break strip — "Ask Sage" flanked by rules — signals a draggable surface, echoing the welcome screen grammar. An upward caret confirms the gesture direction. Prev / Next sit below as bare arrows at the corners — navigation is deliberately secondary.</div>
+      <div class="pills">
+        <span class="pill">Chat is dominant</span>
+        <span class="pill">B-Break handle</span>
+        <span class="pill">Drag-up caret</span>
+        <span class="pill">Nav as secondary</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ V3: SAGE ROW ══ -->
+  <div class="col" id="col-3">
+    <span class="col-label">3 — Sage Row</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-counter">3 / 12</span>
+        </div>
+        <div class="progress-row">
+          <div class="progress-track"></div>
+          <div class="progress-fill" style="width: 25%"></div>
+        </div>
+
+        <div class="c-body">
+          <div class="c-subject">Calculus Foundations</div>
+          <div class="c-question">
+            A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?
+          </div>
+          <div class="c-rule"></div>
+          <div class="c-options">
+            <div class="c-option">
+              <span class="c-opt-letter">A</span>
+              <span class="c-opt-text">t = 0 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">B</span>
+              <span class="c-opt-text">t = 2 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">C</span>
+              <span class="c-opt-text">t = 0 and t = 2</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">D</span>
+              <span class="c-opt-text">t = 1 and t = 3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="v3-sage-zone">
+          <div class="v3-sage-turn">
+            <div class="v3-sage-lbl-col">
+              <span class="v3-sage-lbl">Sage</span>
+            </div>
+            <div class="v3-sage-rule-v"></div>
+            <div class="v3-sage-input-col">
+              <span class="v3-sage-placeholder">Ask me anything…</span>
+              <button class="v3-sage-send">↑</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="v3-nav-zone">
+          <button class="v3-nav-btn disabled">← Prev</button>
+          <button class="v3-nav-btn">Next →</button>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">3 — Sage Row</div>
+      <div class="info-desc">The chat affordance lives inside the column grid — 72px label col, 1px rule, Cormorant italic placeholder — identical to the welcome screen's redirect input. "Sage" sits in the left column; the right column holds the input. The chat reads as a continuation of the dialogue, not a UI widget. Nav arrows sit below, minimal and secondary.</div>
+      <div class="pills">
+        <span class="pill">Chat in column grid</span>
+        <span class="pill">Welcome screen match</span>
+        <span class="pill">Dialogue continuity</span>
+        <span class="pill">Nav below, minimal</span>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<script>
+  const viewBtns = document.querySelectorAll('#viewBtns .cbtn');
+  const stage = document.getElementById('stage');
+  const colMap = { 1: 'col-1', 2: 'col-2', 3: 'col-3' };
+
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      viewBtns.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      const v = btn.dataset.v;
+      if (v === 'all') {
+        stage.classList.remove('single');
+        Object.values(colMap).forEach(id => document.getElementById(id).classList.remove('hide'));
+      } else {
+        stage.classList.add('single');
+        Object.entries(colMap).forEach(([k, id]) => {
+          document.getElementById(id).classList.toggle('hide', k !== v);
+        });
+      }
+    });
+  });
+</script>
+</body>
+</html>

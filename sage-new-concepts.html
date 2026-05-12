@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sage — New Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0A0A0A; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+  /* ── Bar ── */
+  .bar {
+    position: sticky; top: 0; left: 0; right: 0; height: 50px;
+    background: #0A0A0A; border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; align-items: center; gap: 14px; padding: 0 32px; z-index: 100;
+  }
+  .bar-a { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+  .bar-b { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.08); }
+  .bar-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+
+  /* ── Stage row ── */
+  .stage {
+    padding: 64px 40px 80px;
+    display: flex; justify-content: center; align-items: flex-start; gap: 44px;
+    flex-wrap: nowrap;
+  }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+  /* ── Phone ── */
+  .phone {
+    width: 390px; height: 800px; border-radius: 44px; overflow: hidden; flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 40px 100px rgba(0,0,0,0.72), 0 8px 24px rgba(0,0,0,0.36);
+  }
+
+  /* ── Info card ── */
+  .info { width: 390px; background: #111; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 22px 24px; }
+  .info-n  { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.16); margin-bottom: 10px; }
+  .info-h  { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.65); margin-bottom: 12px; }
+  .info-d  { font-size: 12.5px; line-height: 1.75; color: rgba(255,255,255,0.28); border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px; margin-bottom: 14px; }
+  .spec    { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+  .spec:last-child { margin-bottom: 0; }
+  .sk { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.15); flex-shrink: 0; }
+  .sv { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3); text-align: right; max-width: 220px; line-height: 1.45; }
+
+  /* ══════════════════════════════════════════
+     SHARED — white screen skeleton
+  ══════════════════════════════════════════ */
+  .screen { background: #FFF; height: 100%; display: flex; flex-direction: column; position: relative; }
+  .sc-top { display: flex; align-items: center; justify-content: space-between; padding: 28px 28px 0; flex-shrink: 0; }
+  .sc-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+  .sc-num { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D4D4D4; }
+  .sc-rule { height: 1px; background: #F0F0F0; margin: 16px 28px 0; flex-shrink: 0; }
+  .sc-prog { height: 1px; background: #C0C0C0; margin: 0 28px; width: 33%; flex-shrink: 0; }
+  .sc-body { flex: 1; padding: 28px 28px 0; overflow: hidden; }
+  .sc-subj { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #C0C0C0; margin-bottom: 20px; }
+  .sc-q { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 300; line-height: 1.55; color: #111; margin-bottom: 24px; }
+  .sc-div { height: 1px; background: #F0F0F0; margin-bottom: 22px; }
+  .sc-opt { display: flex; gap: 14px; align-items: baseline; margin-bottom: 18px; }
+  .sc-opt.dim { opacity: 0.28; }
+  .ol { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D0D0D0; width: 12px; flex-shrink: 0; }
+  .ot { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 300; color: #999; line-height: 1.35; }
+
+  /* column grid */
+  .cg { display: grid; grid-template-columns: 72px 1px 1fr; gap: 16px; align-items: start; padding: 12px 0; }
+  .cg + .cg { border-top: 1px solid #F5F5F5; }
+  .cg-k { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8; line-height: 1.5; padding-top: 2px; }
+  .cg-r { width: 1px; background: #EBEBEB; align-self: stretch; }
+  .cg-v { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; line-height: 1.5; color: #333; }
+  .cg-v.sage { font-style: italic; color: #888; }
+  .cg-v.em { font-style: italic; }
+
+  /* footer nav */
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 52px; flex-shrink: 0; border-top: 1px solid #F5F5F5; }
+  .nl { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #DADADA; }
+  .nc { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; }
+
+  /* sheet overlay */
+  .sheet { position: absolute; inset: 0; background: #FFF; display: flex; flex-direction: column; }
+  .pill { width: 36px; height: 4px; background: #E8E8E8; border-radius: 2px; margin: 14px auto 0; flex-shrink: 0; }
+  .sheet-top { padding: 18px 28px 16px; border-bottom: 1px solid #F0F0F0; flex-shrink: 0; }
+  .sheet-body { flex: 1; padding: 0 28px; overflow: hidden; }
+  .sheet-input-row { border-top: 1px solid #F0F0F0; padding: 14px 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
+  .sheet-input-text { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; font-style: italic; color: #CCCCCC; }
+  .sheet-send { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #D0D0D0; }
+
+  /* quick actions */
+  .qa { display: flex; flex-direction: column; gap: 12px; padding: 16px 0; }
+  .qa-item { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; font-style: italic; color: #C0C0C0; }
+  .qa-item.sel { color: #444; }
+  .qa-item.dim { opacity: 0.28; }
+
+  /* ══════════════════════════════════════════
+     CONCEPT A — THE WITNESS
+     Sage remembers across sessions.
+     Presence deepens with each return.
+  ══════════════════════════════════════════ */
+
+  /* Footer trigger with session badge */
+  .witness-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 52px; flex-shrink: 0; border-top: 1px solid #F5F5F5; }
+  .witness-sage-trigger { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .wst-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: #C0C0C0; }
+  .wst-sessions { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 0.1em; color: #C8A878; }
+
+  /* Memory tag inside sheet */
+  .mem-tag {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: #FBF7F1; border: 1px solid #E8D8BE; border-radius: 4px;
+    padding: 5px 12px; margin-bottom: 14px;
+  }
+  .mem-dot { width: 5px; height: 5px; border-radius: 50%; background: #C8A070; flex-shrink: 0; }
+  .mem-text { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.08em; color: #A88060; }
+
+  /* ══════════════════════════════════════════
+     CONCEPT B — THE THREAD
+     Sage's voice surfaces inline,
+     without being summoned.
+  ══════════════════════════════════════════ */
+  .thread {
+    margin-top: 6px;
+    padding: 12px 0 12px 16px;
+    border-left: 2px solid #E4DDD4;
+  }
+  .thread-who { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8B89A; margin-bottom: 6px; }
+  .thread-text { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-style: italic; font-weight: 300; color: #888; line-height: 1.55; }
+  .thread-cta { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; margin-top: 8px; }
+
+  /* selected answer */
+  .sc-opt.sel .ol { color: #111; }
+  .sc-opt.sel .ot { color: #111; }
+  .sc-opt.wrong .ot { color: #BBAA99; }
+  .sc-opt.wrong .ol { color: #BBAA99; }
+
+  /* ══════════════════════════════════════════
+     CONCEPT C — THE STUDY PARTNER
+     Sage thinks alongside the learner.
+     We, not You.
+  ══════════════════════════════════════════ */
+  .partner-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 52px; flex-shrink: 0; border-top: 1px solid #F5F5F5; }
+  .partner-trigger { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #B8B0A8; }
+
+  /* "Sage is thinking" micro-state */
+  .thinking-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  .thinking-dots { display: flex; gap: 5px; }
+  .td { width: 5px; height: 5px; border-radius: 50%; background: #D8CFC8; }
+  .td.d2 { opacity: 0.55; }
+  .td.d3 { opacity: 0.25; }
+  .thinking-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C0B8; }
+
+  /* co-reasoning turn in sheet */
+  .turn { display: grid; grid-template-columns: 72px 1px 1fr; gap: 16px; align-items: start; padding: 14px 0; }
+  .turn + .turn { border-top: 1px solid #F8F8F8; }
+  .turn-who { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: #CCCCCC; padding-top: 2px; }
+  .turn-who.sage { color: #C8B89A; }
+  .turn-rule { width: 1px; background: #F0F0F0; align-self: stretch; }
+  .turn-msg { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 300; line-height: 1.55; color: #444; }
+  .turn-msg.sage { font-style: italic; color: #888; }
+  .turn-msg.you { color: #555; }
+  .turn-msg.ghost { color: #CCCCCC; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="bar-a">Agent Classroom</span>
+  <div class="bar-dot"></div>
+  <span class="bar-b">Sage · New Concepts</span>
+</div>
+
+<div class="stage">
+
+  <!-- ══════════════════════════════════════════
+       CONCEPT A — THE WITNESS
+  ══════════════════════════════════════════ -->
+  <div class="col">
+
+    <div class="phone">
+      <div class="screen">
+        <!-- Sheet open — Sage opens with memory -->
+        <div class="sheet">
+          <div class="pill"></div>
+          <div class="sheet-top">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:#C0C0C0;margin-bottom:14px;">Sage</div>
+            <div class="mem-tag">
+              <div class="mem-dot"></div>
+              <div class="mem-text">Session 3 · 2 patterns noted</div>
+            </div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:300;font-style:italic;color:#222;line-height:1.55;">
+              You've hesitated on syntax questions twice now. Want to talk through what's making them feel uncertain?
+            </div>
+          </div>
+          <div class="sheet-body">
+            <div class="cg" style="padding-top:16px;">
+              <div class="cg-k">Sage</div>
+              <div class="cg-r"></div>
+              <div class="cg-v sage">I noticed you moved quickly through the first three, then slowed here. That's usually a signal worth looking at.</div>
+            </div>
+            <div class="cg">
+              <div class="cg-k">Or —</div>
+              <div class="cg-r"></div>
+              <div class="qa" style="padding:0;">
+                <div class="qa-item">— show me what I keep missing</div>
+                <div class="qa-item">— walk me through this one</div>
+                <div class="qa-item">— skip for now</div>
+              </div>
+            </div>
+          </div>
+          <div class="sheet-input-row">
+            <div class="sheet-input-text">Ask anything…</div>
+            <div class="sheet-send">↑ send</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second state: question screen showing the trigger -->
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">4 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Python · Syntax</div>
+          <div class="sc-q">Which method returns the number of items in a list?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt"><span class="ol">A</span><span class="ot">count()</span></div>
+          <div class="sc-opt"><span class="ol">B</span><span class="ot">size()</span></div>
+          <div class="sc-opt"><span class="ol">C</span><span class="ot">len()</span></div>
+          <div class="sc-opt"><span class="ol">D</span><span class="ot">length()</span></div>
+        </div>
+        <div class="witness-nav">
+          <span class="nl">← Prev</span>
+          <div class="witness-sage-trigger">
+            <div class="wst-label">↑ / Ask Sage</div>
+            <div class="wst-sessions">Session 3 · 2 patterns</div>
+          </div>
+          <span class="nl">Next →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept A</div>
+      <div class="info-h">The Witness</div>
+      <div class="info-d">Sage doesn't greet you — it continues from where it was watching. After the first session the footer trigger gains a faint amber session count and a pattern note. When the sheet opens, Sage leads with a specific earned observation drawn from cross-session memory, not a generic invitation. Quick-action phrases adapt per session to reflect actual hesitation patterns.</div>
+      <div class="spec"><span class="sk">Trigger</span><span class="sv">↑ / Ask Sage · Session 3 · 2 patterns</span></div>
+      <div class="spec"><span class="sk">Sheet open</span><span class="sv">Memory tag + pattern-specific opening</span></div>
+      <div class="spec"><span class="sk">Session 1</span><span class="sv">Transparent — "I'm starting to learn your patterns"</span></div>
+      <div class="spec"><span class="sk">Session 5+</span><span class="sv">Predictive — Sage leads without prompting</span></div>
+      <div class="spec"><span class="sk">Agentic layer</span><span class="sv">Cross-session memory · trust evolution</span></div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       CONCEPT B — THE THREAD
+  ══════════════════════════════════════════ -->
+  <div class="col">
+
+    <!-- State 1: correct answer, Sage threads in -->
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">4 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Python · Syntax</div>
+          <div class="sc-q">Which method returns the number of items in a list?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">count()</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">size()</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">len()</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">length()</span></div>
+          <!-- Sage threads in below the selected answer -->
+          <div class="thread">
+            <div class="thread-who">Sage</div>
+            <div class="thread-text">Good. <em>len()</em> is worth knowing cold — it works on strings, dicts, and tuples too. One function, everywhere.</div>
+            <div class="thread-cta">Go deeper ↗</div>
+          </div>
+        </div>
+        <div class="nav">
+          <span class="nl">← Prev</span>
+          <span class="nl">Next →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- State 2: wrong answer, different thread -->
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">7 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-prog" style="width:58%;"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Python · Methods</div>
+          <div class="sc-q">What does the <em style="font-style:italic;">strip()</em> method do to a string?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">Splits it into a list</span></div>
+          <div class="sc-opt wrong sel"><span class="ol" style="color:#BBAA99;">B</span><span class="ot" style="color:#BBAA99;">Removes all spaces</span></div>
+          <div class="sc-opt dim"><span class="ol">C</span><span class="ot">Removes leading and trailing whitespace</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">Converts to lowercase</span></div>
+          <!-- Thread: wrong answer, Sage speaks to the misconception -->
+          <div class="thread">
+            <div class="thread-who">Sage</div>
+            <div class="thread-text">Almost — <em>strip()</em> only touches the edges. To remove all spaces, you'd need <em>replace(' ', '')</em>. A very common mix-up.</div>
+            <div class="thread-cta">Go deeper ↗</div>
+          </div>
+        </div>
+        <div class="nav">
+          <span class="nl">← Prev</span>
+          <span class="nl">Next →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept B</div>
+      <div class="info-h">The Thread</div>
+      <div class="info-d">Sage doesn't wait to be summoned. After every answer — right or wrong — Sage's voice surfaces inline, threaded directly below the selected option with a left-rule in warm grey. A brief, specific observation. It fades after a few seconds unless tapped. The footer loses the Ask Sage trigger entirely: Sage is already in the conversation. "Go deeper" opens the sheet for those who want more.</div>
+      <div class="spec"><span class="sk">Trigger</span><span class="sv">None — Sage appears on answer submit</span></div>
+      <div class="spec"><span class="sk">Placement</span><span class="sv">Inline below selected answer, border-left rule</span></div>
+      <div class="spec"><span class="sk">Footer</span><span class="sv">Prev / Next only — no Ask Sage button</span></div>
+      <div class="spec"><span class="sk">Correct answer</span><span class="sv">Connection, pattern, deeper context</span></div>
+      <div class="spec"><span class="sk">Wrong answer</span><span class="sv">Addresses the specific misconception</span></div>
+      <div class="spec"><span class="sk">Agentic layer</span><span class="sv">Proactive · context-sensitive · zero friction</span></div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       CONCEPT C — THE STUDY PARTNER
+  ══════════════════════════════════════════ -->
+  <div class="col">
+
+    <!-- State 1: question screen, after answer, "Sage is thinking" -->
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">4 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Python · Syntax</div>
+          <div class="sc-q">Which method returns the number of items in a list?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">count()</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">size()</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">len()</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">length()</span></div>
+          <!-- Sage thinking micro-state -->
+          <div class="thinking-row">
+            <div class="thinking-dots">
+              <div class="td"></div>
+              <div class="td d2"></div>
+              <div class="td d3"></div>
+            </div>
+            <div class="thinking-label">Sage is thinking</div>
+          </div>
+        </div>
+        <div class="partner-nav">
+          <span class="nl">← Prev</span>
+          <span class="partner-trigger">↑ Think with Sage</span>
+          <span class="nl">Next →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- State 2: sheet open — co-reasoning mode -->
+    <div class="phone">
+      <div class="screen">
+        <div class="sheet">
+          <div class="pill"></div>
+          <div class="sheet-top">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:#C0C0C0;margin-bottom:12px;">Thinking with Sage</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:300;font-style:italic;color:#222;line-height:1.55;">
+              We got that one. Want to look at why <em>size()</em> trips so many people — or keep moving?
+            </div>
+          </div>
+          <div class="sheet-body">
+            <div class="turn" style="padding-top:16px;">
+              <div class="turn-who">Kaze</div>
+              <div class="turn-rule"></div>
+              <div class="turn-msg you">I wasn't totally sure — I eliminated A and D but size() felt possible.</div>
+            </div>
+            <div class="turn">
+              <div class="turn-who sage">Sage</div>
+              <div class="turn-rule"></div>
+              <div class="turn-msg sage">That's the right instinct. <em>size()</em> leaks in from other languages. The fact you landed on <em>len()</em> means you're starting to think in Python, not around it.</div>
+            </div>
+            <div class="turn">
+              <div class="turn-who">Kaze</div>
+              <div class="turn-rule"></div>
+              <div class="turn-msg ghost">keep moving</div>
+            </div>
+          </div>
+          <div class="sheet-input-row">
+            <div class="sheet-input-text">Say something…</div>
+            <div class="sheet-send">↑ send</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept C</div>
+      <div class="info-h">The Study Partner</div>
+      <div class="info-d">The relationship model shifts from AI tutor to thinking companion. "Ask Sage" becomes "Think with Sage." Language moves from "you" to "we." After you submit an answer, a brief "Sage is thinking…" micro-state appears before Sage speaks. The sheet opens as a debrief, not a help request — Sage validates your reasoning process, not just the outcome. Sage speaks about what you were thinking, not what you got wrong.</div>
+      <div class="spec"><span class="sk">Trigger label</span><span class="sv">↑ Think with Sage (not Ask Sage)</span></div>
+      <div class="spec"><span class="sk">Micro-state</span><span class="sv">Sage is thinking · 3-dot indicator</span></div>
+      <div class="spec"><span class="sk">Language register</span><span class="sv">"We got that one" not "You got that right"</span></div>
+      <div class="spec"><span class="sk">Sheet frame</span><span class="sv">Co-reasoning / debrief, not Q&amp;A</span></div>
+      <div class="spec"><span class="sk">Agentic layer</span><span class="sv">Relationship model shift · collaborative trust</span></div>
+    </div>
+
+  </div>
+
+</div><!-- /stage -->
+
+</body>
+</html>

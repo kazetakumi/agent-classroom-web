@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Sage — Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 54px;
+      background: #111;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bar-left { display: flex; align-items: center; gap: 18px; }
+    .bar-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+    .btn-row { display: flex; gap: 3px; }
+    .cbtn {
+      background: transparent; border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px;
+      cursor: pointer; transition: all 0.14s;
+    }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+
+    /* ── State toggle ── */
+    .state-toggle { display: flex; align-items: center; gap: 8px; }
+    .state-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.22); }
+    .toggle-pill { display: flex; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; }
+    .tpill { background: transparent; border: none; color: rgba(255,255,255,0.35); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; padding: 4px 14px; cursor: pointer; transition: all 0.14s; }
+    .tpill.on { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* ── Stage ── */
+    .stage { padding-top: 76px; padding-bottom: 60px; display: flex; justify-content: center; align-items: flex-start; gap: 32px; min-height: 100vh; }
+    .stage.single { gap: 0; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .col.hide { display: none; }
+    .col-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+    .phone { width: 390px; height: 800px; border-radius: 44px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09); position: relative; }
+    .info { width: 390px; background: #1A1A1A; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 18px; }
+    .info-name { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 7px; }
+    .info-desc { font-size: 12px; color: rgba(255,255,255,0.48); line-height: 1.6; margin-bottom: 10px; }
+    .pills { display: flex; gap: 5px; flex-wrap: wrap; }
+    .pill { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.09); border-radius: 3px; padding: 2px 7px; }
+
+
+    /* ═══════════════════════════════════════════════
+       SHARED — QUESTION CARD BACKGROUND
+       (visible behind concepts 1 and 3)
+    ═══════════════════════════════════════════════ */
+
+    .qcard-bg {
+      position: absolute; inset: 0;
+      background: #FFFFFF;
+      display: flex; flex-direction: column;
+    }
+
+    .qcard-top {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .qcard-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .qcard-counter { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D0D0D0; }
+
+    .qcard-progress { position: relative; margin: 20px 28px 0; }
+    .qcard-track { height: 1px; background: #F0F0F0; }
+    .qcard-fill { position: absolute; top: 0; left: 0; height: 1px; background: #BDBDBD; }
+
+    .qcard-body { padding: 26px 28px 0; }
+    .qcard-subject { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #CFCFCF; margin-bottom: 18px; }
+    .qcard-question { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 300; line-height: 1.52; color: #111; }
+    .qcard-rule { height: 1px; background: #EFEFEF; margin: 24px 0 6px; }
+
+    .qcard-options { display: flex; flex-direction: column; }
+    .qcard-option { display: flex; align-items: flex-start; gap: 18px; padding: 12px 0; border-bottom: 1px solid #F6F6F6; }
+    .qcard-option:last-child { border-bottom: none; }
+    .qcard-opt-letter { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #CFCFCF; min-width: 14px; padding-top: 5px; flex-shrink: 0; }
+    .qcard-opt-text { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; color: #888; line-height: 1.4; }
+
+    .qcard-footer { position: absolute; bottom: 0; left: 0; right: 0; border-top: 1px solid #F0F0F0; height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; background: #FFFFFF; }
+    .qcard-nav { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #ABABAB; }
+    .qcard-sage-trigger { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .qcard-sage-arrow { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #D0D0D0; line-height: 1; }
+    .qcard-sage-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #D0D0D0; }
+
+
+    /* ═══════════════════════════════════════════════
+       SHARED — COLUMN GRID CONVERSATION
+       Used by all three concepts for the Sage dialogue.
+    ═══════════════════════════════════════════════ */
+
+    .turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 20px 28px 0;
+    }
+    .turn:first-child { padding-top: 24px; }
+
+    .lbl-col { display: flex; align-items: flex-start; justify-content: flex-end; padding-top: 3px; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; }
+    .rule-v { background: #EFEFEF; width: 1px; }
+    .speech { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; line-height: 1.55; color: #111; }
+    .speech.user { font-style: italic; color: #666; }
+
+    /* Sage input row */
+    .input-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 0 28px;
+      align-items: flex-start;
+    }
+    .you-col { display: flex; justify-content: flex-end; padding-top: 5px; }
+    .you-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; }
+    .input-v { background: #EFEFEF; width: 1px; }
+    .ta-col { display: flex; flex-direction: column; gap: 6px; }
+    .ta {
+      background: transparent; border: none; border-bottom: 1px solid #EBEBEB;
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 19px; font-weight: 300; color: #111;
+      padding: 4px 0; outline: none; resize: none;
+      line-height: 1.4; min-height: 32px; overflow: hidden; width: 100%;
+    }
+    .ta::placeholder { color: #D4D4D4; }
+    .send-row { display: flex; justify-content: flex-end; }
+    .send-btn { background: transparent; border: none; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #CCCCCC; transition: color 0.14s; }
+    .send-btn:hover { color: #111; }
+
+    /* "empty" vs "responded" show/hide */
+    .state-empty .show-responded { display: none; }
+    .state-responded .show-empty { display: none; }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT 1 — HALF SHEET
+       The question card stays visible and dimmed
+       behind a white scrim. The Sage sheet rises from
+       the footer, anchored at 55% height, with a
+       B-Break-style handle strip at its top edge.
+       The dialogue happens inside the sheet in the
+       column grid. Context (question) is still legible
+       above — the user never loses their place.
+    ═══════════════════════════════════════════════ */
+
+    .v1-scrim {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.72);
+      z-index: 1;
+    }
+
+    .v1-sheet {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      top: 290px;
+      background: #FFFFFF;
+      border-top: 1px solid #EFEFEF;
+      z-index: 2;
+      display: flex; flex-direction: column;
+    }
+
+    .v1-handle {
+      flex-shrink: 0;
+      padding: 18px 28px 0;
+    }
+    .v1-handle-row { display: flex; align-items: center; }
+    .v1-handle-line { flex: 1; height: 1px; background: #F0F0F0; }
+    .v1-handle-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #D8D8D8; padding: 0 12px; }
+
+    .v1-convo { flex: 1; overflow: hidden; }
+
+    .v1-input-zone {
+      border-top: 1px solid #F2F2F2;
+      flex-shrink: 0;
+      padding: 14px 0 34px;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT 2 — FULL TAKEOVER
+       Tapping Ask Sage replaces the question card
+       entirely. A clean full-screen Sage context with
+       its own top strip. "← Question" in the right
+       corner returns the user. The full screen lets
+       Sage give longer explanations without cramping.
+       Input at the bottom uses the welcome screen
+       redirect pattern.
+    ═══════════════════════════════════════════════ */
+
+    .v2-screen {
+      position: absolute; inset: 0;
+      background: #FFFFFF;
+      display: flex; flex-direction: column;
+      z-index: 2;
+    }
+
+    .v2-top {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .v2-top-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .v2-back { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #BBBBBB; cursor: pointer; }
+
+    .v2-rule { height: 1px; background: #F0F0F0; margin: 20px 28px 0; flex-shrink: 0; }
+
+    /* Context pill — shows the question being discussed */
+    .v2-context {
+      margin: 18px 28px 0;
+      padding: 10px 14px;
+      border: 1px solid #F0F0F0;
+      flex-shrink: 0;
+    }
+    .v2-context-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #D4D4D4; margin-bottom: 6px; }
+    .v2-context-text { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 300; color: #AAAAAA; line-height: 1.45; }
+
+    .v2-convo { flex: 1; overflow: hidden; }
+
+    .v2-input-zone {
+      border-top: 1px solid #F2F2F2;
+      flex-shrink: 0;
+      padding: 14px 0 34px;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT 3 — INLINE EXPANSION
+       No overlay, no modal. Tapping Ask Sage dims
+       the options and expands the bottom of the
+       question card downward into a live Sage zone.
+       The question is still readable at the top.
+       The dialogue begins directly below a rule.
+       Nav arrows remain accessible at the very bottom.
+       The whole screen becomes a unified reading space.
+    ═══════════════════════════════════════════════ */
+
+    .v3-screen {
+      position: absolute; inset: 0;
+      background: #FFFFFF;
+      display: flex; flex-direction: column;
+      z-index: 2;
+    }
+
+    .v3-question-zone { flex-shrink: 0; }
+
+    .v3-top {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+    }
+    .v3-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .v3-counter { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D0D0D0; }
+
+    .v3-prog { position: relative; margin: 20px 28px 0; }
+    .v3-track { height: 1px; background: #F0F0F0; }
+    .v3-fill { position: absolute; top: 0; left: 0; height: 1px; background: #BDBDBD; }
+
+    .v3-q-body { padding: 24px 28px 0; }
+    .v3-subject { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #CFCFCF; margin-bottom: 14px; }
+    .v3-question { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; line-height: 1.5; color: #AAAAAA; }
+
+    .v3-sage-divider {
+      display: flex; align-items: center;
+      padding: 0 28px; margin: 20px 0 0;
+    }
+    .v3-sage-line { flex: 1; height: 1px; background: #EFEFEF; }
+    .v3-sage-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #D4D4D4; padding: 0 12px; }
+
+    .v3-convo { flex: 1; overflow: hidden; }
+
+    .v3-input-zone {
+      border-top: 1px solid #F2F2F2;
+      flex-shrink: 0;
+      padding: 14px 0 0;
+    }
+
+    /* Nav below the input */
+    .v3-nav {
+      padding: 10px 28px 28px;
+      display: flex; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .v3-nav-btn { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #BBBBBB; background: none; border: none; cursor: pointer; }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Bar ── -->
+<div class="bar">
+  <div class="bar-left">
+    <span class="bar-title">Ask Sage — Concepts</span>
+    <div class="bar-sep"></div>
+    <div class="btn-row" id="viewBtns">
+      <button class="cbtn on" data-v="all">All 3</button>
+      <button class="cbtn" data-v="1">Half Sheet</button>
+      <button class="cbtn" data-v="2">Full Screen</button>
+      <button class="cbtn" data-v="3">Inline</button>
+    </div>
+  </div>
+  <div class="state-toggle">
+    <span class="state-lbl">State</span>
+    <div class="toggle-pill">
+      <button class="tpill on" data-s="empty">Opened</button>
+      <button class="tpill" data-s="responded">Responded</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Stage ── -->
+<div class="stage" id="stage">
+
+
+  <!-- ══ 1: HALF SHEET ══ -->
+  <div class="col" id="col-1">
+    <span class="col-label">1 — Half Sheet</span>
+    <div class="phone">
+
+      <!-- Question card behind, visible but dimmed -->
+      <div class="qcard-bg">
+        <div class="qcard-top">
+          <span class="qcard-app">Agent Classroom</span>
+          <span class="qcard-counter">3 / 12</span>
+        </div>
+        <div class="qcard-progress">
+          <div class="qcard-track"></div>
+          <div class="qcard-fill" style="width:25%"></div>
+        </div>
+        <div class="qcard-body">
+          <div class="qcard-subject">Calculus Foundations</div>
+          <div class="qcard-question">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="qcard-rule"></div>
+          <div class="qcard-options">
+            <div class="qcard-option"><span class="qcard-opt-letter">A</span><span class="qcard-opt-text">t = 0 only</span></div>
+            <div class="qcard-option"><span class="qcard-opt-letter">B</span><span class="qcard-opt-text">t = 2 only</span></div>
+            <div class="qcard-option"><span class="qcard-opt-letter">C</span><span class="qcard-opt-text">t = 0 and t = 2</span></div>
+            <div class="qcard-option"><span class="qcard-opt-letter">D</span><span class="qcard-opt-text">t = 1 and t = 3</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrim -->
+      <div class="v1-scrim"></div>
+
+      <!-- Sage sheet -->
+      <div class="v1-sheet" id="v1-sheet-content">
+
+        <div class="v1-handle">
+          <div class="v1-handle-row">
+            <div class="v1-handle-line"></div>
+            <span class="v1-handle-lbl">Ask Sage</span>
+            <div class="v1-handle-line"></div>
+          </div>
+        </div>
+
+        <div class="v1-convo">
+
+          <!-- Sage opens -->
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech">Ask me anything about this question.</div>
+          </div>
+
+          <!-- Responded state -->
+          <div class="show-responded">
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">You</span></div>
+              <div class="rule-v"></div>
+              <div class="speech user">How do I find when it's at rest?</div>
+            </div>
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">Set v(t) = 0. Factor 3t(t − 2) = 0 — that gives you t = 0 and t = 2. Both are valid rest points.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="v1-input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="What do you want to know…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">1 — Half Sheet</div>
+      <div class="info-desc">The question card stays visible and dimmed behind a white scrim. The Sage sheet rises from the footer covering ~60% of the screen, anchored with a B-Break handle strip at its top edge. The user never loses visual context — the question is still legible above. The column grid dialogue happens inside the sheet.</div>
+      <div class="pills">
+        <span class="pill">Question visible above</span>
+        <span class="pill">White scrim dims bg</span>
+        <span class="pill">B-Break handle</span>
+        <span class="pill">Column grid inside</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ 2: FULL TAKEOVER ══ -->
+  <div class="col" id="col-2">
+    <span class="col-label">2 — Full Screen</span>
+    <div class="phone">
+
+      <!-- Question card base (behind, fully hidden by v2-screen) -->
+      <div class="qcard-bg" style="opacity:0"></div>
+
+      <!-- Full screen takeover -->
+      <div class="v2-screen" id="v2-screen-content">
+
+        <div class="v2-top">
+          <span class="v2-top-app">Agent Classroom</span>
+          <span class="v2-back">← Question</span>
+        </div>
+        <div class="v2-rule"></div>
+
+        <!-- Collapsed question context -->
+        <div class="v2-context">
+          <div class="v2-context-label">On question 3</div>
+          <div class="v2-context-text">A particle moves along the x-axis with velocity v(t) = 3t² − 6t…</div>
+        </div>
+
+        <div class="v2-convo">
+
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech">Ask me anything about this question.</div>
+          </div>
+
+          <div class="show-responded">
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">You</span></div>
+              <div class="rule-v"></div>
+              <div class="speech user">How do I find when it's at rest?</div>
+            </div>
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">Set v(t) = 0. Factor 3t(t − 2) = 0 — that gives you t = 0 and t = 2. Both are valid rest points.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="v2-input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="What do you want to know…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">2 — Full Screen</div>
+      <div class="info-desc">Tapping Ask Sage replaces the question card entirely with a dedicated Sage screen. A collapsed context block at the top shows which question is being discussed. The full screen gives Sage space for longer explanations without cramping. "← Question" in the top-right returns. Same column grid dialogue throughout.</div>
+      <div class="pills">
+        <span class="pill">Full screen replace</span>
+        <span class="pill">← Question back nav</span>
+        <span class="pill">Collapsed context</span>
+        <span class="pill">Room for long answers</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ 3: INLINE EXPANSION ══ -->
+  <div class="col" id="col-3">
+    <span class="col-label">3 — Inline</span>
+    <div class="phone">
+
+      <div class="v3-screen" id="v3-screen-content">
+
+        <!-- Question zone — faded -->
+        <div class="v3-question-zone">
+          <div class="v3-top">
+            <span class="v3-app">Agent Classroom</span>
+            <span class="v3-counter">3 / 12</span>
+          </div>
+          <div class="v3-prog">
+            <div class="v3-track"></div>
+            <div class="v3-fill" style="width:25%"></div>
+          </div>
+          <div class="v3-q-body">
+            <div class="v3-subject">Calculus Foundations</div>
+            <div class="v3-question">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          </div>
+        </div>
+
+        <!-- Sage zone expands inline -->
+        <div class="v3-sage-divider">
+          <div class="v3-sage-line"></div>
+          <span class="v3-sage-lbl">Ask Sage</span>
+          <div class="v3-sage-line"></div>
+        </div>
+
+        <div class="v3-convo">
+
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech">Ask me anything about this question.</div>
+          </div>
+
+          <div class="show-responded">
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">You</span></div>
+              <div class="rule-v"></div>
+              <div class="speech user">How do I find when it's at rest?</div>
+            </div>
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">Set v(t) = 0. Factor 3t(t − 2) = 0 — that gives you t = 0 and t = 2. Both are valid rest points.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="v3-input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="What do you want to know…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="v3-nav">
+          <button class="v3-nav-btn">← Prev</button>
+          <button class="v3-nav-btn">Next →</button>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">3 — Inline</div>
+      <div class="info-desc">No overlay or modal — the screen expands downward in place. The question is dimmed but stays readable at the top. A "── Ask Sage ──" divider (matching the footer's B-Break grammar) marks the transition. The dialogue flows below it in the column grid. Nav arrows remain accessible at the very bottom. Everything on one continuous surface.</div>
+      <div class="pills">
+        <span class="pill">No modal</span>
+        <span class="pill">Question fades, stays</span>
+        <span class="pill">B-Break divider</span>
+        <span class="pill">Nav still reachable</span>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<script>
+  /* ── View toggle ── */
+  const viewBtns = document.querySelectorAll('#viewBtns .cbtn');
+  const stage = document.getElementById('stage');
+  const colMap = { 1: 'col-1', 2: 'col-2', 3: 'col-3' };
+
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      viewBtns.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      const v = btn.dataset.v;
+      if (v === 'all') {
+        stage.classList.remove('single');
+        Object.values(colMap).forEach(id => document.getElementById(id).classList.remove('hide'));
+      } else {
+        stage.classList.add('single');
+        Object.entries(colMap).forEach(([k, id]) => {
+          document.getElementById(id).classList.toggle('hide', k !== v);
+        });
+      }
+    });
+  });
+
+  /* ── State toggle ── */
+  const statePills = document.querySelectorAll('.tpill');
+
+  function applyState(s) {
+    document.querySelectorAll('.phone').forEach(phone => {
+      phone.classList.remove('state-empty', 'state-responded');
+      phone.classList.add('state-' + s);
+    });
+  }
+
+  statePills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      statePills.forEach(p => p.classList.remove('on'));
+      pill.classList.add('on');
+      applyState(pill.dataset.s);
+    });
+  });
+
+  applyState('empty');
+
+  /* ── Auto-resize textareas ── */
+  document.querySelectorAll('textarea').forEach(ta => {
+    ta.addEventListener('input', () => {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    });
+  });
+</script>
+</body>
+</html>

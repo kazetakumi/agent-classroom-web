@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Sage — Soul Concepts III</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0A0A0A;
+      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ── Top bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 50px;
+      background: #0A0A0A;
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 32px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .bar-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+    }
+    .bar-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.1); }
+
+    /* ── Stage ── */
+    .stage {
+      padding: 86px 40px 80px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 52px;
+    }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+    /* ── Phone ── */
+    .phone {
+      width: 390px; height: 800px;
+      border-radius: 44px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.07),
+        0 40px 100px rgba(0,0,0,0.7),
+        0 8px 24px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+    }
+
+    /* ── Info card ── */
+    .info {
+      width: 390px;
+      background: #111111;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 22px 24px 20px;
+    }
+    .info-concept {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.16); margin-bottom: 10px;
+    }
+    .info-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px; font-weight: 300;
+      color: rgba(255,255,255,0.75); margin-bottom: 12px;
+      font-style: italic;
+    }
+    .info-desc {
+      font-size: 12.5px;
+      color: rgba(255,255,255,0.33);
+      line-height: 1.75;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    .spec {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .spec:last-child { margin-bottom: 0; }
+    .spec-k {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.16);
+    }
+    .spec-v {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; color: rgba(255,255,255,0.32);
+    }
+
+    /* ════════════════════════════════════════════
+       SHARED SCREEN SKELETON
+    ════════════════════════════════════════════ */
+
+    .screen {
+      background: #FFFFFF;
+      height: 100%;
+      display: flex; flex-direction: column;
+    }
+
+    .sc-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 28px 0; flex-shrink: 0;
+    }
+    .sc-app {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #C8C8C8;
+    }
+    .sc-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.06em;
+      color: #D4D4D4;
+    }
+    .sc-hairline { height: 1px; background: #F0F0F0; margin: 16px 28px 0; flex-shrink: 0; }
+    .sc-progress { height: 1px; background: #C0C0C0; margin: 0 28px; width: 25%; flex-shrink: 0; }
+
+    .sc-body { flex: 1; padding: 28px 28px 0; overflow: hidden; }
+
+    .sc-subject {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: #C0C0C0; margin-bottom: 20px;
+    }
+    .sc-q {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px; font-weight: 300; line-height: 1.55; color: #111;
+      margin-bottom: 24px;
+    }
+    .sc-divider { height: 1px; background: #F0F0F0; margin-bottom: 22px; }
+    .sc-opt {
+      display: flex; gap: 14px; align-items: baseline; margin-bottom: 18px;
+    }
+    .sc-opt.dim { opacity: 0.28; }
+    .sc-opt.sel .sc-opt-l { color: #111; }
+    .sc-opt.sel .sc-opt-t { color: #111; }
+    .sc-opt-l {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; color: #D0D0D0; width: 12px; flex-shrink: 0;
+    }
+    .sc-opt-t {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 300; color: #999; line-height: 1.35;
+    }
+
+    /* Nav strip — always separate from Ask Sage */
+    .nav-strip {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; height: 44px; flex-shrink: 0;
+      border-top: 1px solid #F5F5F5;
+    }
+    .nav-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #DADADA;
+    }
+
+
+    /* ════════════════════════════════════════════
+       A — THE RISEN WORD
+       "Sage" at 120px, clipped — only the letter
+       tops emerge from the screen's bottom edge.
+    ════════════════════════════════════════════ */
+
+    .ask-risen {
+      flex-shrink: 0;
+      height: 72px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      border-top: 1px solid #F2F2F2;
+    }
+
+    .risen-word {
+      position: absolute;
+      /* Push the text so only the uppermost glyph
+         portions remain visible above the bottom clip. */
+      top: 20px;
+      left: 0; right: 0;
+      text-align: center;
+
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 124px;
+      font-weight: 300;
+      font-style: italic;
+      color: #BBBBBB;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+
+      /* No animation — it is simply there, unmoving. */
+      user-select: none;
+    }
+
+
+    /* ════════════════════════════════════════════
+       B — THE ELLIPSIS
+       Three Cormorant dots breathing in sequence.
+       Sage is always mid-thought.
+    ════════════════════════════════════════════ */
+
+    @keyframes dot-breath {
+      0%, 100% { opacity: 0.18; }
+      50%       { opacity: 0.64; }
+    }
+
+    .ask-ellipsis {
+      flex-shrink: 0;
+      height: 72px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 18px;
+      cursor: pointer;
+      border-top: 1px solid #F0F0F0;
+    }
+
+    .e-dot {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px; font-weight: 300;
+      color: #999;
+      line-height: 1;
+      /* default dim */
+      opacity: 0.18;
+      animation: dot-breath 6s ease-in-out infinite;
+    }
+
+    /* Stagger: each dot 2 s behind the previous */
+    .e-dot:nth-child(1) { animation-delay: 0s; }
+    .e-dot:nth-child(2) { animation-delay: 2s; }
+    .e-dot:nth-child(3) { animation-delay: 4s; }
+
+
+    /* ════════════════════════════════════════════
+       C — THE LINE OF INTENTION
+       A 1.5px line that is barely more present than
+       a rule. No text. The zone knows.
+    ════════════════════════════════════════════ */
+
+    .ask-intention {
+      flex-shrink: 0;
+      height: 72px;
+      position: relative;
+      cursor: pointer;
+
+      /* A faint warm radial behind the line —
+         almost imperceptible, like light leaking through. */
+      background:
+        radial-gradient(
+          ellipse 70% 28px at 50% 50%,
+          rgba(248, 246, 242, 0.8) 0%,
+          rgba(255, 255, 255, 0) 100%
+        );
+    }
+
+    .intention-line {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      height: 1.5px;
+      transform: translateY(-50%);
+
+      /* The line is slightly warmer than a normal rule.
+         It fades in from each edge — no hard terminations. */
+      background: linear-gradient(
+        to right,
+        transparent 0%,
+        #C8C8C0 6%,   /* the C0 in hex = 192 — B channel lower = warm */
+        #C0C0B8 30%,
+        #C0C0B8 70%,
+        #C8C8C0 94%,
+        transparent 100%
+      );
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="bar-title">Agent Classroom</span>
+  <div class="bar-dot"></div>
+  <span class="bar-title" style="opacity:0.5">Ask Sage · Soul Concepts III</span>
+</div>
+
+<div class="stage">
+
+  <!-- ══════ A — THE RISEN WORD ══════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="sc-hairline"></div>
+        <div class="sc-progress"></div>
+
+        <div class="sc-body">
+          <div class="sc-subject">Calculus Foundations</div>
+          <div class="sc-q">
+            A particle moves along the x-axis with velocity
+            v(t) = 3t² − 6t. At what time is the particle
+            at rest?
+          </div>
+          <div class="sc-divider"></div>
+          <div class="sc-opt dim">
+            <span class="sc-opt-l">A</span>
+            <span class="sc-opt-t">t = 0 only</span>
+          </div>
+          <div class="sc-opt dim">
+            <span class="sc-opt-l">B</span>
+            <span class="sc-opt-t">t = 2 only</span>
+          </div>
+          <div class="sc-opt sel">
+            <span class="sc-opt-l">C</span>
+            <span class="sc-opt-t">t = 0 and t = 2</span>
+          </div>
+          <div class="sc-opt dim">
+            <span class="sc-opt-l">D</span>
+            <span class="sc-opt-t">t = 1 and t = 3</span>
+          </div>
+        </div>
+
+        <div class="nav-strip">
+          <span class="nav-lbl">← Prev</span>
+          <span class="nav-lbl">Next →</span>
+        </div>
+
+        <div class="ask-risen">
+          <div class="risen-word">Sage</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-concept">Concept A</div>
+      <div class="info-name">The Risen Word</div>
+      <div class="info-desc">
+        Sage's name at 124px — large enough to be architectural —
+        sits just below the screen's horizon. Only the uppermost
+        strokes of the letterforms are visible: the crown of the S,
+        the curved tops. The word is submerged. The gesture is
+        literal — swipe up and it rises. No affordance label needed.
+        The half-visible word is the instruction.
+      </div>
+      <div class="spec">
+        <span class="spec-k">Font</span>
+        <span class="spec-v">Cormorant italic 300 · 124px</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Color</span>
+        <span class="spec-v">#BBBBBB</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Zone height</span>
+        <span class="spec-v">72px · overflow hidden</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Animation</span>
+        <span class="spec-v">None — stillness is the point</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Character</span>
+        <span class="spec-v">Something vast, just below the surface</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════ B — THE ELLIPSIS ══════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="sc-hairline"></div>
+        <div class="sc-progress"></div>
+
+        <div class="sc-body">
+          <div class="sc-subject">Calculus Foundations</div>
+          <div class="sc-q">
+            A particle moves along the x-axis with velocity
+            v(t) = 3t² − 6t. At what time is the particle
+            at rest?
+          </div>
+          <div class="sc-divider"></div>
+          <div class="sc-opt dim">
+            <span class="sc-opt-l">A</span>
+            <span class="sc-opt-t">t = 0 only</span>
+          </div>
+          <div class="sc-opt dim">
+            <span class="sc-opt-l">B</span>
+            <span class="sc-opt-t">t = 2 only</span>
+          </div>
+          <div class="sc-opt sel">
+            <span class="sc-opt-l">C</span>
+            <span class="sc-opt-t">t = 0 and t = 2</span>
+          </div>
+          <div class="sc-opt dim">
+            <span class="sc-opt-l">D</span>
+            <span class="sc-opt-t">t = 1 and t = 3</span>
+          </div>
+        </div>
+
+        <div class="nav-strip">
+          <span class="nav-lbl">← Prev</span>
+          <span class="nav-lbl">Next →</span>
+        </div>
+
+        <div class="ask-ellipsis">
+          <span class="e-dot">·</span>
+          <span class="e-dot">·</span>
+          <span class="e-dot">·</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-concept">Concept B</div>
+      <div class="info-name">The Ellipsis</div>
+      <div class="info-desc">
+        Three middle-dots in Cormorant Garamond — spaced, not compressed
+        into a Unicode ellipsis — breathing in slow sequence. One lights,
+        settles, fades. Then the next. Then the third. Six seconds per
+        cycle. Not a chat typing indicator — too slow, too calm for that.
+        This is the weight of a teacher's pause before speaking.
+        Sage is always mid-thought. Tap to hear it.
+      </div>
+      <div class="spec">
+        <span class="spec-k">Font</span>
+        <span class="spec-v">Cormorant 300 · 32px · middle-dot ·</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Color</span>
+        <span class="spec-v">#999 at peak opacity 0.64</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Cycle</span>
+        <span class="spec-v">6s ease-in-out · 2s stagger per dot</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Rest opacity</span>
+        <span class="spec-v">0.18</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Character</span>
+        <span class="spec-v">An unfinished sentence. Always.</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════ C — THE LINE OF INTENTION ══════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="sc-hairline"></div>
+        <div class="sc-progress"></div>
+
+        <div class="sc-body">
+          <div class="sc-subject">Calculus Foundations</div>
+          <div class="sc-q">
+            A particle moves along the x-axis with velocity
+            v(t) = 3t² − 6t. At what time is the particle
+            at rest?
+          </div>
+          <div class="sc-divider"></div>
+          <div class="sc-opt dim">
+            <span class="sc-opt-l">A</span>
+            <span class="sc-opt-t">t = 0 only</span>
+          </div>
+          <div class="sc-opt dim">
+            <span class="sc-opt-l">B</span>
+            <span class="sc-opt-t">t = 2 only</span>
+          </div>
+          <div class="sc-opt sel">
+            <span class="sc-opt-l">C</span>
+            <span class="sc-opt-t">t = 0 and t = 2</span>
+          </div>
+          <div class="sc-opt dim">
+            <span class="sc-opt-l">D</span>
+            <span class="sc-opt-t">t = 1 and t = 3</span>
+          </div>
+        </div>
+
+        <div class="nav-strip">
+          <span class="nav-lbl">← Prev</span>
+          <span class="nav-lbl">Next →</span>
+        </div>
+
+        <div class="ask-intention">
+          <div class="intention-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-concept">Concept C</div>
+      <div class="info-name">The Line of Intention</div>
+      <div class="info-desc">
+        Nothing. Just a line — 1.5px — centered in a 72px zone.
+        But this line is not a rule. It is slightly warmer than
+        the surrounding white. Slightly more present. Behind it,
+        the faintest radial warmth, as if something on the other
+        side is lit. No text. No animation. No instruction.
+        The screen simply knows. So does the hand.
+      </div>
+      <div class="spec">
+        <span class="spec-k">Line height</span>
+        <span class="spec-v">1.5px</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Color</span>
+        <span class="spec-v">#C0C0B8 — warm gray, not neutral</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Glow</span>
+        <span class="spec-v">Radial #F8F6F2 · ellipse 70% 28px</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Zone height</span>
+        <span class="spec-v">72px · full width tap</span>
+      </div>
+      <div class="spec">
+        <span class="spec-k">Character</span>
+        <span class="spec-v">Sage is behind this. Already lit.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -2,6 +2,106 @@
   "project": "AgentClassroom",
   "tasks": [
     {
+      "id": "FEAT-003",
+      "type": "feat",
+      "title": "Reading Room Redesign \u2014 Full UI/UX Overhaul",
+      "status": "todo",
+      "blocked": [],
+      "children": [
+        {
+          "id": "US-010",
+          "type": "user-story",
+          "title": "Design System Bootstrap",
+          "status": "done",
+          "blocked": [],
+          "children": []
+        },
+        {
+          "id": "US-011",
+          "type": "user-story",
+          "title": "SageTrigger.tsx \u2014 shared bottom zone component",
+          "status": "todo",
+          "blocked": [
+            "US-010"
+          ],
+          "children": []
+        },
+        {
+          "id": "US-012",
+          "type": "user-story",
+          "title": "Onboarding Name screen + App Entry Guard",
+          "status": "todo",
+          "blocked": [
+            "US-010"
+          ],
+          "children": []
+        },
+        {
+          "id": "US-013",
+          "type": "user-story",
+          "title": "Welcome screen rewrite",
+          "status": "todo",
+          "blocked": [
+            "US-010",
+            "US-011"
+          ],
+          "children": []
+        },
+        {
+          "id": "US-014",
+          "type": "user-story",
+          "title": "Question Card rewrite",
+          "status": "todo",
+          "blocked": [
+            "US-011"
+          ],
+          "children": []
+        },
+        {
+          "id": "US-015",
+          "type": "user-story",
+          "title": "SageSheet.tsx \u2014 full-screen overlay (replaces CompanionSheet)",
+          "status": "todo",
+          "blocked": [
+            "US-011"
+          ],
+          "children": []
+        },
+        {
+          "id": "US-016",
+          "type": "user-story",
+          "title": "Results screen rewrite",
+          "status": "todo",
+          "blocked": [
+            "US-011"
+          ],
+          "children": []
+        },
+        {
+          "id": "US-017",
+          "type": "user-story",
+          "title": "Review Grid rewrite",
+          "status": "todo",
+          "blocked": [
+            "US-011",
+            "US-016"
+          ],
+          "children": []
+        },
+        {
+          "id": "US-018",
+          "type": "user-story",
+          "title": "Explanation screen",
+          "status": "todo",
+          "blocked": [
+            "US-011",
+            "US-017"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
       "id": "FEAT-002",
       "type": "feat",
       "title": "Detailed Results View \u2014 ticket grid and per-question explanation screen",

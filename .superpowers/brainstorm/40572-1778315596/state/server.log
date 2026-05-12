@@ -1,0 +1,4 @@
+{"type":"server-started","port":59342,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:59342","screen_dir":"/Users/dreaminds/Desktop/POCs/AgentClassroom/v1/.superpowers/brainstorm/40572-1778315596/content","state_dir":"/Users/dreaminds/Desktop/POCs/AgentClassroom/v1/.superpowers/brainstorm/40572-1778315596/state"}
+{"type":"screen-added","file":"/Users/dreaminds/Desktop/POCs/AgentClassroom/v1/.superpowers/brainstorm/40572-1778315596/content/explanation-options.html"}
+{"type":"screen-added","file":"/Users/dreaminds/Desktop/POCs/AgentClassroom/v1/.superpowers/brainstorm/40572-1778315596/content/waiting-done.html"}
+{"type":"server-stopped","reason":"idle timeout"}

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explanation Screen — Concepts 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ─── Control bar ────────────────────────────── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 54px;
+      background: #111; display: flex; align-items: center;
+      padding: 0 28px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bar-left { display: flex; align-items: center; gap: 18px; }
+    .bar-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+    .btn-row { display: flex; gap: 3px; }
+    .cbtn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px; cursor: pointer; transition: all 0.14s; }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+
+    /* ─── Stage ──────────────────────────────────── */
+    .stage { padding-top: 76px; padding-bottom: 60px; display: flex; justify-content: center; align-items: flex-start; gap: 32px; min-height: 100vh; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .col.hide { display: none; }
+    .col-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+    .phone { width: 390px; height: 800px; border-radius: 44px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09); }
+
+    /* ═══════════════════════════════════════════════
+       SHARED SCREEN FOUNDATION
+    ═══════════════════════════════════════════════ */
+
+    .screen { background: #FFFFFF; height: 100%; display: flex; flex-direction: column; }
+
+    .top-strip { padding: 32px 28px 0; display: flex; align-items: baseline; justify-content: space-between; flex-shrink: 0; }
+    .top-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .top-back { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #C0C0C0; }
+
+    .rule-h { height: 1px; background: #F0F0F0; margin: 20px 28px 0; flex-shrink: 0; }
+
+    /* Question zone */
+    .question-zone { padding: 20px 28px 0; flex-shrink: 0; }
+    .question-meta { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #BBBBBB; margin-bottom: 14px; }
+    .question-text { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 300; color: #111; line-height: 1.6; }
+
+    /* Footer bar */
+    .footer-bar { flex-shrink: 0; height: 56px; border-top: 1px solid #F0F0F0; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; margin-top: auto; }
+    .footer-nav { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #ABABAB; }
+    .footer-sage { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .footer-sage-arrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #D0D0D0; }
+    .footer-sage-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: #D0D0D0; }
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT A — FOUR FIELDS
+       Every required field gets its own labeled
+       section: QUESTION / SELECTED / CORRECT /
+       EXPLANATION. Reads like a structured debrief
+       — clear, scannable, no visual tricks needed.
+    ═══════════════════════════════════════════════ */
+
+    .field-block { padding: 18px 28px 0; flex-shrink: 0; }
+    .field-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #C8C8C8; margin-bottom: 10px;
+    }
+    .field-value-wrong {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 300; font-style: italic;
+      color: #C0C0C0; line-height: 1.5;
+    }
+    .field-value-correct {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 300; font-style: italic;
+      color: #111; line-height: 1.5;
+    }
+    .field-explanation {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 300;
+      color: #444; line-height: 1.7;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT B — THE DIFF
+       All four options replayed. Selected: dim + ×.
+       Correct: full ink. Others: opacity 0.3.
+       Explanation prose directly below the options.
+    ═══════════════════════════════════════════════ */
+
+    .options-zone { padding: 0 28px; flex-shrink: 0; }
+    .option-row { display: flex; align-items: baseline; gap: 14px; padding: 10px 0; border-bottom: 1px solid #F6F6F6; }
+    .option-row:last-child { border-bottom: none; }
+    .opt-letter { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #CFCFCF; width: 14px; flex-shrink: 0; }
+    .opt-text { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; color: #888; line-height: 1.3; flex: 1; }
+    .opt-tag { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; color: #D8D8D8; flex-shrink: 0; align-self: center; }
+    .option-row.correct .opt-letter { color: #111; }
+    .option-row.correct .opt-text   { color: #111; }
+    .option-row.correct .opt-tag    { color: #AAAAAA; }
+    .option-row.yours .opt-letter   { color: #CECECE; }
+    .option-row.yours .opt-text     { color: #C0C0C0; }
+    .option-row.faded               { opacity: 0.3; }
+
+    .expl-prose {
+      padding: 18px 28px 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 300;
+      color: #444; line-height: 1.7;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT C — RECEIPT + ESSAY
+       Two-line receipt (SELECTED / CORRECT) gives
+       the answer diff in one breath. Then the
+       explanation gets the full remaining space as
+       an open Cormorant paragraph — generous, calm.
+    ═══════════════════════════════════════════════ */
+
+    .receipt-zone { padding: 0 28px; flex-shrink: 0; }
+    .receipt-row { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #F4F4F4; }
+    .receipt-row:last-child { border-bottom: none; }
+    .receipt-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8; }
+    .receipt-value { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 300; font-style: italic; text-align: right; }
+    .receipt-value.wrong   { color: #C0C0C0; }
+    .receipt-value.correct { color: #111; }
+
+    .essay-zone {
+      padding: 20px 28px 0;
+      flex-shrink: 0;
+    }
+    .essay-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #C8C8C8; margin-bottom: 14px;
+    }
+    .essay-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 300;
+      color: #333; line-height: 1.75;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-left">
+    <span class="bar-title">Explanation Screen — Concepts 2</span>
+    <div class="bar-sep"></div>
+    <div class="btn-row">
+      <button class="cbtn on" onclick="show('all',this)">All</button>
+      <button class="cbtn"    onclick="show('a',  this)">A — Four Fields</button>
+      <button class="cbtn"    onclick="show('b',  this)">B — The Diff</button>
+      <button class="cbtn"    onclick="show('c',  this)">C — Receipt + Essay</button>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+
+  <!-- ════════════════════════════════════════════════
+       CONCEPT A — FOUR FIELDS
+       Each required field labeled and stacked.
+       QUESTION / SELECTED / CORRECT / EXPLANATION.
+       Reads like a structured debrief document.
+  ════════════════════════════════════════════════ -->
+  <div class="col" id="col-a">
+    <span class="col-label">A — Four Fields</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-back">← Review</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <!-- QUESTION -->
+        <div class="field-block">
+          <div class="field-label">Question · 3 of 12</div>
+          <div class="question-text">
+            A particle moves along the <em>x</em>&#8209;axis
+            with velocity <em>v</em>(<em>t</em>) = 3<em>t</em><sup>2</sup> − 6<em>t</em>.
+            At what time is the particle at rest?
+          </div>
+        </div>
+        <div class="rule-h"></div>
+
+        <!-- SELECTED -->
+        <div class="field-block">
+          <div class="field-label">Selected</div>
+          <div class="field-value-wrong"><em>t</em> = 0 only</div>
+        </div>
+
+        <!-- CORRECT -->
+        <div class="field-block">
+          <div class="field-label">Correct</div>
+          <div class="field-value-correct"><em>t</em> = 0 and <em>t</em> = 2</div>
+        </div>
+        <div class="rule-h"></div>
+
+        <!-- EXPLANATION -->
+        <div class="field-block">
+          <div class="field-label">Explanation</div>
+          <div class="field-explanation">
+            The particle is at rest when velocity
+            equals zero. Setting 3<em>t</em><sup>2</sup> − 6<em>t</em> = 0
+            and factoring gives <em>t</em>(3<em>t</em> − 6) = 0,
+            so <em>t</em> = 0 or <em>t</em> = 2. Both are
+            valid — the particle stops at the
+            origin and again when it reverses.
+          </div>
+        </div>
+
+        <div class="footer-bar">
+          <span class="footer-nav">← Prev</span>
+          <div class="footer-sage">
+            <span class="footer-sage-arrow">↑</span>
+            <span class="footer-sage-label">Ask Sage</span>
+          </div>
+          <span class="footer-nav">Next →</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       CONCEPT B — THE DIFF
+       Options replayed: selected dim, correct full
+       ink, others faded. Explanation text below.
+       Answer comparison is visual, not labelled.
+  ════════════════════════════════════════════════ -->
+  <div class="col" id="col-b">
+    <span class="col-label">B — The Diff</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-back">← Review</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="question-zone">
+          <div class="question-meta">Calculus Foundations · Question 3 of 12</div>
+          <div class="question-text">
+            A particle moves along the <em>x</em>&#8209;axis
+            with velocity <em>v</em>(<em>t</em>) = 3<em>t</em><sup>2</sup> − 6<em>t</em>.
+            At what time is the particle at rest?
+          </div>
+        </div>
+        <div class="rule-h"></div>
+
+        <!-- Options — visual diff -->
+        <div class="options-zone" style="padding-top: 4px;">
+          <div class="option-row yours">
+            <span class="opt-letter">A</span>
+            <span class="opt-text"><em>t</em> = 0 only</span>
+            <span class="opt-tag">selected ×</span>
+          </div>
+          <div class="option-row faded">
+            <span class="opt-letter">B</span>
+            <span class="opt-text"><em>t</em> = 2 only</span>
+          </div>
+          <div class="option-row correct">
+            <span class="opt-letter">C</span>
+            <span class="opt-text"><em>t</em> = 0 and <em>t</em> = 2</span>
+            <span class="opt-tag">correct</span>
+          </div>
+          <div class="option-row faded">
+            <span class="opt-letter">D</span>
+            <span class="opt-text"><em>t</em> = 1 and <em>t</em> = 3</span>
+          </div>
+        </div>
+        <div class="rule-h"></div>
+
+        <!-- Explanation — unlabelled, flows naturally -->
+        <div class="expl-prose">
+          The particle is at rest when velocity
+          equals zero. Factoring
+          3<em>t</em><sup>2</sup> − 6<em>t</em> = 0 gives
+          <em>t</em>(3<em>t</em> − 6) = 0, so
+          <em>t</em> = 0 and <em>t</em> = 2 — two
+          solutions, not one.
+        </div>
+
+        <div class="footer-bar">
+          <span class="footer-nav">← Prev</span>
+          <div class="footer-sage">
+            <span class="footer-sage-arrow">↑</span>
+            <span class="footer-sage-label">Ask Sage</span>
+          </div>
+          <span class="footer-nav">Next →</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       CONCEPT C — RECEIPT + ESSAY
+       Two-line receipt (SELECTED / CORRECT) gives
+       the answer comparison instantly. Then the
+       explanation gets the full remaining space —
+       generous Cormorant prose, room to breathe.
+  ════════════════════════════════════════════════ -->
+  <div class="col" id="col-c">
+    <span class="col-label">C — Receipt + Essay</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-back">← Review</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="question-zone">
+          <div class="question-meta">Calculus Foundations · Question 3 of 12</div>
+          <div class="question-text">
+            A particle moves along the <em>x</em>&#8209;axis
+            with velocity <em>v</em>(<em>t</em>) = 3<em>t</em><sup>2</sup> − 6<em>t</em>.
+            At what time is the particle at rest?
+          </div>
+        </div>
+        <div class="rule-h"></div>
+
+        <!-- Receipt — selected vs correct, two rows -->
+        <div class="receipt-zone" style="padding-top: 4px;">
+          <div class="receipt-row">
+            <span class="receipt-label">Selected</span>
+            <span class="receipt-value wrong"><em>t</em> = 0 only</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Correct</span>
+            <span class="receipt-value correct"><em>t</em> = 0 and <em>t</em> = 2</span>
+          </div>
+        </div>
+        <div class="rule-h"></div>
+
+        <!-- Essay — labelled explanation, generous size -->
+        <div class="essay-zone">
+          <div class="essay-label">Explanation</div>
+          <div class="essay-text">
+            The particle is at rest when its
+            velocity equals zero. Setting
+            3<em>t</em><sup>2</sup> − 6<em>t</em> = 0
+            and factoring gives
+            <em>t</em>(3<em>t</em> − 6) = 0,
+            so <em>t</em> = 0 or <em>t</em> = 2.
+            Both values are solutions — the
+            particle stops momentarily at the
+            origin, and again when it reverses
+            direction at <em>t</em> = 2.
+          </div>
+        </div>
+
+        <div class="footer-bar">
+          <span class="footer-nav">← Prev</span>
+          <div class="footer-sage">
+            <span class="footer-sage-arrow">↑</span>
+            <span class="footer-sage-label">Ask Sage</span>
+          </div>
+          <span class="footer-nav">Next →</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /stage -->
+
+<script>
+  function show(id, btn) {
+    document.querySelectorAll('.cbtn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    ['a','b','c'].forEach(c => {
+      const el = document.getElementById('col-' + c);
+      if (id === 'all' || id === c) el.classList.remove('hide');
+      else el.classList.add('hide');
+    });
+  }
+</script>
+
+</body>
+</html>

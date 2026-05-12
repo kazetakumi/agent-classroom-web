@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Classroom — All Screens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Control Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 54px;
+      background: #111;
+      display: flex; align-items: center;
+      padding: 0 28px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      gap: 18px;
+    }
+    .bar-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); white-space: nowrap;
+    }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
+    .btn-row { display: flex; gap: 3px; flex-wrap: wrap; }
+    .cbtn {
+      background: transparent; border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px;
+      cursor: pointer; transition: all 0.14s; white-space: nowrap;
+    }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+
+    /* ── Stage ── */
+    .stage {
+      padding-top: 76px; padding-bottom: 60px;
+      display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    /* ── Phone ── */
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09);
+      position: relative;
+    }
+
+    /* ── Screen panels ── */
+    .screen-panel { display: none; position: absolute; inset: 0; }
+    .screen-panel.active { display: block; }
+
+
+    /* ══════════════════════════════════════════════
+       SHARED SCREEN FOUNDATION
+    ══════════════════════════════════════════════ */
+
+    .screen {
+      background: #FFFFFF; height: 100%;
+      display: flex; flex-direction: column;
+    }
+
+    .top-strip {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .top-app {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .top-date  { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D8D8D8; }
+    .top-back  { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #C0C0C0; cursor: pointer; }
+    .top-counter { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: #D0D0D0; }
+
+    .rule-h     { height: 1px; background: #F0F0F0; margin: 20px 28px 0; flex-shrink: 0; }
+    .rule-flush { height: 1px; background: #F0F0F0; margin: 0; flex-shrink: 0; }
+
+    /* Column grid turns */
+    .turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 20px 28px 0;
+    }
+    .turn:first-child { padding-top: 24px; }
+    .lbl-col { display: flex; align-items: flex-start; justify-content: flex-end; padding-top: 3px; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; }
+    .rule-v { background: #EFEFEF; width: 1px; }
+    .speech-col { }
+    .speech { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; line-height: 1.55; color: #111; }
+
+    /* Session key-value (welcome + results) */
+    .session-list { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+    .session-row { display: flex; align-items: baseline; gap: 10px; }
+    .session-key { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #D0D0D0; min-width: 66px; flex-shrink: 0; }
+    .session-val { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 17px; color: #666; }
+
+    /* B-Break action pattern (welcome + results) */
+    .break-section { flex-shrink: 0; margin: 20px 0 0; }
+    .break-divider { display: flex; align-items: center; padding: 0 28px; }
+    .break-line { flex: 1; height: 1px; background: #EFEFEF; }
+    .break-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #D4D4D4; padding: 0 12px; }
+    .break-action { padding: 18px 28px 0; }
+    .break-btn { width: 100%; background: #111; color: #FFF; border: none; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; padding: 16px 22px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; letter-spacing: 0.02em; transition: background 0.14s; }
+    .break-btn:hover { background: #333; }
+    .break-btn-arrow { opacity: 0.45; font-size: 18px; }
+
+    /* Ghost secondary action */
+    .ghost-action { padding: 0 28px 40px; flex-shrink: 0; }
+    .ghost-inner { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #F2F2F2; padding-top: 18px; }
+    .ghost-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; font-weight: 300; color: #CFCFCF; cursor: pointer; }
+
+    /* Shared footer bar (question / review / explanation) */
+    .footer-bar { flex-shrink: 0; height: 56px; border-top: 1px solid #F0F0F0; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; margin-top: auto; }
+    .fb-nav { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #ABABAB; background: none; border: none; cursor: pointer; }
+    .fb-nav.dim { color: #DCDCDC; cursor: default; }
+    .fb-sage { display: flex; flex-direction: column; align-items: center; gap: 0; cursor: pointer; }
+    .fb-sage-arrow { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #D0D0D0; line-height: 1; }
+    .fb-sage-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #D0D0D0; }
+    /* Explanation uses footer-nav / footer-sage variants */
+    .footer-nav { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #ABABAB; }
+    .footer-sage { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .footer-sage-arrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #D0D0D0; }
+    .footer-sage-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: #D0D0D0; }
+
+
+    /* ══════════════════════════════════════════════
+       SCREEN 1 — WELCOME (B-Break)
+       Source: welcome-concepts.html col-b
+    ══════════════════════════════════════════════ */
+
+    .transcript {
+      flex: 1;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      overflow: hidden;
+    }
+
+    .break-session-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; color: #111; margin-bottom: 4px; }
+    .break-session-meta { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #C8C8C8; letter-spacing: 0.06em; margin-bottom: 16px; }
+
+    .b-redirect { padding: 0 28px 40px; flex-shrink: 0; }
+    .b-redirect-inner { display: flex; align-items: flex-end; gap: 12px; border-top: 1px solid #F2F2F2; padding-top: 18px; }
+    .b-redirect-ta { flex: 1; background: transparent; border: none; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; font-weight: 300; color: #111; outline: none; resize: none; line-height: 1.55; min-height: 28px; overflow: hidden; }
+    .b-redirect-ta::placeholder { color: #CFCFCF; }
+    .b-redirect-send { background: transparent; border: none; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: #D4D4D4; padding: 2px; transition: color 0.14s; flex-shrink: 0; line-height: 1; }
+    .b-redirect-send:hover { color: #111; }
+
+
+    /* ══════════════════════════════════════════════
+       SCREEN 2 — QUESTION CARD (V1 Footer Bar)
+       Source: question-concepts-2.html col-1
+    ══════════════════════════════════════════════ */
+
+    .progress-row { position: relative; margin: 20px 28px 0; flex-shrink: 0; }
+    .progress-track { height: 1px; background: #F0F0F0; }
+    .progress-fill { position: absolute; top: 0; left: 0; height: 1px; background: #BDBDBD; }
+
+    .c-body { flex: 1; overflow: hidden; padding: 26px 28px 16px; }
+    .c-subject { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #CFCFCF; margin-bottom: 18px; }
+    .c-question { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 300; line-height: 1.52; color: #111; }
+    .c-rule { height: 1px; background: #EFEFEF; margin: 24px 0 6px; }
+    .c-options { display: flex; flex-direction: column; }
+    .c-option { display: flex; align-items: flex-start; gap: 18px; padding: 12px 0; border-bottom: 1px solid #F6F6F6; cursor: pointer; }
+    .c-option:last-child { border-bottom: none; }
+    .c-opt-letter { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #CFCFCF; min-width: 14px; padding-top: 5px; flex-shrink: 0; }
+    .c-opt-text { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; color: #888; line-height: 1.4; }
+
+    .v1-footer { border-top: 1px solid #F0F0F0; padding: 0 28px; height: 56px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .v1-nav-btn { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #ABABAB; background: none; border: none; cursor: pointer; padding: 8px 0; transition: color 0.12s; }
+    .v1-nav-btn:hover { color: #111; }
+    .v1-nav-btn.disabled { color: #DEDEDE; pointer-events: none; }
+    .v1-sage-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; cursor: pointer; padding: 6px 16px; transition: opacity 0.12s; }
+    .v1-sage-btn:hover { opacity: 0.6; }
+    .v1-sage-arrow { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #D0D0D0; line-height: 1; }
+    .v1-sage-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #D0D0D0; }
+
+
+    /* ══════════════════════════════════════════════
+       SCREEN 3 — ASK SAGE (Pill Handle)
+       Source: sage-concepts-3.html col-1
+    ══════════════════════════════════════════════ */
+
+    .sage-screen { background: #FFFFFF; height: 100%; display: flex; flex-direction: column; }
+
+    .v1-handle-zone { display: flex; justify-content: center; align-items: center; padding: 14px 0 10px; flex-shrink: 0; cursor: grab; }
+    .v1-pill { width: 36px; height: 4px; background: #E0E0E0; border-radius: 2px; }
+
+    .sage-app-strip { display: flex; align-items: baseline; justify-content: flex-start; padding: 0 28px; flex-shrink: 0; }
+    .sage-app-name { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .sage-rule { height: 1px; background: #F0F0F0; margin: 16px 28px 0; flex-shrink: 0; }
+
+    .sage-convo { flex: 1; overflow: hidden; }
+
+    .offers-turn { display: grid; grid-template-columns: 72px 1px 1fr; gap: 0 16px; padding: 6px 28px 0; }
+    .offers-rule-v { background: #EFEFEF; width: 1px; }
+    .offer-list { display: flex; flex-direction: column; margin-top: 4px; }
+    .offer-item { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; font-weight: 300; color: #BBBBBB; line-height: 1.45; padding: 7px 0; cursor: pointer; border-bottom: 1px solid #F8F8F8; transition: color 0.12s; }
+    .offer-item:last-child { border-bottom: none; }
+    .offer-item:hover { color: #111; }
+    .offer-item::before { content: '—'; font-style: normal; color: #E4E4E4; margin-right: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; transition: color 0.12s; }
+    .offer-item:hover::before { color: #111; }
+
+    .sage-input-zone { border-top: 1px solid #F2F2F2; flex-shrink: 0; padding: 14px 0 34px; }
+    .input-turn { display: grid; grid-template-columns: 72px 1px 1fr; gap: 0 16px; padding: 0 28px; align-items: flex-start; }
+    .you-col { display: flex; justify-content: flex-end; padding-top: 5px; }
+    .you-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; }
+    .input-v { background: #EFEFEF; width: 1px; }
+    .ta-col { display: flex; flex-direction: column; gap: 6px; }
+    .ta { background: transparent; border: none; border-bottom: 1px solid #EBEBEB; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 19px; font-weight: 300; color: #111; padding: 4px 0; outline: none; resize: none; line-height: 1.4; min-height: 32px; overflow: hidden; width: 100%; }
+    .ta::placeholder { color: #D4D4D4; }
+    .send-row { display: flex; justify-content: flex-end; }
+    .send-btn { background: transparent; border: none; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #CCCCCC; transition: color 0.14s; }
+    .send-btn:hover { color: #111; }
+
+
+    /* ══════════════════════════════════════════════
+       SCREEN 4 — RESULTS (C: The Ledger)
+       Source: results-concepts.html col-c
+    ══════════════════════════════════════════════ */
+
+    .c-content { flex: 1; display: flex; flex-direction: column; }
+    .ledger-zone { padding: 28px 28px 0; flex-shrink: 0; }
+    .ledger-subject { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #BBBBBB; margin-bottom: 20px; }
+    .ledger-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; }
+    .ledger-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8; }
+    .ledger-value { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; color: #111; letter-spacing: 0.04em; }
+    .ledger-value-dim { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #ABABAB; letter-spacing: 0.04em; }
+    .ledger-rule { height: 1px; background: #F0F0F0; margin: 3px 0; }
+    .c-spacer { flex: 1; }
+    .c-sage-rule { height: 1px; background: #F0F0F0; margin: 0 28px; flex-shrink: 0; }
+
+
+    /* ══════════════════════════════════════════════
+       SCREEN 5 — REVIEW GRID (D: Seat Map)
+       Source: review-concepts.html col-d
+    ══════════════════════════════════════════════ */
+
+    .filter-strip { display: flex; gap: 20px; align-items: baseline; padding: 14px 28px; flex-shrink: 0; }
+    .ftab { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #D0D0D0; cursor: pointer; display: flex; align-items: baseline; gap: 5px; }
+    .ftab.on { color: #111; }
+    .ftab-count { font-size: 8px; color: #D8D8D8; }
+    .ftab.on .ftab-count { color: #999; }
+
+    .d-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 28px 8px; }
+    .d-seats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; }
+    .d-seat { aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.12s; }
+    .d-seat:hover { opacity: 0.78; }
+    .d-seat--correct { background: rgba(117,158,126,0.18); }
+    .d-seat--wrong   { background: rgba(171,102,102,0.20); }
+    .d-seat--skipped { background: #F3F3F3; }
+    .d-seat-num { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 24px; line-height: 1; }
+    .d-seat--correct .d-seat-num { color: #4E7A5A; }
+    .d-seat--wrong   .d-seat-num { color: #8B4848; }
+    .d-seat--skipped .d-seat-num { color: #C8C8C8; }
+
+    .d-legend { display: flex; justify-content: center; gap: 22px; margin-top: 26px; }
+    .d-legend-item { display: flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8; }
+    .d-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .d-dot--correct { background: rgba(117,158,126,0.55); }
+    .d-dot--wrong   { background: rgba(171,102,102,0.55); }
+    .d-dot--skipped { background: #DCDCDC; }
+
+
+    /* ══════════════════════════════════════════════
+       SCREEN 6 — EXPLANATION (A: Four Fields)
+       Source: explanation-concepts-2.html col-a
+    ══════════════════════════════════════════════ */
+
+    .field-block { padding: 18px 28px 0; flex-shrink: 0; }
+    .field-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; margin-bottom: 10px; }
+    .field-question-text { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 300; color: #111; line-height: 1.6; }
+    .field-value-wrong { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; font-style: italic; color: #C0C0C0; line-height: 1.5; }
+    .field-value-correct { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; font-style: italic; color: #111; line-height: 1.5; }
+    .field-explanation { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; color: #444; line-height: 1.7; }
+
+    /* ── Ask Sage slide-up overlay ── */
+    #screen-sage {
+      display: block !important;
+      transform: translateY(100%);
+      transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+      pointer-events: none;
+    }
+    #screen-sage.active {
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .v1-handle-zone { cursor: pointer; }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Control Bar ── -->
+<div class="bar">
+  <span class="bar-title">Agent Classroom</span>
+  <div class="bar-sep"></div>
+  <div class="btn-row" id="screenBtns">
+    <button class="cbtn on" data-s="welcome">Welcome</button>
+    <button class="cbtn" data-s="question">Question</button>
+    <button class="cbtn" data-s="sage">Ask Sage</button>
+    <button class="cbtn" data-s="results">Results</button>
+    <button class="cbtn" data-s="review">Review Grid</button>
+    <button class="cbtn" data-s="explanation">Explanation</button>
+  </div>
+</div>
+
+<!-- ── Stage ── -->
+<div class="stage">
+  <div class="phone">
+
+
+    <!-- ══ SCREEN 1: WELCOME — B-Break ══ -->
+    <div class="screen-panel active" id="screen-welcome">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-date">10 May</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="transcript">
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Good morning, Kaze. I've prepared something for you today.</div>
+            </div>
+          </div>
+
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Here's your session —</div>
+              <div class="session-list">
+                <div class="session-row">
+                  <span class="session-key">Topic</span>
+                  <span class="session-val">Calculus Foundations</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Questions</span>
+                  <span class="session-val">12 · Level A2</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Duration</span>
+                  <span class="session-val">~9 minutes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Ready when you are.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="break-section">
+          <div class="break-divider">
+            <div class="break-line"></div>
+            <span class="break-label">Your move</span>
+            <div class="break-line"></div>
+          </div>
+          <div class="break-action">
+            <div class="break-session-name">Calculus Foundations</div>
+            <div class="break-session-meta">12 questions · ~9 min · Level A2</div>
+            <button class="break-btn">
+              Begin this session
+              <span class="break-btn-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="b-redirect">
+          <div class="b-redirect-inner">
+            <textarea class="b-redirect-ta" placeholder="Or tell Sage something different…" rows="1"></textarea>
+            <button class="b-redirect-send">↑</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ══ SCREEN 2: QUESTION CARD — Footer Bar ══ -->
+    <div class="screen-panel" id="screen-question">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-counter">3 / 12</span>
+        </div>
+        <div class="progress-row">
+          <div class="progress-track"></div>
+          <div class="progress-fill" style="width: 25%"></div>
+        </div>
+
+        <div class="c-body">
+          <div class="c-subject">Calculus Foundations</div>
+          <div class="c-question">
+            A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?
+          </div>
+          <div class="c-rule"></div>
+          <div class="c-options">
+            <div class="c-option">
+              <span class="c-opt-letter">A</span>
+              <span class="c-opt-text">t = 0 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">B</span>
+              <span class="c-opt-text">t = 2 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">C</span>
+              <span class="c-opt-text">t = 0 and t = 2</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">D</span>
+              <span class="c-opt-text">t = 1 and t = 3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="v1-footer">
+          <button class="v1-nav-btn disabled">← Prev</button>
+          <button class="v1-sage-btn">
+            <span class="v1-sage-arrow">↑</span>
+            <span class="v1-sage-lbl">Ask Sage</span>
+          </button>
+          <button class="v1-nav-btn">Next →</button>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ══ SCREEN 3: ASK SAGE — Pill Handle ══ -->
+    <div class="screen-panel" id="screen-sage">
+      <div class="sage-screen">
+
+        <div class="v1-handle-zone">
+          <div class="v1-pill"></div>
+        </div>
+
+        <div class="sage-app-strip">
+          <span class="sage-app-name">Agent Classroom</span>
+        </div>
+        <div class="sage-rule"></div>
+
+        <div class="sage-convo">
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech">Ask me anything. Or I can —</div>
+          </div>
+          <div class="offers-turn">
+            <div class="lbl-col"></div>
+            <div class="offers-rule-v"></div>
+            <div class="offer-list">
+              <div class="offer-item">give you a hint</div>
+              <div class="offer-item">skip this question</div>
+              <div class="offer-item">walk through the concept</div>
+              <div class="offer-item">end the session</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sage-input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="Or ask anything…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ══ SCREEN 4: RESULTS — C: The Ledger ══ -->
+    <div class="screen-panel" id="screen-results">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-date">10 May</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="c-content">
+
+          <div class="ledger-zone">
+            <div class="ledger-subject">Calculus Foundations · 12 Questions</div>
+            <div class="ledger-row">
+              <span class="ledger-label">Correct</span>
+              <span class="ledger-value">9</span>
+            </div>
+            <div class="ledger-row">
+              <span class="ledger-label">Wrong</span>
+              <span class="ledger-value">2</span>
+            </div>
+            <div class="ledger-row">
+              <span class="ledger-label">Skipped</span>
+              <span class="ledger-value-dim">1</span>
+            </div>
+            <div class="ledger-rule"></div>
+            <div class="ledger-row">
+              <span class="ledger-label">Score</span>
+              <span class="ledger-value">9 / 12</span>
+            </div>
+            <div class="ledger-row">
+              <span class="ledger-label">Time</span>
+              <span class="ledger-value">6m 42s</span>
+            </div>
+          </div>
+
+          <div class="c-spacer"></div>
+
+          <div class="c-sage-rule"></div>
+          <div class="turn" style="padding-top: 20px; padding-bottom: 20px;">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Two to review. Ready when you are.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="break-section" style="margin-top: 0;">
+          <div class="break-divider">
+            <div class="break-line"></div>
+            <span class="break-label">Your move</span>
+            <div class="break-line"></div>
+          </div>
+          <div class="break-action">
+            <button class="break-btn">
+              Review answers
+              <span class="break-btn-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="footer-bar" style="justify-content: center;">
+          <div class="fb-sage">
+            <span class="fb-sage-arrow">↑</span>
+            <span class="fb-sage-label">Ask Sage</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ══ SCREEN 5: REVIEW GRID — D: Seat Map ══ -->
+    <div class="screen-panel" id="screen-review">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-back">← Results</span>
+        </div>
+        <div class="rule-h"></div>
+        <div class="filter-strip">
+          <div class="ftab on">All <span class="ftab-count">12</span></div>
+          <div class="ftab">Wrong <span class="ftab-count">2</span></div>
+          <div class="ftab">Skipped <span class="ftab-count">1</span></div>
+          <div class="ftab">Correct <span class="ftab-count">9</span></div>
+        </div>
+        <div class="rule-flush"></div>
+
+        <div class="d-body">
+          <div class="d-seats">
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">1</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">2</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">3</span></div>
+            <div class="d-seat d-seat--wrong">  <span class="d-seat-num">4</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">5</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">6</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">7</span></div>
+            <div class="d-seat d-seat--skipped"><span class="d-seat-num">8</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">9</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">10</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">11</span></div>
+            <div class="d-seat d-seat--wrong">  <span class="d-seat-num">12</span></div>
+          </div>
+
+          <div class="d-legend">
+            <div class="d-legend-item"><div class="d-dot d-dot--correct"></div>Correct</div>
+            <div class="d-legend-item"><div class="d-dot d-dot--wrong"></div>Wrong</div>
+            <div class="d-legend-item"><div class="d-dot d-dot--skipped"></div>Skipped</div>
+          </div>
+        </div>
+
+        <div class="footer-bar">
+          <button class="fb-nav dim">← Prev</button>
+          <div class="fb-sage">
+            <span class="fb-sage-arrow">↑</span>
+            <span class="fb-sage-label">Ask Sage</span>
+          </div>
+          <button class="fb-nav">Next →</button>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ══ SCREEN 6: EXPLANATION — A: Four Fields ══ -->
+    <div class="screen-panel" id="screen-explanation">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-back">← Review</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="field-block">
+          <div class="field-label">Question · 3 of 12</div>
+          <div class="field-question-text">
+            A particle moves along the <em>x</em>&#8209;axis
+            with velocity <em>v</em>(<em>t</em>) = 3<em>t</em><sup>2</sup> − 6<em>t</em>.
+            At what time is the particle at rest?
+          </div>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="field-block">
+          <div class="field-label">Selected</div>
+          <div class="field-value-wrong"><em>t</em> = 0 only</div>
+        </div>
+
+        <div class="field-block">
+          <div class="field-label">Correct</div>
+          <div class="field-value-correct"><em>t</em> = 0 and <em>t</em> = 2</div>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="field-block">
+          <div class="field-label">Explanation</div>
+          <div class="field-explanation">
+            The particle is at rest when velocity
+            equals zero. Setting 3<em>t</em><sup>2</sup> − 6<em>t</em> = 0
+            and factoring gives <em>t</em>(3<em>t</em> − 6) = 0,
+            so <em>t</em> = 0 or <em>t</em> = 2. Both are
+            valid — the particle stops at the
+            origin and again when it reverses.
+          </div>
+        </div>
+
+        <div class="footer-bar">
+          <span class="footer-nav">← Prev</span>
+          <div class="footer-sage">
+            <span class="footer-sage-arrow">↑</span>
+            <span class="footer-sage-label">Ask Sage</span>
+          </div>
+          <span class="footer-nav">Next →</span>
+        </div>
+
+      </div>
+    </div>
+
+
+  </div><!-- /phone -->
+</div><!-- /stage -->
+
+<script>
+  const btns   = document.querySelectorAll('#screenBtns .cbtn');
+  const panels = document.querySelectorAll('.screen-panel');
+  const sagePanel = document.getElementById('screen-sage');
+  let prevScreen = 'welcome';
+
+  function showScreen(s) {
+    panels.forEach(p => { if (p !== sagePanel) p.classList.remove('active'); });
+    const target = document.getElementById('screen-' + s);
+    if (target) target.classList.add('active');
+    btns.forEach(b => b.classList.toggle('on', b.dataset.s === s));
+  }
+
+  function openSage() {
+    // Remember which screen we came from
+    const current = document.querySelector('.screen-panel.active:not(#screen-sage)');
+    if (current) prevScreen = current.id.replace('screen-', '');
+    sagePanel.classList.add('active');
+    btns.forEach(b => b.classList.toggle('on', b.dataset.s === 'sage'));
+  }
+
+  function closeSage() {
+    sagePanel.classList.remove('active');
+    showScreen(prevScreen);
+  }
+
+  // Top bar tab switching
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.s === 'sage') { openSage(); return; }
+      sagePanel.classList.remove('active');
+      showScreen(btn.dataset.s);
+    });
+  });
+
+  // All Ask Sage buttons across screens
+  document.querySelectorAll('.fb-sage, .v1-sage-btn, .footer-sage').forEach(el => {
+    el.addEventListener('click', openSage);
+  });
+
+  // Pill handle dismisses the sheet
+  document.querySelector('.v1-handle-zone').addEventListener('click', closeSage);
+
+  document.querySelectorAll('textarea').forEach(ta => {
+    ta.addEventListener('input', () => {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    });
+  });
+</script>
+</body>
+</html>

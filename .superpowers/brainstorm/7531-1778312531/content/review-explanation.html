@@ -1,0 +1,413 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .screens-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 20px;
+    align-items: start;
+  }
+
+  .screen-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .screen-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9a8e82;
+  }
+
+  .phone-wrap {
+    border: 2px solid transparent;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .phone-wrap:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.13); }
+  .phone-wrap.selected { border-color: #c96842; box-shadow: 0 8px 32px rgba(201,104,66,0.22); }
+
+  .phone-screen {
+    background: #f5f0e8;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── REVIEW GRID ── */
+  .rg-header {
+    padding: 18px 18px 0;
+  }
+  .rg-back {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9a8e82;
+    margin-bottom: 10px;
+  }
+  .rg-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: #1a1714;
+    margin-bottom: 12px;
+  }
+  .rg-filters {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .rg-pill {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1.5px solid #e2d9ce;
+    color: #9a8e82;
+    background: transparent;
+    cursor: pointer;
+  }
+  .rg-pill.active {
+    border-color: #1a1714;
+    color: #1a1714;
+    background: transparent;
+  }
+  .rg-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 18px 14px;
+  }
+  .rg-tile {
+    background: #faf7f2;
+    border: 1.5px solid #e2d9ce;
+    border-radius: 8px;
+    padding: 10px 10px 10px 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .rg-tile::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .rg-tile.correct::before { background: #2d6a4f; }
+  .rg-tile.wrong::before   { background: #9b2226; }
+  .rg-tile.skipped::before { background: #c9bfb4; }
+
+  .rg-tile-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: #1a1714;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .rg-tile-preview {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    color: #9a8e82;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .rg-tile-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 10px;
+  }
+  .rg-tile.correct .rg-tile-badge { color: #2d6a4f; background: #d1fae5; }
+  .rg-tile.wrong   .rg-tile-badge { color: #9b2226; background: #fee2e2; }
+  .rg-tile.skipped .rg-tile-badge { color: #9a8e82; background: #e8e3de; }
+
+  .rg-pagination {
+    padding: 0 18px 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+  }
+  .rg-page-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #4a4541;
+    background: none;
+    border: 1.5px solid #e2d9ce;
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+  .rg-page-indicator {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #9a8e82;
+  }
+
+  /* ── EXPLANATION SCREEN ── */
+  .ex-header {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid #e2d9ce;
+  }
+  .ex-back {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9a8e82;
+    margin-bottom: 10px;
+  }
+  .ex-meta {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #c96842;
+    margin-bottom: 6px;
+  }
+  .ex-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    line-height: 1.45;
+    color: #1a1714;
+  }
+
+  .ex-options {
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-bottom: 1px solid #e2d9ce;
+  }
+  .ex-opt {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    padding: 8px 10px 8px 12px;
+    border: 1.5px solid #e2d9ce;
+    border-radius: 7px;
+    background: #faf7f2;
+    color: #4a4541;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ex-opt::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .ex-opt.correct {
+    border-color: #2d6a4f;
+    background: #f0faf5;
+    color: #1a1714;
+  }
+  .ex-opt.correct::before { background: #2d6a4f; }
+  .ex-opt.wrong {
+    border-color: #9b2226;
+    background: #fff5f5;
+    color: #9b2226;
+  }
+  .ex-opt.wrong::before { background: #9b2226; }
+
+  .ex-letter {
+    font-size: 10px;
+    font-weight: 600;
+    min-width: 12px;
+    color: #c96842;
+  }
+  .ex-opt.correct .ex-letter { color: #2d6a4f; }
+  .ex-opt.wrong   .ex-letter { color: #9b2226; }
+
+  .ex-explanation {
+    padding: 12px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .ex-exp-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #c96842;
+    margin-bottom: 8px;
+  }
+  .ex-step {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #4a4541;
+    line-height: 1.5;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2d9ce;
+    display: flex;
+    gap: 8px;
+  }
+  .ex-step:last-child { border-bottom: none; }
+  .ex-step-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    color: #c9bfb4;
+    min-width: 14px;
+    line-height: 1.5;
+  }
+
+  .style-label {
+    background: #fff;
+    border-top: 1px solid #e8e4e0;
+    padding: 12px 16px;
+  }
+  .style-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a1714;
+    margin-bottom: 2px;
+  }
+  .style-desc {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #888;
+    line-height: 1.4;
+  }
+</style>
+
+<h2>Review Grid &amp; Explanation Screen</h2>
+<p class="subtitle">Both screens in full Reading Room palette. These are fixed designs — click to confirm you're happy with the direction, or let me know what to change.</p>
+
+<div class="screens-row">
+
+  <!-- Review Grid -->
+  <div class="screen-col">
+    <div class="screen-title">Review Grid</div>
+    <div class="phone-wrap" data-choice="review" onclick="toggleSelect(this)">
+      <div class="phone-screen">
+        <div class="rg-header">
+          <div class="rg-back">← Results</div>
+          <div class="rg-heading">Review</div>
+          <div class="rg-filters">
+            <div class="rg-pill active">All</div>
+            <div class="rg-pill">Correct</div>
+            <div class="rg-pill">Wrong</div>
+            <div class="rg-pill">Skipped</div>
+          </div>
+        </div>
+        <div class="rg-grid">
+          <div class="rg-tile correct">
+            <div class="rg-tile-badge">✓</div>
+            <div class="rg-tile-num">01</div>
+            <div class="rg-tile-preview">Find the derivative of f(x) = 3x³ − 2x + 5</div>
+          </div>
+          <div class="rg-tile wrong">
+            <div class="rg-tile-badge">✕</div>
+            <div class="rg-tile-num">02</div>
+            <div class="rg-tile-preview">Evaluate the limit as x→0 of sin(x)/x</div>
+          </div>
+          <div class="rg-tile correct">
+            <div class="rg-tile-badge">✓</div>
+            <div class="rg-tile-num">03</div>
+            <div class="rg-tile-preview">Solve for x: 2x² + 5x − 3 = 0</div>
+          </div>
+          <div class="rg-tile skipped">
+            <div class="rg-tile-badge">–</div>
+            <div class="rg-tile-num">04</div>
+            <div class="rg-tile-preview">If sin θ = 3/5, find cos θ</div>
+          </div>
+          <div class="rg-tile wrong">
+            <div class="rg-tile-badge">✕</div>
+            <div class="rg-tile-num">05</div>
+            <div class="rg-tile-preview">Find the integral of e^x · cos(x) dx</div>
+          </div>
+          <div class="rg-tile correct">
+            <div class="rg-tile-badge">✓</div>
+            <div class="rg-tile-num">06</div>
+            <div class="rg-tile-preview">What is the determinant of a 2×2 matrix?</div>
+          </div>
+        </div>
+        <div class="rg-pagination">
+          <button class="rg-page-btn">←</button>
+          <span class="rg-page-indicator">1 / 3</span>
+          <button class="rg-page-btn">→</button>
+        </div>
+      </div>
+      <div class="style-label">
+        <div class="style-name">Review Grid</div>
+        <div class="style-desc">Left-border stripe signals outcome. Question number in serif, preview in DM Sans. Pill filter tabs.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Explanation Screen -->
+  <div class="screen-col">
+    <div class="screen-title">Explanation Screen</div>
+    <div class="phone-wrap" data-choice="explanation" onclick="toggleSelect(this)">
+      <div class="phone-screen">
+        <div class="ex-header">
+          <div class="ex-back">← Review</div>
+          <div class="ex-meta">Mathematics · Q01</div>
+          <div class="ex-question">Find the derivative of f(x) = 3x³ − 2x + 5.</div>
+        </div>
+        <div class="ex-options">
+          <div class="ex-opt wrong">
+            <span class="ex-letter">A</span> 9x² − 2 &nbsp;<em style="font-size:9px;color:#9b2226">(your answer)</em>
+          </div>
+          <div class="ex-opt correct">
+            <span class="ex-letter">B</span> 9x² − 2
+          </div>
+          <div class="ex-opt">
+            <span class="ex-letter">C</span> 9x² + 5
+          </div>
+          <div class="ex-opt">
+            <span class="ex-letter">D</span> 6x − 2
+          </div>
+        </div>
+        <div class="ex-explanation">
+          <div class="ex-exp-label">Explanation</div>
+          <div class="ex-step">
+            <span class="ex-step-num">1</span>
+            Apply the power rule: d/dx(xⁿ) = n·xⁿ⁻¹ to each term separately.
+          </div>
+          <div class="ex-step">
+            <span class="ex-step-num">2</span>
+            For 3x³: bring down the 3, multiply by coefficient → 9x².
+          </div>
+          <div class="ex-step">
+            <span class="ex-step-num">3</span>
+            For −2x: derivative is simply −2. Constant 5 disappears.
+          </div>
+        </div>
+      </div>
+      <div class="style-label">
+        <div class="style-name">Explanation Screen</div>
+        <div class="style-desc">Soft card options with left-border outcome indicators. Numbered steps separated by rules.</div>
+      </div>
+    </div>
+  </div>
+
+</div>

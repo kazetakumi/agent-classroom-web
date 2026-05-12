@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Results Screen — Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ─────────── BAR ─────────── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 54px;
+      background: #111;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bar-left { display: flex; align-items: center; gap: 18px; }
+    .bar-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+    .btn-row { display: flex; gap: 3px; }
+    .cbtn {
+      background: transparent; border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px;
+      cursor: pointer; transition: all 0.14s;
+    }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+
+    /* ─────────── STAGE + PHONE ─────────── */
+    .stage {
+      padding-top: 76px; padding-bottom: 60px;
+      display: flex; justify-content: center; align-items: flex-start;
+      gap: 32px; min-height: 100vh;
+    }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .col.hide { display: none; }
+    .col-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #888;
+    }
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09);
+    }
+
+    /* ═══════════════════════════════════════════════
+       SHARED SCREEN FOUNDATION
+       All three screens use this base system.
+    ═══════════════════════════════════════════════ */
+
+    .screen {
+      background: #FFFFFF; height: 100%;
+      display: flex; flex-direction: column;
+    }
+
+    .top-strip {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .top-app {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .top-date {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D8D8D8;
+    }
+    .rule-h { height: 1px; background: #F0F0F0; margin: 20px 28px 0; flex-shrink: 0; }
+
+    /* Column grid — 72px | 1px | 1fr */
+    .turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 20px 28px 0;
+    }
+    .lbl-col {
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-top: 3px;
+    }
+    .lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .rule-v { background: #EFEFEF; width: 1px; }
+    .speech-col { }
+    .speech {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 300; line-height: 1.55; color: #111;
+    }
+
+    /* Session key-value (reused from Welcome) */
+    .session-list { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+    .session-row { display: flex; align-items: baseline; gap: 10px; }
+    .session-key {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+      letter-spacing: 0.08em; text-transform: uppercase; color: #D0D0D0;
+      min-width: 66px; flex-shrink: 0;
+    }
+    .session-val {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 17px; color: #666;
+    }
+
+    /* B-Break action (shared pattern from Welcome locked design) */
+    .break-section { flex-shrink: 0; margin: 20px 0 0; }
+    .break-divider {
+      display: flex; align-items: center;
+      padding: 0 28px;
+    }
+    .break-line { flex: 1; height: 1px; background: #EFEFEF; }
+    .break-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #D4D4D4; padding: 0 12px;
+    }
+    .break-action { padding: 18px 28px 0; }
+    .break-btn {
+      width: 100%; background: #111; color: #FFF; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+      padding: 16px 22px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      letter-spacing: 0.02em; transition: background 0.14s;
+    }
+    .break-btn:hover { background: #333; }
+    .break-btn-arrow { opacity: 0.45; font-size: 18px; }
+
+    /* Ghost secondary action */
+    .ghost-action { padding: 0 28px 40px; flex-shrink: 0; }
+    .ghost-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid #F2F2F2;
+      padding-top: 18px;
+    }
+    .ghost-text {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 18px; font-weight: 300; color: #CFCFCF;
+      cursor: pointer;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT A — THE DEBRIEF
+       Sage closes the loop in their own voice.
+       Pure column grid: score embedded in dialogue.
+       Bookends the Welcome screen perfectly.
+       Tone: warm, personal, conversational.
+    ═══════════════════════════════════════════════ */
+
+    .a-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT B — THE REVEAL
+       Screen breaks for a typographic score moment.
+       The number gets ceremony; Sage whispers one thing.
+       Tone: architectural, dramatic, then human.
+    ═══════════════════════════════════════════════ */
+
+    .b-content { flex: 1; display: flex; flex-direction: column; }
+
+    .hero-zone {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 0 28px;
+    }
+    .hero-fraction {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .hero-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 88px; color: #111;
+      line-height: 0.9; letter-spacing: -0.02em;
+    }
+    .hero-frac-line {
+      width: 52px; height: 1px; background: #D4D4D4; margin: 10px 0;
+    }
+    .hero-den {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 30px; color: #B4B4B4; line-height: 1;
+    }
+    .hero-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #D8D8D8; margin-top: 24px; text-align: center;
+    }
+    .b-rule { height: 1px; background: #F0F0F0; margin: 0 28px; flex-shrink: 0; }
+    .b-sage-turn { flex-shrink: 0; }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT C — THE LEDGER
+       Pure data table first — IBM Plex Mono receipt.
+       Sage speaks last, one line only.
+       Tone: analytical, archival, precise.
+    ═══════════════════════════════════════════════ */
+
+    .c-content { flex: 1; display: flex; flex-direction: column; }
+
+    .ledger-zone {
+      padding: 28px 28px 0; flex-shrink: 0;
+    }
+    .ledger-subject {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #BBBBBB; margin-bottom: 20px;
+    }
+    .ledger-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 7px 0;
+    }
+    .ledger-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #C8C8C8;
+    }
+    .ledger-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px; font-weight: 500; color: #111; letter-spacing: 0.04em;
+    }
+    .ledger-value-dim {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px; color: #ABABAB; letter-spacing: 0.04em;
+    }
+    .ledger-rule { height: 1px; background: #F0F0F0; margin: 3px 0; }
+
+    .c-spacer { flex: 1; }
+    .c-sage-rule { height: 1px; background: #F0F0F0; margin: 0 28px; flex-shrink: 0; }
+
+  </style>
+</head>
+<body>
+
+<!-- ─────────── BAR ─────────── -->
+<div class="bar">
+  <div class="bar-left">
+    <span class="bar-title">Results Screen — Concepts</span>
+    <div class="bar-sep"></div>
+    <div class="btn-row" id="viewBtns">
+      <button class="cbtn on" data-v="all">All 3</button>
+      <button class="cbtn" data-v="a">A — Debrief</button>
+      <button class="cbtn" data-v="b">B — Reveal</button>
+      <button class="cbtn" data-v="c">C — Ledger</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── STAGE ─────────── -->
+<div class="stage" id="stage">
+
+
+  <!-- ══════════════════════════════════════
+       A — THE DEBRIEF
+       Sage closes the loop in their own voice.
+       Column grid throughout, score in dialogue.
+  ══════════════════════════════════════════ -->
+  <div class="col" id="col-a">
+    <span class="col-label">A — The Debrief</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-date">10 May</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="a-content">
+
+          <!-- Sage: warm opener -->
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">That's a wrap, Kaze.</div>
+            </div>
+          </div>
+
+          <!-- Sage: breakdown — mirrors Welcome session list -->
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Here's how it went —</div>
+              <div class="session-list">
+                <div class="session-row">
+                  <span class="session-key">Score</span>
+                  <span class="session-val">9 of 12</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Correct</span>
+                  <span class="session-val">9</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Wrong</span>
+                  <span class="session-val">2</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Skipped</span>
+                  <span class="session-val">1</span>
+                </div>
+                <div class="session-row">
+                  <span class="session-key">Time</span>
+                  <span class="session-val">6m 42s</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sage: closing thought -->
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Two questions worth a second look.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Action: Your move (B-Break pattern) -->
+        <div class="break-section">
+          <div class="break-divider">
+            <div class="break-line"></div>
+            <span class="break-label">Your move</span>
+            <div class="break-line"></div>
+          </div>
+          <div class="break-action">
+            <button class="break-btn">
+              <span>Review those questions</span>
+              <span class="break-btn-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ghost secondary -->
+        <div class="ghost-action">
+          <div class="ghost-inner">
+            <span class="ghost-text">Or start a new session</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       B — THE REVEAL
+       Hero score gets the full stage.
+       Grid breaks, score breathes, Sage whispers one thing.
+  ══════════════════════════════════════════ -->
+  <div class="col" id="col-b">
+    <span class="col-label">B — The Reveal</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-date">10 May</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="b-content">
+
+          <!-- Hero: typographic fraction, centred -->
+          <div class="hero-zone">
+            <div class="hero-fraction">
+              <div class="hero-num">9</div>
+              <div class="hero-frac-line"></div>
+              <div class="hero-den">12</div>
+            </div>
+            <div class="hero-meta">Calculus Foundations · 6m 42s</div>
+          </div>
+
+          <!-- Rule, then Sage's single comment -->
+          <div class="b-rule"></div>
+          <div class="b-sage-turn">
+            <div class="turn" style="padding-top: 20px; padding-bottom: 20px;">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech-col">
+                <div class="speech">Two worth revisiting.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Action: Your move -->
+        <div class="break-section" style="margin-top: 0;">
+          <div class="break-divider">
+            <div class="break-line"></div>
+            <span class="break-label">Your move</span>
+            <div class="break-line"></div>
+          </div>
+          <div class="break-action">
+            <button class="break-btn">
+              <span>Review questions</span>
+              <span class="break-btn-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ghost secondary -->
+        <div class="ghost-action">
+          <div class="ghost-inner">
+            <span class="ghost-text">Or start a new session</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       C — THE LEDGER
+       Data table speaks first, fully in IBM Plex Mono.
+       Sage gets the last word — one quiet line.
+  ══════════════════════════════════════════ -->
+  <div class="col" id="col-c">
+    <span class="col-label">C — The Ledger</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-date">10 May</span>
+        </div>
+        <div class="rule-h"></div>
+
+        <div class="c-content">
+
+          <!-- Data: IBM Plex Mono receipt table -->
+          <div class="ledger-zone">
+            <div class="ledger-subject">Calculus Foundations · 12 Questions</div>
+
+            <div class="ledger-row">
+              <span class="ledger-label">Correct</span>
+              <span class="ledger-value">9</span>
+            </div>
+            <div class="ledger-row">
+              <span class="ledger-label">Wrong</span>
+              <span class="ledger-value">2</span>
+            </div>
+            <div class="ledger-row">
+              <span class="ledger-label">Skipped</span>
+              <span class="ledger-value-dim">1</span>
+            </div>
+
+            <div class="ledger-rule"></div>
+
+            <div class="ledger-row">
+              <span class="ledger-label">Score</span>
+              <span class="ledger-value">9 / 12</span>
+            </div>
+            <div class="ledger-row">
+              <span class="ledger-label">Time</span>
+              <span class="ledger-value">6m 42s</span>
+            </div>
+          </div>
+
+          <!-- Spacer pushes Sage's word to bottom of content area -->
+          <div class="c-spacer"></div>
+
+          <!-- Rule, then Sage speaks last -->
+          <div class="c-sage-rule"></div>
+          <div class="turn" style="padding-top: 20px; padding-bottom: 20px;">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech-col">
+              <div class="speech">Two to review. Ready when you are.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Action: Your move -->
+        <div class="break-section" style="margin-top: 0;">
+          <div class="break-divider">
+            <div class="break-line"></div>
+            <span class="break-label">Your move</span>
+            <div class="break-line"></div>
+          </div>
+          <div class="break-action">
+            <button class="break-btn">
+              <span>Review answers</span>
+              <span class="break-btn-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ghost secondary -->
+        <div class="ghost-action">
+          <div class="ghost-inner">
+            <span class="ghost-text">Or start a new session</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+</div><!-- /stage -->
+
+<script>
+  const btns = document.querySelectorAll('.cbtn');
+  const colMap = {
+    a: document.getElementById('col-a'),
+    b: document.getElementById('col-b'),
+    c: document.getElementById('col-c'),
+  };
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      const v = btn.dataset.v;
+      if (v === 'all') {
+        Object.values(colMap).forEach(el => el.classList.remove('hide'));
+      } else {
+        Object.values(colMap).forEach(el => el.classList.add('hide'));
+        colMap[v].classList.remove('hide');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

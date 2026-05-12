@@ -1,0 +1,337 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .options-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 20px;
+    align-items: start;
+  }
+
+  .phone-wrap {
+    border: 2px solid transparent;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .phone-wrap:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.13); }
+  .phone-wrap.selected { border-color: #c96842; box-shadow: 0 8px 32px rgba(201,104,66,0.22); }
+
+  .phone-screen { background: #f5f0e8; display: flex; flex-direction: column; min-height: 480px; }
+
+  .style-label { background: #fff; border-top: 1px solid #e8e4e0; padding: 12px 16px; }
+  .style-name { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #1a1714; margin-bottom: 2px; }
+  .style-desc { font-family: 'DM Sans', sans-serif; font-size: 11px; color: #888; line-height: 1.4; }
+
+  /* ─────────────────────────────────────────
+     OPTION A — Narrative / Textbook
+     Compact answer summary + flowing prose
+  ───────────────────────────────────────── */
+  .ea { }
+
+  .ea-header {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid #e2d9ce;
+  }
+  .ea-back { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #9a8e82; margin-bottom: 10px; }
+  .ea-meta { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #c96842; margin-bottom: 6px; }
+  .ea-question { font-family: 'DM Serif Display', serif; font-size: 15px; line-height: 1.45; color: #1a1714; }
+
+  .ea-verdict {
+    display: flex;
+    gap: 8px;
+    padding: 12px 18px;
+    border-bottom: 1px solid #e2d9ce;
+    align-items: center;
+  }
+  .ea-verdict-pill {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .ea-verdict-pill.wrong { background: #fee2e2; color: #9b2226; }
+  .ea-verdict-pill.correct { background: #d1fae5; color: #2d6a4f; }
+  .ea-verdict-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #4a4541;
+    line-height: 1.4;
+  }
+  .ea-verdict-text strong { color: #1a1714; font-weight: 500; }
+
+  .ea-prose-section { padding: 14px 18px 18px; }
+  .ea-prose-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #c96842;
+    margin-bottom: 10px;
+  }
+  .ea-prose {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: #4a4541;
+    line-height: 1.7;
+  }
+  .ea-prose strong { color: #1a1714; font-weight: 500; }
+  .ea-prose em { font-style: italic; color: #2d6a4f; }
+
+  /* ─────────────────────────────────────────
+     OPTION B — Full Card Stack
+     All 4 options shown + step cards below
+  ───────────────────────────────────────── */
+  .eb { }
+
+  .eb-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid #e2d9ce;
+  }
+  .eb-back { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #9a8e82; margin-bottom: 10px; }
+  .eb-meta { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #c96842; margin-bottom: 6px; }
+  .eb-question { font-family: 'DM Serif Display', serif; font-size: 14px; line-height: 1.45; color: #1a1714; }
+
+  .eb-options { padding: 10px 18px; display: flex; flex-direction: column; gap: 5px; border-bottom: 1px solid #e2d9ce; }
+  .eb-opt {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    padding: 7px 10px;
+    border: 1.5px solid #e2d9ce;
+    border-radius: 7px;
+    background: #faf7f2;
+    color: #9a8e82;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .eb-opt.correct { border-color: #2d6a4f; background: #edf7f2; color: #2d6a4f; }
+  .eb-opt.wrong   { border-color: #9b2226; background: #fdf0f0; color: #9b2226; }
+  .eb-letter {
+    font-size: 10px; font-weight: 600; min-width: 12px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .eb-opt-tag {
+    font-size: 9px; font-weight: 600; margin-left: auto;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+
+  .eb-steps { padding: 10px 18px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .eb-steps-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: #c96842; margin-bottom: 2px;
+  }
+  .eb-step-card {
+    background: #faf7f2;
+    border: 1.5px solid #e2d9ce;
+    border-radius: 7px;
+    padding: 8px 10px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .eb-step-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    color: #e2d9ce;
+    line-height: 1;
+    min-width: 16px;
+    margin-top: 1px;
+  }
+  .eb-step-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #4a4541;
+    line-height: 1.5;
+  }
+
+  /* ─────────────────────────────────────────
+     OPTION C — Dark Header + Step Blocks
+     Ink strip header, prominent serif steps
+  ───────────────────────────────────────── */
+  .ec { }
+
+  .ec-header {
+    background: #1a1714;
+    padding: 18px 18px 16px;
+  }
+  .ec-back { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7a7068; margin-bottom: 10px; }
+  .ec-meta { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #c96842; margin-bottom: 6px; }
+  .ec-question { font-family: 'DM Serif Display', serif; font-size: 14px; line-height: 1.45; color: #f5f0e8; margin-bottom: 12px; }
+
+  .ec-answer-row { display: flex; gap: 8px; }
+  .ec-answer-chip {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .ec-answer-chip.wrong  { background: rgba(155,34,38,0.25); color: #f4a4a6; }
+  .ec-answer-chip.correct { background: rgba(45,106,79,0.3); color: #86efac; }
+
+  .ec-body { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 0; }
+  .ec-body-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: #c96842; margin-bottom: 12px;
+  }
+  .ec-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid #e2d9ce;
+  }
+  .ec-step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .ec-step-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: #e2d9ce;
+    line-height: 1;
+    min-width: 24px;
+  }
+  .ec-step-content { display: flex; flex-direction: column; gap: 2px; }
+  .ec-step-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: #9a8e82;
+  }
+  .ec-step-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px; color: #4a4541; line-height: 1.5;
+  }
+</style>
+
+<h2>Explanation Screen — 3 Concepts</h2>
+<p class="subtitle">Three structurally different approaches to showing the answer breakdown and explanation. Same content, different hierarchy.</p>
+
+<div class="options-row">
+
+  <!-- Option A: Narrative -->
+  <div class="phone-wrap" data-choice="a" onclick="toggleSelect(this)">
+    <div class="phone-screen ea">
+      <div class="ea-header">
+        <div class="ea-back">← Review</div>
+        <div class="ea-meta">Mathematics · Q02</div>
+        <div class="ea-question">Find the derivative of f(x) = 3x³ − 2x + 5.</div>
+      </div>
+      <div class="ea-verdict">
+        <div class="ea-verdict-pill wrong">Your answer</div>
+        <div class="ea-verdict-text">You chose <strong>B: 3x² − 2</strong>. Correct: <strong>A: 9x² − 2</strong></div>
+      </div>
+      <div class="ea-prose-section">
+        <div class="ea-prose-label">Why</div>
+        <div class="ea-prose">
+          Apply the <strong>power rule</strong> to each term: d/dx(xⁿ) = n·xⁿ⁻¹. For <strong>3x³</strong>, bring the exponent down and multiply — <em>9x²</em>. For <strong>−2x</strong>, the derivative is simply −2. The constant 5 vanishes. Combined: <em>9x² − 2</em>.
+        </div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">A — Narrative</div>
+      <div class="style-desc">Compact verdict row, then flowing prose explanation. Reads like a textbook annotation.</div>
+    </div>
+  </div>
+
+  <!-- Option B: Full card stack -->
+  <div class="phone-wrap" data-choice="b" onclick="toggleSelect(this)">
+    <div class="phone-screen eb">
+      <div class="eb-header">
+        <div class="eb-back">← Review</div>
+        <div class="eb-meta">Mathematics · Q02</div>
+        <div class="eb-question">Find the derivative of f(x) = 3x³ − 2x + 5.</div>
+      </div>
+      <div class="eb-options">
+        <div class="eb-opt correct">
+          <span class="eb-letter">A</span> 9x² − 2
+          <span class="eb-opt-tag">Correct</span>
+        </div>
+        <div class="eb-opt wrong">
+          <span class="eb-letter">B</span> 3x² − 2
+          <span class="eb-opt-tag">Your pick</span>
+        </div>
+        <div class="eb-opt"><span class="eb-letter">C</span> 9x² + 5</div>
+        <div class="eb-opt"><span class="eb-letter">D</span> 6x − 2</div>
+      </div>
+      <div class="eb-steps">
+        <div class="eb-steps-label">Explanation</div>
+        <div class="eb-step-card">
+          <div class="eb-step-num">1</div>
+          <div class="eb-step-text">Apply the power rule: d/dx(xⁿ) = n·xⁿ⁻¹ to each term.</div>
+        </div>
+        <div class="eb-step-card">
+          <div class="eb-step-num">2</div>
+          <div class="eb-step-text">For 3x³: exponent comes down → 9x².</div>
+        </div>
+        <div class="eb-step-card">
+          <div class="eb-step-num">3</div>
+          <div class="eb-step-text">For −2x: derivative is −2. Constant 5 disappears.</div>
+        </div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">B — Full Card Stack</div>
+      <div class="style-desc">All 4 options shown as cards with outcome tags, then step cards below. Mirrors quiz interaction.</div>
+    </div>
+  </div>
+
+  <!-- Option C: Dark header + step blocks -->
+  <div class="phone-wrap" data-choice="c" onclick="toggleSelect(this)">
+    <div class="phone-screen ec">
+      <div class="ec-header">
+        <div class="ec-back">← Review</div>
+        <div class="ec-meta">Mathematics · Q02</div>
+        <div class="ec-question">Find the derivative of f(x) = 3x³ − 2x + 5.</div>
+        <div class="ec-answer-row">
+          <div class="ec-answer-chip wrong">✕ You: B · 3x² − 2</div>
+          <div class="ec-answer-chip correct">✓ A · 9x² − 2</div>
+        </div>
+      </div>
+      <div class="ec-body">
+        <div class="ec-body-label">Explanation</div>
+        <div class="ec-step">
+          <div class="ec-step-num">1</div>
+          <div class="ec-step-content">
+            <div class="ec-step-label">Power Rule</div>
+            <div class="ec-step-text">d/dx(xⁿ) = n·xⁿ⁻¹ — apply to each term separately.</div>
+          </div>
+        </div>
+        <div class="ec-step">
+          <div class="ec-step-num">2</div>
+          <div class="ec-step-content">
+            <div class="ec-step-label">First term: 3x³</div>
+            <div class="ec-step-text">Bring exponent down, multiply by coefficient → 9x².</div>
+          </div>
+        </div>
+        <div class="ec-step">
+          <div class="ec-step-num">3</div>
+          <div class="ec-step-content">
+            <div class="ec-step-label">Remaining terms</div>
+            <div class="ec-step-text">−2x derivative is −2. Constant 5 disappears. Result: 9x² − 2.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">C — Dark Header + Step Blocks</div>
+      <div class="style-desc">Ink strip holds question + answer chips. Cream body has large serif step numbers with labelled steps.</div>
+    </div>
+  </div>
+
+</div>

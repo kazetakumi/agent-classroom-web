@@ -1,0 +1,303 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .cards-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 20px;
+    align-items: start;
+  }
+
+  .style-wrap {
+    border: 2px solid transparent;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .style-wrap:hover { box-shadow: 0 6px 28px rgba(0,0,0,0.12); }
+  .style-wrap.selected { border-color: #c96842; box-shadow: 0 6px 28px rgba(201,104,66,0.2); }
+
+  .card-shell {
+    background: #f5f0e8;
+    padding: 0;
+  }
+
+  /* Top bar: progress */
+  .progress-bar-wrap {
+    padding: 16px 20px 0;
+  }
+  .progress-meta {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9a8e82;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress-track {
+    height: 2px;
+    background: #e2d9ce;
+    border-radius: 1px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .progress-fill {
+    width: 35%;
+    height: 100%;
+    background: #c96842;
+    border-radius: 1px;
+  }
+
+  /* Question text */
+  .q-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #1a1714;
+    padding: 0 20px 18px;
+  }
+
+  /* ── Style A: Clean ruled list (radio-button feel) ── */
+  .sa-options { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 0; }
+  .sa-opt {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #4a4541;
+    padding: 10px 0;
+    border-bottom: 1px solid #e2d9ce;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sa-opt:last-child { border-bottom: none; }
+  .sa-radio {
+    width: 14px; height: 14px;
+    border: 1.5px solid #c9bfb4;
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .sa-letter {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #c96842;
+    min-width: 12px;
+  }
+  /* selected state for A */
+  .sa-opt.sel { color: #1a1714; }
+  .sa-opt.sel .sa-radio {
+    border-color: #c96842;
+    background: #c96842;
+  }
+  .sa-opt.sel .sa-radio::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: #f5f0e8;
+    border-radius: 50%;
+  }
+
+  /* ── Style B: Soft card rows ── */
+  .sb-options { padding: 4px 20px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .sb-opt {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: #4a4541;
+    padding: 10px 14px;
+    border: 1.5px solid #e2d9ce;
+    border-radius: 8px;
+    background: #faf7f2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sb-letter {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #c96842;
+    background: #f5f0e8;
+    border: 1px solid #e2d9ce;
+    border-radius: 4px;
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  /* selected */
+  .sb-opt.sel {
+    border-color: #c96842;
+    background: #fdf5f1;
+    color: #1a1714;
+  }
+  .sb-opt.sel .sb-letter {
+    background: #c96842;
+    border-color: #c96842;
+    color: #fff;
+  }
+
+  /* ── Style C: Left-border accent rows ── */
+  .sc-options { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 0; }
+  .sc-opt {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #4a4541;
+    padding: 10px 12px;
+    border-left: 3px solid #e2d9ce;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .sc-letter {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #9a8e82;
+    min-width: 12px;
+  }
+  /* selected */
+  .sc-opt.sel {
+    border-left-color: #c96842;
+    color: #1a1714;
+  }
+  .sc-opt.sel .sc-letter { color: #c96842; }
+
+  /* Caption labels */
+  .style-label {
+    background: #fff;
+    border-top: 1px solid #e8e4e0;
+    padding: 12px 16px;
+  }
+  .style-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a1714;
+    margin-bottom: 2px;
+  }
+  .style-desc {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #888;
+  }
+</style>
+
+<h2>Answer Option Style</h2>
+<p class="subtitle">All three use Warm Parchment palette. One option per card is shown in its selected state so you can see how selection is indicated.</p>
+
+<div class="cards-row">
+
+  <!-- Style A: Ruled list -->
+  <div class="style-wrap" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-shell">
+      <div class="progress-bar-wrap">
+        <div class="progress-meta"><span>Mathematics</span><span>6 / 17</span></div>
+        <div class="progress-track"><div class="progress-fill"></div></div>
+      </div>
+      <div class="q-text">Find the derivative of f(x) = 3x³ − 2x + 5.</div>
+      <div class="sa-options">
+        <div class="sa-opt sel">
+          <div class="sa-radio"></div>
+          <span class="sa-letter">A</span>
+          9x² − 2
+        </div>
+        <div class="sa-opt">
+          <div class="sa-radio"></div>
+          <span class="sa-letter">B</span>
+          3x² − 2
+        </div>
+        <div class="sa-opt">
+          <div class="sa-radio"></div>
+          <span class="sa-letter">C</span>
+          9x² + 5
+        </div>
+        <div class="sa-opt">
+          <div class="sa-radio"></div>
+          <span class="sa-letter">D</span>
+          6x − 2
+        </div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">A — Ruled List</div>
+      <div class="style-desc">Radio circles + divider lines. Feels like a real exam paper.</div>
+    </div>
+  </div>
+
+  <!-- Style B: Soft cards -->
+  <div class="style-wrap" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-shell">
+      <div class="progress-bar-wrap">
+        <div class="progress-meta"><span>Mathematics</span><span>6 / 17</span></div>
+        <div class="progress-track"><div class="progress-fill"></div></div>
+      </div>
+      <div class="q-text">Find the derivative of f(x) = 3x³ − 2x + 5.</div>
+      <div class="sb-options">
+        <div class="sb-opt">
+          <span class="sb-letter">A</span>
+          9x² − 2
+        </div>
+        <div class="sb-opt sel">
+          <span class="sb-letter">B</span>
+          3x² − 2
+        </div>
+        <div class="sb-opt">
+          <span class="sb-letter">C</span>
+          9x² + 5
+        </div>
+        <div class="sb-opt">
+          <span class="sb-letter">D</span>
+          6x − 2
+        </div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">B — Soft Cards</div>
+      <div class="style-desc">Bordered tiles with letter badge. More app-like, tappable feel.</div>
+    </div>
+  </div>
+
+  <!-- Style C: Left border -->
+  <div class="style-wrap" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-shell">
+      <div class="progress-bar-wrap">
+        <div class="progress-meta"><span>Mathematics</span><span>6 / 17</span></div>
+        <div class="progress-track"><div class="progress-fill"></div></div>
+      </div>
+      <div class="q-text">Find the derivative of f(x) = 3x³ − 2x + 5.</div>
+      <div class="sc-options">
+        <div class="sc-opt">
+          <span class="sc-letter">A</span>
+          9x² − 2
+        </div>
+        <div class="sc-opt">
+          <span class="sc-letter">B</span>
+          3x² − 2
+        </div>
+        <div class="sc-opt sel">
+          <span class="sc-letter">C</span>
+          9x² + 5
+        </div>
+        <div class="sc-opt">
+          <span class="sc-letter">D</span>
+          6x − 2
+        </div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">C — Left Accent Bar</div>
+      <div class="style-desc">Minimal sidebar highlight. Clean, editorial, typographic.</div>
+    </div>
+  </div>
+
+</div>

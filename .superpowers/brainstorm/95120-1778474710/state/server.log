@@ -1,0 +1,4 @@
+{"type":"server-started","port":57417,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:57417","screen_dir":"/Users/dreaminds/Desktop/POCs/AgentClassroom/v1/.superpowers/brainstorm/95120-1778474710/content","state_dir":"/Users/dreaminds/Desktop/POCs/AgentClassroom/v1/.superpowers/brainstorm/95120-1778474710/state"}
+{"type":"screen-added","file":"/Users/dreaminds/Desktop/POCs/AgentClassroom/v1/.superpowers/brainstorm/95120-1778474710/content/sage-new-concepts.html"}
+{"type":"screen-added","file":"/Users/dreaminds/Desktop/POCs/AgentClassroom/v1/.superpowers/brainstorm/95120-1778474710/content/sage-new-concepts-full.html"}
+{"type":"server-stopped","reason":"idle timeout"}

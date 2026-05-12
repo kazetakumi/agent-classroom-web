@@ -1,0 +1,200 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .options-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 20px;
+    align-items: start;
+  }
+
+  .phone-wrap {
+    border: 2px solid transparent;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .phone-wrap:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.13); }
+  .phone-wrap.selected { border-color: #c96842; box-shadow: 0 8px 32px rgba(201,104,66,0.22); }
+
+  .phone-screen { background: #f5f0e8; display: flex; flex-direction: column; }
+
+  .style-label {
+    background: #fff;
+    border-top: 1px solid #e8e4e0;
+    padding: 12px 16px;
+  }
+  .style-name { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #1a1714; margin-bottom: 2px; }
+  .style-desc { font-family: 'DM Sans', sans-serif; font-size: 11px; color: #888; line-height: 1.4; }
+
+  /* Shared header */
+  .grid-header { padding: 18px 18px 0; }
+  .grid-back { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #9a8e82; margin-bottom: 10px; }
+  .grid-heading { font-family: 'DM Serif Display', serif; font-size: 20px; color: #1a1714; margin-bottom: 12px; }
+  .grid-filters { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .grid-pill { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; padding: 4px 10px; border-radius: 20px; border: 1.5px solid #e2d9ce; color: #9a8e82; }
+  .grid-pill.active { border-color: #1a1714; color: #1a1714; }
+
+  /* Shared pagination */
+  .grid-pagination { padding: 2px 18px 16px; display: flex; justify-content: center; align-items: center; gap: 14px; }
+  .pg-btn { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; color: #4a4541; background: none; border: 1.5px solid #e2d9ce; border-radius: 4px; padding: 4px 10px; }
+  .pg-ind { font-family: 'DM Sans', sans-serif; font-size: 11px; color: #9a8e82; }
+
+  /* ── OPTION A: Colour-band header ── */
+  .ga-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 18px 14px; }
+  .ga-tile { border-radius: 8px; overflow: hidden; border: 1.5px solid #e2d9ce; background: #faf7f2; }
+  .ga-band { height: 6px; width: 100%; }
+  .ga-tile.correct .ga-band { background: #2d6a4f; }
+  .ga-tile.wrong   .ga-band { background: #9b2226; }
+  .ga-tile.skipped .ga-band { background: #c9bfb4; }
+  .ga-body { padding: 8px 10px 10px; }
+  .ga-num { font-family: 'DM Serif Display', serif; font-size: 18px; color: #1a1714; line-height: 1; margin-bottom: 4px; }
+  .ga-preview { font-family: 'DM Sans', sans-serif; font-size: 10px; color: #9a8e82; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* ── OPTION B: Full tint background ── */
+  .gb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 18px 14px; }
+  .gb-tile { border-radius: 8px; padding: 10px; border: 1.5px solid transparent; }
+  .gb-tile.correct { background: #edf7f2; border-color: #b8deca; }
+  .gb-tile.wrong   { background: #fdf0f0; border-color: #e8b4b4; }
+  .gb-tile.skipped { background: #f2f0ed; border-color: #ddd8d0; }
+  .gb-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
+  .gb-num { font-family: 'DM Serif Display', serif; font-size: 18px; line-height: 1; }
+  .gb-tile.correct .gb-num { color: #2d6a4f; }
+  .gb-tile.wrong   .gb-num { color: #9b2226; }
+  .gb-tile.skipped .gb-num { color: #9a8e82; }
+  .gb-icon { font-size: 11px; font-weight: 700; line-height: 1; margin-top: 2px; }
+  .gb-tile.correct .gb-icon { color: #2d6a4f; }
+  .gb-tile.wrong   .gb-icon { color: #9b2226; }
+  .gb-tile.skipped .gb-icon { color: #b5a99e; }
+  .gb-preview { font-family: 'DM Sans', sans-serif; font-size: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .gb-tile.correct .gb-preview { color: #3d7a60; }
+  .gb-tile.wrong   .gb-preview { color: #8a4040; }
+  .gb-tile.skipped .gb-preview { color: #9a8e82; }
+
+  /* ── OPTION C: Icon-dominant ── */
+  .gc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 18px 14px; }
+  .gc-tile { border-radius: 8px; padding: 10px 10px 10px 10px; border: 1.5px solid #e2d9ce; background: #faf7f2; display: flex; flex-direction: column; gap: 6px; }
+  .gc-top { display: flex; align-items: center; gap: 8px; }
+  .gc-icon-circle {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .gc-tile.correct .gc-icon-circle { background: #2d6a4f; color: #fff; }
+  .gc-tile.wrong   .gc-icon-circle { background: #9b2226; color: #fff; }
+  .gc-tile.skipped .gc-icon-circle { background: #e2d9ce; color: #9a8e82; }
+  .gc-num { font-family: 'DM Serif Display', serif; font-size: 15px; color: #1a1714; line-height: 1; }
+  .gc-preview { font-family: 'DM Sans', sans-serif; font-size: 10px; color: #9a8e82; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+</style>
+
+<h2>Review Grid — Alternative Layouts</h2>
+<p class="subtitle">Same data, three different ways to signal outcome. The previous left-border option is not shown — these are the three new alternatives.</p>
+
+<div class="options-row">
+
+  <!-- Option A: Colour band -->
+  <div class="phone-wrap" data-choice="a" onclick="toggleSelect(this)">
+    <div class="phone-screen">
+      <div class="grid-header">
+        <div class="grid-back">← Results</div>
+        <div class="grid-heading">Review</div>
+        <div class="grid-filters">
+          <div class="grid-pill active">All</div>
+          <div class="grid-pill">Correct</div>
+          <div class="grid-pill">Wrong</div>
+          <div class="grid-pill">Skipped</div>
+        </div>
+      </div>
+      <div class="ga-grid">
+        <div class="ga-tile correct"><div class="ga-band"></div><div class="ga-body"><div class="ga-num">01</div><div class="ga-preview">Find the derivative of f(x) = 3x³ − 2x + 5</div></div></div>
+        <div class="ga-tile wrong"><div class="ga-band"></div><div class="ga-body"><div class="ga-num">02</div><div class="ga-preview">Evaluate the limit as x→0 of sin(x)/x</div></div></div>
+        <div class="ga-tile correct"><div class="ga-band"></div><div class="ga-body"><div class="ga-num">03</div><div class="ga-preview">Solve for x: 2x² + 5x − 3 = 0</div></div></div>
+        <div class="ga-tile skipped"><div class="ga-band"></div><div class="ga-body"><div class="ga-num">04</div><div class="ga-preview">If sin θ = 3/5, find cos θ</div></div></div>
+        <div class="ga-tile wrong"><div class="ga-band"></div><div class="ga-body"><div class="ga-num">05</div><div class="ga-preview">Find the integral of e^x · cos(x) dx</div></div></div>
+        <div class="ga-tile correct"><div class="ga-band"></div><div class="ga-body"><div class="ga-num">06</div><div class="ga-preview">Determinant of a 2×2 matrix</div></div></div>
+      </div>
+      <div class="grid-pagination">
+        <div class="pg-btn">←</div>
+        <div class="pg-ind">1 / 3</div>
+        <div class="pg-btn">→</div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">A — Colour Band Header</div>
+      <div class="style-desc">Thin stripe across the top of each tile. Subtle, clean — outcome is a quiet signal.</div>
+    </div>
+  </div>
+
+  <!-- Option B: Full tint -->
+  <div class="phone-wrap" data-choice="b" onclick="toggleSelect(this)">
+    <div class="phone-screen">
+      <div class="grid-header">
+        <div class="grid-back">← Results</div>
+        <div class="grid-heading">Review</div>
+        <div class="grid-filters">
+          <div class="grid-pill active">All</div>
+          <div class="grid-pill">Correct</div>
+          <div class="grid-pill">Wrong</div>
+          <div class="grid-pill">Skipped</div>
+        </div>
+      </div>
+      <div class="gb-grid">
+        <div class="gb-tile correct"><div class="gb-row"><div class="gb-num">01</div><div class="gb-icon">✓</div></div><div class="gb-preview">Find the derivative of f(x) = 3x³ − 2x + 5</div></div>
+        <div class="gb-tile wrong"><div class="gb-row"><div class="gb-num">02</div><div class="gb-icon">✕</div></div><div class="gb-preview">Evaluate the limit as x→0 of sin(x)/x</div></div>
+        <div class="gb-tile correct"><div class="gb-row"><div class="gb-num">03</div><div class="gb-icon">✓</div></div><div class="gb-preview">Solve for x: 2x² + 5x − 3 = 0</div></div>
+        <div class="gb-tile skipped"><div class="gb-row"><div class="gb-num">04</div><div class="gb-icon">–</div></div><div class="gb-preview">If sin θ = 3/5, find cos θ</div></div>
+        <div class="gb-tile wrong"><div class="gb-row"><div class="gb-num">05</div><div class="gb-icon">✕</div></div><div class="gb-preview">Find the integral of e^x · cos(x)</div></div>
+        <div class="gb-tile correct"><div class="gb-row"><div class="gb-num">06</div><div class="gb-icon">✓</div></div><div class="gb-preview">Determinant of a 2×2 matrix</div></div>
+      </div>
+      <div class="grid-pagination">
+        <div class="pg-btn">←</div>
+        <div class="pg-ind">1 / 3</div>
+        <div class="pg-btn">→</div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">B — Full Tint Background</div>
+      <div class="style-desc">Entire tile tinted with outcome colour. Most expressive — the grid reads at a glance.</div>
+    </div>
+  </div>
+
+  <!-- Option C: Icon dominant -->
+  <div class="phone-wrap" data-choice="c" onclick="toggleSelect(this)">
+    <div class="phone-screen">
+      <div class="grid-header">
+        <div class="grid-back">← Results</div>
+        <div class="grid-heading">Review</div>
+        <div class="grid-filters">
+          <div class="grid-pill active">All</div>
+          <div class="grid-pill">Correct</div>
+          <div class="grid-pill">Wrong</div>
+          <div class="grid-pill">Skipped</div>
+        </div>
+      </div>
+      <div class="gc-grid">
+        <div class="gc-tile correct"><div class="gc-top"><div class="gc-icon-circle">✓</div><div class="gc-num">01</div></div><div class="gc-preview">Find the derivative of f(x) = 3x³ − 2x + 5</div></div>
+        <div class="gc-tile wrong"><div class="gc-top"><div class="gc-icon-circle">✕</div><div class="gc-num">02</div></div><div class="gc-preview">Evaluate the limit as x→0 of sin(x)/x</div></div>
+        <div class="gc-tile correct"><div class="gc-top"><div class="gc-icon-circle">✓</div><div class="gc-num">03</div></div><div class="gc-preview">Solve for x: 2x² + 5x − 3 = 0</div></div>
+        <div class="gc-tile skipped"><div class="gc-top"><div class="gc-icon-circle">–</div><div class="gc-num">04</div></div><div class="gc-preview">If sin θ = 3/5, find cos θ</div></div>
+        <div class="gc-tile wrong"><div class="gc-top"><div class="gc-icon-circle">✕</div><div class="gc-num">05</div></div><div class="gc-preview">Find the integral of e^x · cos(x)</div></div>
+        <div class="gc-tile correct"><div class="gc-top"><div class="gc-icon-circle">✓</div><div class="gc-num">06</div></div><div class="gc-preview">Determinant of a 2×2 matrix</div></div>
+      </div>
+      <div class="grid-pagination">
+        <div class="pg-btn">←</div>
+        <div class="pg-ind">1 / 3</div>
+        <div class="pg-btn">→</div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">C — Icon Circles</div>
+      <div class="style-desc">Filled circle badge with ✓ / ✕ / – paired with question number. Bold and unambiguous.</div>
+    </div>
+  </div>
+
+</div>

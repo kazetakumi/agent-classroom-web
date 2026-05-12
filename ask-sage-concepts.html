@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask Sage — Component Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --ink: #111111;
+    --ink-mid: #444444;
+    --ink-muted: #888888;
+    --label: #C8C8C8;
+    --label-dark: #ABABAB;
+    --rule: #F0F0F0;
+    --rule-strong: #EBEBEB;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #F7F7F5;
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 48px 32px 80px;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .page-header h1 {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #AAAAAA;
+    margin-bottom: 10px;
+  }
+
+  .page-header h2 {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .page-header p {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 300;
+    color: #999;
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  /* ─── Grid ─────────────────────────────────── */
+
+  .concepts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+
+  .concept {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  /* ─── Phone frame ───────────────────────────── */
+
+  .phone-frame {
+    width: 280px;
+    height: 580px;
+    background: #FFFFFF;
+    border-radius: 32px;
+    border: 1px solid #E0E0E0;
+    box-shadow:
+      0 2px 8px rgba(0,0,0,0.06),
+      0 20px 60px rgba(0,0,0,0.08);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── Shared screen chrome ──────────────────── */
+
+  .screen-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 22px 0;
+    flex-shrink: 0;
+  }
+
+  .screen-top-label {
+    font-family: var(--mono);
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .screen-top-meta {
+    font-family: var(--mono);
+    font-size: 8px;
+    color: var(--label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .screen-rule {
+    width: calc(100% - 44px);
+    margin: 14px 22px 0;
+    height: 1px;
+    background: var(--rule-strong);
+    flex-shrink: 0;
+  }
+
+  /* ─── Screen content (ghost, to show context) ─ */
+
+  .screen-content {
+    flex: 1;
+    padding: 24px 22px 0;
+    overflow: hidden;
+  }
+
+  .ghost-block {
+    background: #F5F5F5;
+    border-radius: 3px;
+  }
+
+  .ghost-line {
+    height: 10px;
+    border-radius: 4px;
+    background: #F0F0F0;
+    margin-bottom: 8px;
+  }
+
+  .ghost-line.short { width: 55%; }
+  .ghost-line.medium { width: 78%; }
+  .ghost-line.long { width: 100%; }
+  .ghost-line.xshort { width: 38%; }
+
+  .ghost-col-grid {
+    display: grid;
+    grid-template-columns: 48px 1px 1fr;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .ghost-label-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 2px;
+  }
+
+  .ghost-label-pill {
+    height: 8px;
+    border-radius: 3px;
+    background: #EBEBEB;
+    width: 32px;
+  }
+
+  .ghost-rule-col {
+    background: #F0F0F0;
+    width: 1px;
+    margin-top: 2px;
+  }
+
+  .ghost-text-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ghost-question {
+    margin-top: 22px;
+  }
+
+  .ghost-options {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ghost-option {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .ghost-option-letter {
+    width: 10px;
+    height: 10px;
+    background: #EBEBEB;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .ghost-option-text {
+    height: 10px;
+    border-radius: 3px;
+    background: #F3F3F3;
+    flex: 1;
+  }
+
+  /* ─── Concept labels ────────────────────────── */
+
+  .concept-meta {
+    text-align: center;
+    max-width: 280px;
+  }
+
+  .concept-tag {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #C0C0C0;
+    margin-bottom: 8px;
+  }
+
+  .concept-name {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .concept-desc {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 300;
+    font-style: italic;
+    color: #999;
+    line-height: 1.6;
+  }
+
+  .concept-detail {
+    margin-top: 16px;
+    padding: 16px 20px;
+    background: #FFFFFF;
+    border: 1px solid #EBEBEB;
+    border-radius: 8px;
+    width: 280px;
+    text-align: left;
+  }
+
+  .concept-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  .concept-detail-row:last-child { margin-bottom: 0; }
+
+  .detail-key {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #C8C8C8;
+  }
+
+  .detail-val {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+
+  /* ══════════════════════════════════════════════
+     CONCEPT A — "STILL WATER"
+     A single muted name-mark + tap zone
+  ══════════════════════════════════════════════ */
+
+  .concept-a .ask-sage-component {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 72px;
+    position: relative;
+    cursor: pointer;
+    padding-bottom: 24px;
+  }
+
+  .concept-a .ask-sage-component::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 22px;
+    right: 22px;
+    height: 1px;
+    background: var(--rule-strong);
+  }
+
+  .concept-a .sage-name {
+    font-family: var(--mono);
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: #D4D4D4;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+
+  /* hover state shown as a static variant below the name */
+  .concept-a .sage-name::after {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: #E4E4E4;
+    margin: 6px auto 0;
+  }
+
+  /* ══════════════════════════════════════════════
+     CONCEPT B — "THE SIGNET"
+     A circle-seal — single identity mark
+  ══════════════════════════════════════════════ */
+
+  .concept-b .ask-sage-component {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 88px;
+    gap: 8px;
+    cursor: pointer;
+    padding-bottom: 16px;
+  }
+
+  .concept-b .ask-sage-component::before {
+    content: '';
+    position: absolute;
+    bottom: 88px;
+    left: 22px;
+    right: 22px;
+    height: 1px;
+    background: var(--rule-strong);
+  }
+
+  .signet-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid #E0E0E0;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .signet-circle .signet-s {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 300;
+    font-style: italic;
+    color: #555;
+    line-height: 1;
+    position: relative;
+    top: 1px;
+  }
+
+  .signet-label {
+    font-family: var(--mono);
+    font-size: 7px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #D8D8D8;
+  }
+
+  /* ══════════════════════════════════════════════
+     CONCEPT C — "THE INVITATION"
+     Full-width italic text — press anywhere
+  ══════════════════════════════════════════════ */
+
+  .concept-c .ask-sage-component {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 72px;
+    cursor: pointer;
+    padding-bottom: 20px;
+    position: relative;
+    gap: 10px;
+  }
+
+  .concept-c .ask-sage-component::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #EBEBEB 20%, #EBEBEB 80%, transparent);
+  }
+
+  .invitation-text {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 300;
+    font-style: italic;
+    color: #C0C0C0;
+    letter-spacing: 0.01em;
+  }
+
+  .invitation-handle {
+    width: 32px;
+    height: 3px;
+    border-radius: 2px;
+    background: #E8E8E8;
+  }
+
+  /* ─── Comparison note ───────────────────────── */
+
+  .comparison-note {
+    max-width: 1160px;
+    margin: 64px auto 0;
+    padding: 32px 40px;
+    background: #FFFFFF;
+    border: 1px solid #EBEBEB;
+    border-radius: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+  }
+
+  .note-col h3 {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #AAAAAA;
+    margin-bottom: 12px;
+  }
+
+  .note-col p {
+    font-family: var(--serif);
+    font-size: 15px;
+    font-weight: 300;
+    color: #555;
+    line-height: 1.7;
+  }
+
+  .note-col p + p {
+    margin-top: 10px;
+  }
+
+  /* ─── Divider between content and component ─── */
+
+  .component-divider {
+    height: 1px;
+    background: var(--rule-strong);
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>Agent Classroom · Ask Sage Component</h1>
+  <h2>Three Concepts</h2>
+  <p>Independent. Singular. The soul of the app.</p>
+</header>
+
+<div class="concepts-grid">
+
+  <!-- ══════ CONCEPT A: STILL WATER ══════ -->
+  <div class="concept concept-a">
+
+    <div class="phone-frame">
+      <!-- Screen chrome -->
+      <div class="screen-top">
+        <span class="screen-top-label">Agent Classroom</span>
+        <span class="screen-top-meta">3 / 12</span>
+      </div>
+      <div class="screen-rule"></div>
+
+      <!-- Ghost content (question card) -->
+      <div class="screen-content">
+        <div style="margin-bottom: 16px;">
+          <div class="ghost-line xshort" style="height: 8px;"></div>
+        </div>
+        <div class="ghost-question">
+          <div class="ghost-line long"></div>
+          <div class="ghost-line medium"></div>
+          <div class="ghost-line short"></div>
+        </div>
+        <div style="margin: 18px 0; height: 1px; background: #F0F0F0;"></div>
+        <div class="ghost-options">
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 52%;"></div>
+          </div>
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 40%;"></div>
+          </div>
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 65%;"></div>
+          </div>
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 58%;"></div>
+          </div>
+        </div>
+
+        <!-- Navigation sits above the Ask Sage component — separate -->
+        <div style="position: absolute; bottom: 72px; left: 22px; right: 22px; display: flex; justify-content: space-between; align-items: center; padding-bottom: 0;">
+          <span style="font-family: var(--mono); font-size: 8px; color: #D0D0D0; letter-spacing: 0.12em; text-transform: uppercase;">← Prev</span>
+          <span style="font-family: var(--mono); font-size: 8px; color: #D0D0D0; letter-spacing: 0.12em; text-transform: uppercase;">Next →</span>
+        </div>
+      </div>
+
+      <!-- ASK SAGE COMPONENT — Concept A -->
+      <div class="ask-sage-component">
+        <span class="sage-name">Sage</span>
+      </div>
+    </div>
+
+    <!-- Concept label -->
+    <div class="concept-meta">
+      <div class="concept-tag">Concept A</div>
+      <div class="concept-name">Still Water</div>
+      <div class="concept-desc">A single muted name. Always present at the threshold — barely there, always available.</div>
+    </div>
+
+    <div class="concept-detail">
+      <div class="concept-detail-row">
+        <span class="detail-key">Height</span>
+        <span class="detail-val">72px</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Tap target</span>
+        <span class="detail-val">Full width</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Typography</span>
+        <span class="detail-val">IBM Plex Mono 8px / #D4D4D4</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Separator</span>
+        <span class="detail-val">1px rule inset 22px</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Character</span>
+        <span class="detail-val">The monk's bell</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════ CONCEPT B: THE SIGNET ══════ -->
+  <div class="concept concept-b">
+
+    <div class="phone-frame">
+      <div class="screen-top">
+        <span class="screen-top-label">Agent Classroom</span>
+        <span class="screen-top-meta">3 / 12</span>
+      </div>
+      <div class="screen-rule"></div>
+
+      <div class="screen-content">
+        <div style="margin-bottom: 16px;">
+          <div class="ghost-line xshort" style="height: 8px;"></div>
+        </div>
+        <div class="ghost-question">
+          <div class="ghost-line long"></div>
+          <div class="ghost-line medium"></div>
+          <div class="ghost-line short"></div>
+        </div>
+        <div style="margin: 18px 0; height: 1px; background: #F0F0F0;"></div>
+        <div class="ghost-options">
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 52%;"></div>
+          </div>
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 40%;"></div>
+          </div>
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 65%;"></div>
+          </div>
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 58%;"></div>
+          </div>
+        </div>
+
+        <!-- Navigation sits above -->
+        <div style="position: absolute; bottom: 88px; left: 22px; right: 22px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--mono); font-size: 8px; color: #D0D0D0; letter-spacing: 0.12em; text-transform: uppercase;">← Prev</span>
+          <span style="font-family: var(--mono); font-size: 8px; color: #D0D0D0; letter-spacing: 0.12em; text-transform: uppercase;">Next →</span>
+        </div>
+      </div>
+
+      <!-- ASK SAGE COMPONENT — Concept B -->
+      <div class="ask-sage-component" style="position: relative;">
+        <div style="position: absolute; top: 0; left: 22px; right: 22px; height: 1px; background: var(--rule-strong);"></div>
+        <div class="signet-circle">
+          <span class="signet-s">S</span>
+        </div>
+        <span class="signet-label">Sage</span>
+      </div>
+    </div>
+
+    <div class="concept-meta">
+      <div class="concept-tag">Concept B</div>
+      <div class="concept-name">The Signet</div>
+      <div class="concept-desc">A seal. An identity mark. One object that means one thing across every screen.</div>
+    </div>
+
+    <div class="concept-detail">
+      <div class="concept-detail-row">
+        <span class="detail-key">Height</span>
+        <span class="detail-val">88px</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Tap target</span>
+        <span class="detail-val">44px circle (full zone)</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Circle</span>
+        <span class="detail-val">44px · 1px border #E0E0E0</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Glyph</span>
+        <span class="detail-val">Cormorant italic "S" · #555</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Character</span>
+        <span class="detail-val">A hanko seal</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════ CONCEPT C: THE INVITATION ══════ -->
+  <div class="concept concept-c">
+
+    <div class="phone-frame">
+      <div class="screen-top">
+        <span class="screen-top-label">Agent Classroom</span>
+        <span class="screen-top-meta">3 / 12</span>
+      </div>
+      <div class="screen-rule"></div>
+
+      <div class="screen-content">
+        <div style="margin-bottom: 16px;">
+          <div class="ghost-line xshort" style="height: 8px;"></div>
+        </div>
+        <div class="ghost-question">
+          <div class="ghost-line long"></div>
+          <div class="ghost-line medium"></div>
+          <div class="ghost-line short"></div>
+        </div>
+        <div style="margin: 18px 0; height: 1px; background: #F0F0F0;"></div>
+        <div class="ghost-options">
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 52%;"></div>
+          </div>
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 40%;"></div>
+          </div>
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 65%;"></div>
+          </div>
+          <div class="ghost-option">
+            <div class="ghost-option-letter"></div>
+            <div class="ghost-option-text" style="width: 58%;"></div>
+          </div>
+        </div>
+
+        <!-- Navigation sits above -->
+        <div style="position: absolute; bottom: 72px; left: 22px; right: 22px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--mono); font-size: 8px; color: #D0D0D0; letter-spacing: 0.12em; text-transform: uppercase;">← Prev</span>
+          <span style="font-family: var(--mono); font-size: 8px; color: #D0D0D0; letter-spacing: 0.12em; text-transform: uppercase;">Next →</span>
+        </div>
+      </div>
+
+      <!-- ASK SAGE COMPONENT — Concept C -->
+      <div class="ask-sage-component">
+        <div class="invitation-handle"></div>
+        <span class="invitation-text">ask sage</span>
+      </div>
+    </div>
+
+    <div class="concept-meta">
+      <div class="concept-tag">Concept C</div>
+      <div class="concept-name">The Invitation</div>
+      <div class="concept-desc">Sage's own words at the bottom. The pill handle shows it can be lifted. Press anywhere to open.</div>
+    </div>
+
+    <div class="concept-detail">
+      <div class="concept-detail-row">
+        <span class="detail-key">Height</span>
+        <span class="detail-val">72px</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Tap target</span>
+        <span class="detail-val">Full width</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Typography</span>
+        <span class="detail-val">Cormorant italic 16px / #C0C0C0</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Handle</span>
+        <span class="detail-val">32×3px · #E8E8E8 · above text</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Separator</span>
+        <span class="detail-val">1px gradient rule, no hard edges</span>
+      </div>
+      <div class="concept-detail-row">
+        <span class="detail-key">Character</span>
+        <span class="detail-val">An open letter</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ─── Comparison note ───────────────────────── -->
+
+<div class="comparison-note">
+
+  <div class="note-col">
+    <h3>A · Still Water</h3>
+    <p>The name in monospace, almost invisible. The entire zone is pressable — the tap affordance is implicit. Sage is present the way a name on a door is present: always there, never demanding.</p>
+    <p>Best when you want Sage to feel like an ambient intelligence rather than a feature. The user discovers it through familiarity, not through a label.</p>
+  </div>
+
+  <div class="note-col">
+    <h3>B · The Signet</h3>
+    <p>A single physical object. The circle has weight and identity — it marks Sage as a character, not a function. The "S" in Cormorant italic is the only glyph, and it carries the full personality of the app.</p>
+    <p>Best when Sage should feel like a person or persona — something you summon. The most distinct from generic AI chat UI patterns. The circle persists identically across every screen.</p>
+  </div>
+
+  <div class="note-col">
+    <h3>C · The Invitation</h3>
+    <p>Sage's own words — lowercase, italic — as the component itself. The pill handle teaches the gesture before the user presses. The gradient rule softens the boundary so the component feels attached to the screen, not bolted on.</p>
+    <p>Best when the voice of Sage matters most. The text can stay fixed ("ask sage") or shift per screen context ("I'm here" on welcome, "ask me" on question). Lowest friction — the interaction is legible immediately.</p>
+  </div>
+
+</div>
+
+</body>
+</html>

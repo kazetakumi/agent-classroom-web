@@ -1,0 +1,13 @@
+
+────────────────────────────────────────────────────────────
+2026-05-12T08:37:58.964441 [US-010]
+────────────────────────────────────────────────────────────
+[US-010] All acceptance criteria are satisfied:
+[US-010] 
+[US-010] - `index.html` now loads Cormorant Garamond (300, 400) and IBM Plex Mono (400, 500) via Google Fonts
+[US-010] - `index.css` `:root` defines `--serif` and `--mono`
+[US-010] - `.col-grid` utility added with exact grid spec
+[US-010] - `.top-strip` utility added with exact flex spec  
+[US-010] - All 98 existing tests still pass — no regressions
+[US-010] 
+[US-010] <promise>COMPLETE</promise>

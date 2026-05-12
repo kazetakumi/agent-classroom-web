@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Sage — Soul Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0E0E0E; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 52px;
+      background: #0E0E0E;
+      display: flex; align-items: center; gap: 18px;
+      padding: 0 32px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bar-title { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.22); }
+    .bar-sep { width: 1px; height: 16px; background: rgba(255,255,255,0.07); flex-shrink: 0; }
+    .bar-sub { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.14); }
+
+    /* ── Stage ── */
+    .stage {
+      padding-top: 88px; padding-bottom: 80px;
+      display: flex; justify-content: center; align-items: flex-start;
+      gap: 48px; min-height: 100vh;
+    }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+
+    /* ── Phone ── */
+    .phone {
+      width: 390px; height: 800px;
+      border-radius: 44px; overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 32px 80px rgba(0,0,0,0.55),
+        0 4px 16px rgba(0,0,0,0.3);
+    }
+
+    /* ── Info card ── */
+    .info {
+      width: 390px;
+      background: #161616;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 20px 22px;
+    }
+    .info-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.18); margin-bottom: 12px;
+    }
+    .info-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 300;
+      color: rgba(255,255,255,0.72);
+      margin-bottom: 10px;
+    }
+    .info-desc {
+      font-size: 12.5px; color: rgba(255,255,255,0.36);
+      line-height: 1.7; margin-bottom: 16px;
+    }
+    .info-divider { height: 1px; background: rgba(255,255,255,0.06); margin-bottom: 14px; }
+    .info-spec-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 7px;
+    }
+    .info-spec-row:last-child { margin-bottom: 0; }
+    .spec-key {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.18);
+    }
+    .spec-val {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; color: rgba(255,255,255,0.36);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SHARED SCREEN SHELL — Question card ghost
+    ═══════════════════════════════════════════════════ */
+
+    .screen {
+      background: #FFFFFF; height: 100%;
+      display: flex; flex-direction: column;
+      position: relative;
+    }
+
+    /* Top strip */
+    .sc-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 28px 0; flex-shrink: 0;
+    }
+    .sc-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .sc-count { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #D4D4D4; }
+    .sc-rule { height: 1px; background: #F0F0F0; margin: 16px 28px 0; flex-shrink: 0; }
+
+    /* Progress fill */
+    .sc-progress {
+      height: 1px; background: #BDBDBD;
+      margin: 0 28px; flex-shrink: 0;
+      width: 25%;
+    }
+
+    /* Content zone */
+    .sc-content { flex: 1; padding: 28px 28px 0; overflow: hidden; }
+
+    .sc-subject {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: #BBBBBB; margin-bottom: 18px;
+    }
+
+    .sc-question {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px; font-weight: 300; line-height: 1.55; color: #111;
+      margin-bottom: 22px;
+    }
+
+    .sc-options-rule { height: 1px; background: #F0F0F0; margin-bottom: 20px; }
+
+    .sc-option {
+      display: flex; gap: 14px; align-items: baseline;
+      margin-bottom: 16px; opacity: 0.9;
+    }
+    .sc-option.selected { opacity: 1; }
+    .sc-option.faded { opacity: 0.28; }
+
+    .sc-opt-letter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; color: #CFCFCF; flex-shrink: 0; width: 12px;
+    }
+    .sc-option.selected .sc-opt-letter { color: #111; }
+
+    .sc-opt-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 300; color: #888; line-height: 1.4;
+    }
+    .sc-option.selected .sc-opt-text { color: #111; }
+
+    /* ── Nav row — sits above every Ask Sage component ── */
+    .nav-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; height: 44px; flex-shrink: 0;
+      border-top: 1px solid #F4F4F4;
+    }
+    .nav-btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #D0D0D0;
+    }
+    .nav-btn.dim { color: #EBEBEB; }
+
+
+    /* ═══════════════════════════════════════════════════
+       CONCEPT A — "PULSE"
+       A living sine wave. No text, no icon.
+       The wave is proof that Sage is present.
+    ═══════════════════════════════════════════════════ */
+
+    @keyframes wave-drift {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-390px); }
+    }
+
+    @keyframes wave-breathe {
+      0%, 100% { opacity: 0.22; }
+      50%       { opacity: 0.55; }
+    }
+
+    .ask-pulse {
+      flex-shrink: 0;
+      height: 72px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+      border-top: 1px solid #F5F5F5;
+    }
+
+    .wave-track {
+      position: absolute;
+      width: 100%; height: 100%;
+      display: flex; align-items: center;
+      overflow: hidden;
+    }
+
+    .wave-svg-wrap {
+      /* double-width so translateX(-390px) loops seamlessly */
+      width: 780px; flex-shrink: 0;
+      animation: wave-drift 9s linear infinite;
+      will-change: transform;
+    }
+
+    .wave-svg-wrap svg {
+      animation: wave-breathe 4s ease-in-out infinite;
+      display: block;
+    }
+
+
+    /* ═══════════════════════════════════════════════════
+       CONCEPT B — "THE GRIP"
+       A tactile ridged texture. Physical. Grab here.
+       Like the ribbing on a physical lever — no metaphor
+       needed. Your hand knows what to do.
+    ═══════════════════════════════════════════════════ */
+
+    .ask-grip {
+      flex-shrink: 0;
+      height: 72px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      border-top: 1px solid #F0F0F0;
+    }
+
+    .grip-line {
+      background: #E2E2E2;
+      height: 1.5px;
+      border-radius: 1px;
+      transition: background 0.2s;
+    }
+
+    .grip-line-1 { width: 36px; }
+    .grip-line-2 { width: 24px; }
+    .grip-line-3 { width: 14px; }
+
+
+    /* ═══════════════════════════════════════════════════
+       CONCEPT C — "THE TAPE"
+       Sage's voice, always running at the periphery.
+       Slow horizontal scroll in Cormorant italic.
+       Fades at both edges. Tap to catch the whisper.
+    ═══════════════════════════════════════════════════ */
+
+    @keyframes tape-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .ask-tape {
+      flex-shrink: 0;
+      height: 64px;
+      display: flex; align-items: center;
+      overflow: hidden;
+      cursor: pointer;
+      border-top: 1px solid #F0F0F0;
+      position: relative;
+
+      /* Fade both edges to white */
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0,0,0,0.15) 6%,
+        black 18%,
+        black 82%,
+        rgba(0,0,0,0.15) 94%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0,0,0,0.15) 6%,
+        black 18%,
+        black 82%,
+        rgba(0,0,0,0.15) 94%,
+        transparent 100%
+      );
+    }
+
+    .tape-inner {
+      display: flex; flex-shrink: 0;
+      /* content is duplicated inside so -50% is one full instance */
+      animation: tape-scroll 28s linear infinite;
+      will-change: transform;
+      white-space: nowrap;
+    }
+
+    .tape-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px; font-weight: 300; font-style: italic;
+      color: #C4C4C4;
+      letter-spacing: 0.01em;
+      padding: 0 48px; /* gap between loop instances */
+      display: inline-block;
+      line-height: 1;
+    }
+
+    .tape-sep {
+      color: #DCDCDC;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px;
+      position: relative; top: -1px;
+    }
+
+
+    /* ═══════════════════════════════════════════════════
+       Page title
+    ═══════════════════════════════════════════════════ */
+
+    .page-title-block {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .page-title-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(255,255,255,0.1);
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="bar">
+  <span class="bar-title">Agent Classroom</span>
+  <div class="bar-sep"></div>
+  <span class="bar-sub">Ask Sage — Soul Concepts</span>
+</div>
+
+<!-- Stage -->
+<div class="stage">
+
+
+  <!-- ══════════════════════════════════════════
+       CONCEPT A  —  PULSE
+  ══════════════════════════════════════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+
+        <!-- Top strip -->
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-count">3 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-progress"></div>
+
+        <!-- Question content -->
+        <div class="sc-content">
+          <div class="sc-subject">Calculus Foundations</div>
+          <div class="sc-question">
+            A particle moves along the x-axis with velocity
+            v(t) = 3t² − 6t. At what time is the particle
+            at rest?
+          </div>
+          <div class="sc-options-rule"></div>
+          <div class="sc-option faded">
+            <span class="sc-opt-letter">A</span>
+            <span class="sc-opt-text">t = 0 only</span>
+          </div>
+          <div class="sc-option faded">
+            <span class="sc-opt-letter">B</span>
+            <span class="sc-opt-text">t = 2 only</span>
+          </div>
+          <div class="sc-option selected">
+            <span class="sc-opt-letter">C</span>
+            <span class="sc-opt-text">t = 0 and t = 2</span>
+          </div>
+          <div class="sc-option faded">
+            <span class="sc-opt-letter">D</span>
+            <span class="sc-opt-text">t = 1 and t = 3</span>
+          </div>
+        </div>
+
+        <!-- Nav row — independent, above Sage -->
+        <div class="nav-row">
+          <span class="nav-btn">← Prev</span>
+          <span class="nav-btn">Next →</span>
+        </div>
+
+        <!-- ── CONCEPT A: PULSE ── -->
+        <div class="ask-pulse" title="Tap to ask Sage">
+          <div class="wave-track">
+            <div class="wave-svg-wrap">
+              <!--
+                Sine wave: period 78px, amplitude ±3.5px, center Y=8 in 16px SVG.
+                780px = 10 full periods → seamless loop when translateX(-390px).
+              -->
+              <svg width="780" height="16" viewBox="0 0 780 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M 0 8
+                     C 13 4.5, 26 4.5, 39 8
+                     S 65 11.5, 78 8
+                     S 104 4.5, 117 8
+                     S 143 11.5, 156 8
+                     S 182 4.5, 195 8
+                     S 221 11.5, 234 8
+                     S 260 4.5, 273 8
+                     S 299 11.5, 312 8
+                     S 338 4.5, 351 8
+                     S 377 11.5, 390 8
+                     S 416 4.5, 429 8
+                     S 455 11.5, 468 8
+                     S 494 4.5, 507 8
+                     S 533 11.5, 546 8
+                     S 572 4.5, 585 8
+                     S 611 11.5, 624 8
+                     S 650 4.5, 663 8
+                     S 689 11.5, 702 8
+                     S 728 4.5, 741 8
+                     S 767 11.5, 780 8"
+                  stroke="#C8C8C8"
+                  stroke-width="1"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="info">
+      <div class="info-tag">Concept A</div>
+      <div class="info-name">Pulse</div>
+      <div class="info-desc">
+        No text. No icon. Just a sine wave — slowly drifting,
+        quietly breathing — at the bottom of every screen.
+        Sage is present the way a heartbeat is present. You don't
+        read it. You feel it. Tap anywhere on the wave to open.
+      </div>
+      <div class="info-divider"></div>
+      <div class="info-spec-row">
+        <span class="spec-key">Height</span>
+        <span class="spec-val">72px</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Tap target</span>
+        <span class="spec-val">Full width</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Wave</span>
+        <span class="spec-val">Period 78px · Amp 3.5px · #C8C8C8</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Drift</span>
+        <span class="spec-val">9s linear loop</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Breathe</span>
+        <span class="spec-val">Opacity 0.22 → 0.55 · 4s ease-in-out</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Character</span>
+        <span class="spec-val">A vital sign. Sage is alive.</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       CONCEPT B  —  THE GRIP
+  ══════════════════════════════════════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-count">3 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-progress"></div>
+
+        <div class="sc-content">
+          <div class="sc-subject">Calculus Foundations</div>
+          <div class="sc-question">
+            A particle moves along the x-axis with velocity
+            v(t) = 3t² − 6t. At what time is the particle
+            at rest?
+          </div>
+          <div class="sc-options-rule"></div>
+          <div class="sc-option faded">
+            <span class="sc-opt-letter">A</span>
+            <span class="sc-opt-text">t = 0 only</span>
+          </div>
+          <div class="sc-option faded">
+            <span class="sc-opt-letter">B</span>
+            <span class="sc-opt-text">t = 2 only</span>
+          </div>
+          <div class="sc-option selected">
+            <span class="sc-opt-letter">C</span>
+            <span class="sc-opt-text">t = 0 and t = 2</span>
+          </div>
+          <div class="sc-option faded">
+            <span class="sc-opt-letter">D</span>
+            <span class="sc-opt-text">t = 1 and t = 3</span>
+          </div>
+        </div>
+
+        <div class="nav-row">
+          <span class="nav-btn">← Prev</span>
+          <span class="nav-btn">Next →</span>
+        </div>
+
+        <!-- ── CONCEPT B: THE GRIP ── -->
+        <div class="ask-grip" title="Tap to ask Sage">
+          <div class="grip-line grip-line-1"></div>
+          <div class="grip-line grip-line-2"></div>
+          <div class="grip-line grip-line-3"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-tag">Concept B</div>
+      <div class="info-name">The Grip</div>
+      <div class="info-desc">
+        Three horizontal ridges, tapering downward in width.
+        Not a pill. Not a handle. A grip — the kind your hand
+        recognises before your brain does. It says "take hold"
+        without saying a word. Press anywhere in the zone to
+        lift the Sage sheet up.
+      </div>
+      <div class="info-divider"></div>
+      <div class="info-spec-row">
+        <span class="spec-key">Height</span>
+        <span class="spec-val">72px</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Tap target</span>
+        <span class="spec-val">Full width</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Ridges</span>
+        <span class="spec-val">36px / 24px / 14px · 1.5px · #E2E2E2</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Gap</span>
+        <span class="spec-val">6px between ridges</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Separator</span>
+        <span class="spec-val">1px rule #F0F0F0</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Character</span>
+        <span class="spec-val">A physical object. Grab and lift.</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       CONCEPT C  —  THE TAPE
+  ══════════════════════════════════════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-count">3 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-progress"></div>
+
+        <div class="sc-content">
+          <div class="sc-subject">Calculus Foundations</div>
+          <div class="sc-question">
+            A particle moves along the x-axis with velocity
+            v(t) = 3t² − 6t. At what time is the particle
+            at rest?
+          </div>
+          <div class="sc-options-rule"></div>
+          <div class="sc-option faded">
+            <span class="sc-opt-letter">A</span>
+            <span class="sc-opt-text">t = 0 only</span>
+          </div>
+          <div class="sc-option faded">
+            <span class="sc-opt-letter">B</span>
+            <span class="sc-opt-text">t = 2 only</span>
+          </div>
+          <div class="sc-option selected">
+            <span class="sc-opt-letter">C</span>
+            <span class="sc-opt-text">t = 0 and t = 2</span>
+          </div>
+          <div class="sc-option faded">
+            <span class="sc-opt-letter">D</span>
+            <span class="sc-opt-text">t = 1 and t = 3</span>
+          </div>
+        </div>
+
+        <div class="nav-row">
+          <span class="nav-btn">← Prev</span>
+          <span class="nav-btn">Next →</span>
+        </div>
+
+        <!-- ── CONCEPT C: THE TAPE ── -->
+        <div class="ask-tape" title="Tap to ask Sage">
+          <div class="tape-inner">
+            <!--
+              Content duplicated exactly once so -50% = one full instance.
+              The mask fades both edges so the seam is invisible.
+            -->
+            <span class="tape-text">
+              ask me anything
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              a hint, perhaps
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              shall I explain
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              walk through this
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              I'm listening
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              what troubles you
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              skip ahead
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+            </span>
+            <span class="tape-text" aria-hidden="true">
+              ask me anything
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              a hint, perhaps
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              shall I explain
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              walk through this
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              I'm listening
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              what troubles you
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+              skip ahead
+              <span class="tape-sep">&nbsp;·&nbsp;</span>
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-tag">Concept C</div>
+      <div class="info-name">The Tape</div>
+      <div class="info-desc">
+        Sage's voice, always running at the periphery of the screen.
+        Slow. Quiet. A loop of offerings — "ask me anything · a hint,
+        perhaps · I'm listening" — drifting past in Cormorant italic.
+        You don't open chat. You catch a whisper.
+        Press anywhere to pause it and step through.
+      </div>
+      <div class="info-divider"></div>
+      <div class="info-spec-row">
+        <span class="spec-key">Height</span>
+        <span class="spec-val">64px</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Tap target</span>
+        <span class="spec-val">Full width</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Typography</span>
+        <span class="spec-val">Cormorant italic 15px / 300 · #C4C4C4</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Speed</span>
+        <span class="spec-val">28s linear loop · imperceptibly slow</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Edges</span>
+        <span class="spec-val">CSS mask fade to transparent</span>
+      </div>
+      <div class="info-spec-row">
+        <span class="spec-key">Character</span>
+        <span class="spec-val">Sage never stops thinking.</span>
+      </div>
+    </div>
+  </div>
+
+
+</div><!-- /stage -->
+
+<div class="page-title-block">
+  <span class="page-title-text">Ask Sage · Soul Concepts · v2</span>
+</div>
+
+</body>
+</html>

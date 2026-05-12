@@ -1,0 +1,422 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .phones-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    margin-top: 20px;
+    align-items: start;
+  }
+
+  .phone-wrap {
+    border: 2px solid transparent;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .phone-wrap:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.13); }
+  .phone-wrap.selected { border-color: #c96842; box-shadow: 0 8px 32px rgba(201,104,66,0.22); }
+
+  .phone-screen {
+    background: #f5f0e8;
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .style-label {
+    background: #fff;
+    border-top: 1px solid #e8e4e0;
+    padding: 12px 16px;
+  }
+  .style-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a1714;
+    margin-bottom: 2px;
+  }
+  .style-desc {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #888;
+    line-height: 1.4;
+  }
+
+  /* Shared button */
+  .btn-ink {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #f5f0e8;
+    background: #1a1714;
+    border: none;
+    border-radius: 6px;
+    padding: 11px 0;
+    width: 100%;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+  }
+  .btn-ghost {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #9a8e82;
+    background: none;
+    border: 1.5px solid #e2d9ce;
+    border-radius: 6px;
+    padding: 10px 0;
+    width: 100%;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* ── Layout A: Giant score centrepiece ── */
+  .ra {
+    padding: 28px 22px 24px;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+  }
+  .ra-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #c96842;
+    margin-bottom: 6px;
+  }
+  .ra-score-wrap {
+    position: relative;
+    margin: 4px 0 0;
+    line-height: 1;
+  }
+  .ra-score {
+    font-family: 'DM Serif Display', serif;
+    font-size: 88px;
+    color: #1a1714;
+    line-height: 1;
+  }
+  .ra-score-denom {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #9a8e82;
+    margin-bottom: 4px;
+  }
+  .ra-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #9a8e82;
+    margin-bottom: 20px;
+    letter-spacing: 0.04em;
+  }
+  .ra-rule {
+    width: 32px;
+    height: 1.5px;
+    background: #e2d9ce;
+    margin: 0 auto 16px;
+  }
+  .ra-stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+    justify-content: center;
+  }
+  .ra-stat { text-align: center; }
+  .ra-stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .ra-stat-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9a8e82;
+    margin-top: 3px;
+  }
+  .ra-correct .ra-stat-num { color: #2d6a4f; }
+  .ra-wrong .ra-stat-num { color: #9b2226; }
+  .ra-skipped .ra-stat-num { color: #9a8e82; }
+  .ra-divider { width: 1px; background: #e2d9ce; align-self: stretch; }
+  .ra-actions { width: 100%; }
+
+  /* ── Layout B: Report card ── */
+  .rb {
+    padding: 0;
+    justify-content: space-between;
+  }
+  .rb-header {
+    padding: 24px 22px 20px;
+    border-bottom: 1px solid #e2d9ce;
+  }
+  .rb-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #c96842;
+    margin-bottom: 6px;
+  }
+  .rb-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: #1a1714;
+    line-height: 1.25;
+  }
+  .rb-time {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #9a8e82;
+    margin-top: 4px;
+  }
+  .rb-rows {
+    padding: 4px 0;
+    flex: 1;
+  }
+  .rb-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 12px 22px;
+    border-bottom: 1px solid #e2d9ce;
+  }
+  .rb-row:last-child { border-bottom: none; }
+  .rb-row-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: #4a4541;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .rb-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .rb-dot-green { background: #2d6a4f; }
+  .rb-dot-red { background: #9b2226; }
+  .rb-dot-gray { background: #c9bfb4; }
+  .rb-row-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: #1a1714;
+  }
+  .rb-footer {
+    padding: 16px 22px 20px;
+    border-top: 1px solid #e2d9ce;
+  }
+
+  /* ── Layout C: Horizontal score bar ── */
+  .rc {
+    padding: 28px 22px 24px;
+    justify-content: space-between;
+  }
+  .rc-top {}
+  .rc-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #c96842;
+    margin-bottom: 14px;
+  }
+  .rc-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: #1a1714;
+    line-height: 1.25;
+    margin-bottom: 4px;
+  }
+  .rc-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #9a8e82;
+    margin-bottom: 20px;
+  }
+  .rc-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    color: #9a8e82;
+    margin-bottom: 6px;
+  }
+  .rc-bar-track {
+    height: 8px;
+    background: #e2d9ce;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    display: flex;
+  }
+  .rc-bar-correct { height: 100%; background: #2d6a4f; flex: 8; }
+  .rc-bar-wrong   { height: 100%; background: #9b2226; flex: 5; }
+  .rc-bar-skipped { height: 100%; background: #c9bfb4; flex: 4; }
+  .rc-legend {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .rc-legend-item {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    color: #4a4541;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .rc-swatch {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+  .rc-score-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .rc-score-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 52px;
+    color: #1a1714;
+    line-height: 1;
+  }
+  .rc-score-denom {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #9a8e82;
+    align-self: flex-end;
+    padding-bottom: 6px;
+  }
+  .rc-bottom {}
+</style>
+
+<h2>Results Screen</h2>
+<p class="subtitle">Post-session. The current design shows three equal-weight stat cards — these three approaches make the result feel more meaningful and earned.</p>
+
+<div class="phones-row">
+
+  <!-- Layout A: Giant score -->
+  <div class="phone-wrap" data-choice="a" onclick="toggleSelect(this)">
+    <div class="phone-screen ra">
+      <div class="ra-eyebrow">Session Complete</div>
+      <div class="ra-score-wrap">
+        <div class="ra-score">8</div>
+        <div class="ra-score-denom">out of 17</div>
+      </div>
+      <div class="ra-label">correct answers · 6 min 42 sec</div>
+      <div class="ra-rule"></div>
+      <div class="ra-stats">
+        <div class="ra-stat ra-correct">
+          <div class="ra-stat-num">8</div>
+          <div class="ra-stat-label">Correct</div>
+        </div>
+        <div class="ra-divider"></div>
+        <div class="ra-stat ra-wrong">
+          <div class="ra-stat-num">5</div>
+          <div class="ra-stat-label">Wrong</div>
+        </div>
+        <div class="ra-divider"></div>
+        <div class="ra-stat ra-skipped">
+          <div class="ra-stat-num">4</div>
+          <div class="ra-stat-label">Skipped</div>
+        </div>
+      </div>
+      <div class="ra-actions">
+        <div class="btn-ink">Review Questions</div>
+        <div class="btn-ghost">Start Again</div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">A — Score as Hero</div>
+      <div class="style-desc">Giant typographic number centred on screen. Instant emotional impact.</div>
+    </div>
+  </div>
+
+  <!-- Layout B: Report card -->
+  <div class="phone-wrap" data-choice="b" onclick="toggleSelect(this)">
+    <div class="phone-screen rb">
+      <div class="rb-header">
+        <div class="rb-eyebrow">Session Complete</div>
+        <div class="rb-title">Your results,<br>6 min 42 sec</div>
+      </div>
+      <div class="rb-rows">
+        <div class="rb-row">
+          <div class="rb-row-label"><span class="rb-dot rb-dot-green"></span> Correct</div>
+          <div class="rb-row-val" style="color:#2d6a4f">8</div>
+        </div>
+        <div class="rb-row">
+          <div class="rb-row-label"><span class="rb-dot rb-dot-red"></span> Wrong</div>
+          <div class="rb-row-val" style="color:#9b2226">5</div>
+        </div>
+        <div class="rb-row">
+          <div class="rb-row-label"><span class="rb-dot rb-dot-gray"></span> Skipped</div>
+          <div class="rb-row-val" style="color:#9a8e82">4</div>
+        </div>
+      </div>
+      <div class="rb-footer">
+        <div class="btn-ink">Review Questions</div>
+        <div class="btn-ghost">Start Again</div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">B — Report Card</div>
+      <div class="style-desc">Ledger-style rows. Feels deliberate and structured, like a formal transcript.</div>
+    </div>
+  </div>
+
+  <!-- Layout C: Score + bar -->
+  <div class="phone-wrap" data-choice="c" onclick="toggleSelect(this)">
+    <div class="phone-screen rc">
+      <div class="rc-top">
+        <div class="rc-eyebrow">Session Complete</div>
+        <div class="rc-title">Well done.</div>
+        <div class="rc-sub">Mathematics · 6 min 42 sec</div>
+        <div class="rc-bar-label"><span>0</span><span>17 questions</span></div>
+        <div class="rc-bar-track">
+          <div class="rc-bar-correct"></div>
+          <div class="rc-bar-wrong"></div>
+          <div class="rc-bar-skipped"></div>
+        </div>
+        <div class="rc-legend">
+          <div class="rc-legend-item"><span class="rc-swatch" style="background:#2d6a4f"></span> 8 correct</div>
+          <div class="rc-legend-item"><span class="rc-swatch" style="background:#9b2226"></span> 5 wrong</div>
+          <div class="rc-legend-item"><span class="rc-swatch" style="background:#c9bfb4"></span> 4 skipped</div>
+        </div>
+        <div class="rc-score-row">
+          <div class="rc-score-num">47%</div>
+          <div class="rc-score-denom">accuracy</div>
+        </div>
+      </div>
+      <div class="rc-bottom">
+        <div class="btn-ink">Review Questions</div>
+        <div class="btn-ghost">Start Again</div>
+      </div>
+    </div>
+    <div class="style-label">
+      <div class="style-name">C — Score + Progress Bar</div>
+      <div class="style-desc">Stacked bar shows proportion visually. Percentage as primary number.</div>
+    </div>
+  </div>
+
+</div>

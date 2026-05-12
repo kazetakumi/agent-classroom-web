@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sage — Standalone Component Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #111; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Top bar ── */
+    .bar {
+      position: sticky; top: 0; left: 0; right: 0; height: 52px;
+      background: #0D0D0D; border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: center; gap: 16px; padding: 0 32px; z-index: 200;
+    }
+    .bar-title { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.22); }
+    .bar-sep { width: 1px; height: 16px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
+    .bar-sub { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.1); }
+    .bar-hint { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: rgba(255,255,255,0.2); margin-left: auto; }
+
+    /* ── Stage ── */
+    .stage { padding: 56px 40px 100px; display: flex; justify-content: center; align-items: flex-start; gap: 52px; min-height: 100vh; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .col-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.22); }
+
+    /* ── Phone shell ── */
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px;
+      overflow: hidden; flex-shrink: 0; position: relative;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 48px 120px rgba(0,0,0,0.82), 0 8px 28px rgba(0,0,0,0.44);
+    }
+
+    /* ── Info card ── */
+    .info { width: 390px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 22px 24px; }
+    .info-n { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.18); margin-bottom: 8px; }
+    .info-h { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.72); margin-bottom: 12px; }
+    .info-d { font-size: 12px; line-height: 1.78; color: rgba(255,255,255,0.28); border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 14px; margin-bottom: 14px; }
+    .spec { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 12px; }
+    .spec:last-child { margin-bottom: 0; }
+    .sk { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.16); flex-shrink: 0; }
+    .sv { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.33); text-align: right; line-height: 1.5; }
+
+
+    /* ════════════════════════════════════════════════════════
+       SHARED WHITE SCREEN — Question card skeleton
+    ════════════════════════════════════════════════════════ */
+
+    .screen { background: #FFF; height: 100%; display: flex; flex-direction: column; position: relative; }
+
+    .sc-top { display: flex; align-items: baseline; justify-content: space-between; padding: 32px 28px 0; flex-shrink: 0; }
+    .sc-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .sc-num { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: #D0D0D0; }
+
+    .sc-rule { height: 1px; background: #F0F0F0; margin: 18px 28px 0; flex-shrink: 0; }
+    .sc-prog { height: 1px; background: #C0C0C0; margin: 0 28px; width: 25%; flex-shrink: 0; }
+
+    .sc-body { flex: 1; padding: 28px 28px 0; overflow: hidden; }
+    .sc-subj { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #CFCFCF; margin-bottom: 18px; }
+    .sc-q { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; line-height: 1.55; color: #111; }
+    .sc-div { height: 1px; background: #F0F0F0; margin: 22px 0 18px; }
+    .sc-opt { display: flex; gap: 14px; align-items: baseline; margin-bottom: 16px; }
+    .sc-opt.dim { opacity: 0.26; }
+    .sc-opt.sel .ol { color: #111; }
+    .sc-opt.sel .ot { color: #111; }
+    .ol { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D0D0D0; width: 12px; flex-shrink: 0; }
+    .ot { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; color: #999; line-height: 1.35; }
+
+    .nav-pure { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 56px; flex-shrink: 0; border-top: 1px solid #F2F2F2; }
+    .nl { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #D0D0D0; background: none; border: none; cursor: pointer; }
+    .nl.dim { color: #EBEBEB; pointer-events: none; }
+
+
+    /* ════════════════════════════════════════════════════════
+       CONCEPT A — THE ORACLE
+       Circle fixed bottom-right. Slides full-screen from below.
+       Dismiss: pill handle at top of Sage overlay.
+    ════════════════════════════════════════════════════════ */
+
+    @keyframes oracle-breathe {
+      0%, 100% { border-color: #E4E4E4; }
+      50%       { border-color: #BEBEBE; }
+    }
+
+    .oracle {
+      position: absolute; bottom: 74px; right: 20px;
+      width: 46px; height: 46px; border-radius: 50%;
+      border: 1px solid #E4E4E4; background: #FFF;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 10;
+      animation: oracle-breathe 4.5s ease-in-out infinite;
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s, opacity 0.22s;
+    }
+    .oracle:hover { transform: scale(1.12); box-shadow: 0 2px 16px rgba(0,0,0,0.08); border-color: #999; }
+    .oracle.hidden { opacity: 0; pointer-events: none; transform: scale(0.7); }
+    .oracle-dot { width: 4px; height: 4px; border-radius: 50%; background: #D0D0D0; transition: background 0.2s; }
+    .oracle:hover .oracle-dot { background: #444; }
+
+    /* Sage overlay A — full screen, slides up */
+    .ov-a {
+      position: absolute; inset: 0; background: #FFF;
+      display: flex; flex-direction: column; z-index: 20;
+      transform: translateY(100%);
+      transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .ov-a.open { transform: translateY(0); }
+
+    /* Pill handle — dismiss for A */
+    .pill-wrap { display: flex; justify-content: center; padding-top: 14px; padding-bottom: 4px; flex-shrink: 0; cursor: pointer; }
+    .pill { width: 36px; height: 4px; background: #E0E0E0; border-radius: 2px; transition: background 0.18s; }
+    .pill-wrap:hover .pill { background: #AAAAAA; }
+
+
+    /* ════════════════════════════════════════════════════════
+       CONCEPT B — THE INTERLOCUTOR
+       Header is Sage's territory. Overlay slides down below it.
+       Dismiss: tap the SAGE header again.
+    ════════════════════════════════════════════════════════ */
+
+    @keyframes murmur-appear {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(2px); }
+      15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+      75%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .sage-header {
+      background: #F9F9F7; border-bottom: 1px solid #E4E4DC;
+      padding: 26px 28px 16px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      flex-shrink: 0; cursor: pointer; position: relative;
+      transition: background 0.2s;
+      z-index: 11;
+    }
+    .sage-header:hover { background: #F5F5F2; }
+    .sage-header.sage-open { background: #F5F5F2; border-bottom-color: #D8D8CE; }
+
+    .sage-header-left { display: flex; flex-direction: column; gap: 3px; }
+    .sage-name { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #888; transition: color 0.18s; }
+    .sage-header.sage-open .sage-name { color: #555; }
+    .sage-app-sub { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #D8D8D8; }
+    .sage-header-ctx { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: #C8C8C8; }
+    .sage-header-dismiss {
+      position: absolute; bottom: 5px; right: 28px;
+      font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+      letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .sage-header.sage-open .sage-header-dismiss { opacity: 1; }
+
+    .sage-murmur {
+      position: absolute; left: 50%; bottom: 6px;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-weight: 300; font-size: 11px; color: #AAAAAA;
+      white-space: nowrap; pointer-events: none; opacity: 0;
+    }
+    .sage-murmur.playing { animation: murmur-appear 5s ease-in-out forwards; }
+
+    /* Sage overlay B — below header, slides down */
+    .ov-b {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      top: 70px; /* below the header */
+      background: #FFF;
+      display: flex; flex-direction: column; z-index: 10;
+      transform: translateY(-110%);
+      transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .ov-b.open { transform: translateY(0); }
+
+    /* B body: standard padding, no pill (header is the dismiss) */
+    .b-no-pill { height: 18px; flex-shrink: 0; }
+
+    /* B screen has no standard header — sage-header replaces it */
+    .screen-b { background: #FFF; height: 100%; display: flex; flex-direction: column; position: relative; }
+
+
+    /* ════════════════════════════════════════════════════════
+       CONCEPT C — THE THREAD
+       Left margin strip. Sage slides in from the left.
+       Dismiss: left-edge strip on Sage screen becomes ← back.
+    ════════════════════════════════════════════════════════ */
+
+    .screen-c { background: #FFF; height: 100%; display: flex; flex-direction: column; position: relative; }
+
+    /* The margin strip (resting state) */
+    .sage-thread {
+      position: absolute; left: 0; top: 0; bottom: 0; width: 44px;
+      border-right: 1px solid #EFEFEF;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 5; background: #FFF;
+      transition: background 0.22s;
+    }
+    .sage-thread:hover { background: #F9F9F7; }
+    .sage-thread:hover .thread-label { color: #555; }
+    .thread-label {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-weight: 300; font-size: 11px; color: #D0D0D0;
+      writing-mode: vertical-rl; text-orientation: mixed;
+      transform: rotate(180deg); letter-spacing: 0.12em;
+      user-select: none; transition: color 0.2s;
+    }
+
+    /* Shifted content */
+    .sc-top-c { display: flex; align-items: baseline; justify-content: space-between; padding: 32px 28px 0 60px; flex-shrink: 0; }
+    .sc-rule-c { height: 1px; background: #F0F0F0; margin: 18px 28px 0 60px; flex-shrink: 0; }
+    .sc-prog-c { height: 1px; background: #C0C0C0; margin: 0 28px 0 60px; width: 25%; flex-shrink: 0; }
+    .sc-body-c { flex: 1; padding: 28px 28px 0 60px; overflow: hidden; }
+    .nav-c { display: flex; align-items: center; justify-content: space-between; padding: 0 28px 0 60px; height: 56px; flex-shrink: 0; border-top: 1px solid #F2F2F2; }
+
+    /* Sage overlay C — full screen from left */
+    .ov-c {
+      position: absolute; inset: 0; background: #FFF;
+      display: flex; flex-direction: row; z-index: 20;
+      transform: translateX(-100%);
+      transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .ov-c.open { transform: translateX(0); }
+
+    /* Left dismiss strip inside Sage overlay C */
+    .ov-c-back {
+      width: 44px; flex-shrink: 0;
+      border-right: 1px solid #EFEFEF;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; background: #FFF;
+      transition: background 0.2s;
+    }
+    .ov-c-back:hover { background: #F9F9F7; }
+    .ov-c-back:hover .back-arrow { color: #333; }
+    .back-arrow {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 18px; font-weight: 300; color: #C8C8C8;
+      writing-mode: vertical-rl; transform: rotate(180deg);
+      user-select: none; transition: color 0.2s;
+    }
+    .ov-c-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+
+    /* ════════════════════════════════════════════════════════
+       SAGE OVERLAY SHARED CONTENT
+       Same conversation interface inside all three overlays.
+    ════════════════════════════════════════════════════════ */
+
+    .so-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .so-head { padding: 20px 28px 0; flex-shrink: 0; }
+    .so-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .so-rule { height: 1px; background: #F0F0F0; margin: 16px 28px 0; flex-shrink: 0; }
+
+    /* Column grid: 52px label | 1px rule | 1fr content */
+    .so-body { flex: 1; padding: 20px 28px 0; overflow: hidden; display: flex; flex-direction: column; gap: 0; }
+
+    .cg { display: grid; grid-template-columns: 52px 1px 1fr; gap: 0 14px; align-items: start; padding: 12px 0; }
+    .cg + .cg { border-top: 1px solid #F8F8F8; }
+    .cg-k { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8; line-height: 1.6; padding-top: 1px; }
+    .cg-vr { width: 1px; background: #EBEBEB; align-self: stretch; }
+    .cg-v { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; line-height: 1.52; color: #555; }
+    .cg-v.italic { font-style: italic; color: #888; }
+
+    /* Quick action items */
+    .qa-list { display: flex; flex-direction: column; gap: 0; }
+    .qa {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 18px; font-weight: 300; color: #AAAAAA;
+      padding: 9px 0; cursor: pointer; user-select: none;
+      transition: color 0.16s, opacity 0.2s;
+      border-bottom: 1px solid #F6F6F6;
+    }
+    .qa:last-child { border-bottom: none; }
+    .qa:hover { color: #333; }
+    .qa.selected { color: #111; font-style: italic; }
+    .qa.faded { opacity: 0.22; pointer-events: none; }
+
+    /* Spacer */
+    .so-spacer { flex: 1; }
+
+    /* Input row */
+    .so-input-rule { height: 1px; background: #F0F0F0; margin: 0 28px; flex-shrink: 0; }
+    .so-input { flex-shrink: 0; padding: 0 28px; }
+    .input-cg { display: grid; grid-template-columns: 52px 1px 1fr auto; gap: 0 14px; align-items: center; height: 56px; }
+    .input-k { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8; }
+    .input-vr { width: 1px; background: #EBEBEB; align-self: stretch; margin: 10px 0; }
+    .input-placeholder { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 17px; font-weight: 300; color: #D0D0D0; }
+    .input-send { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #D0D0D0; cursor: pointer; padding: 4px; transition: color 0.16s; }
+    .input-send:hover { color: #555; }
+
+  </style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="bar-title">Sage — Standalone Component</span>
+  <div class="bar-sep"></div>
+  <span class="bar-sub">Three Concepts · Interactive</span>
+  <span class="bar-hint">tap the trigger on each phone</span>
+</div>
+
+<div class="stage">
+
+
+  <!-- ══════════════════════════════════════════
+       A — THE ORACLE
+       Trigger: bottom-right circle
+       Entry:   slides up full-screen from below
+       Dismiss: pill handle at top
+  ══════════════════════════════════════════ -->
+  <div class="col">
+    <span class="col-label">A — The Oracle</span>
+
+    <div class="phone" id="phone-a">
+      <div class="screen">
+
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-prog"></div>
+
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+
+        <div class="nav-pure">
+          <button class="nl dim">← Prev</button>
+          <button class="nl">Next →</button>
+        </div>
+
+        <!-- The Oracle circle — only Sage element -->
+        <div class="oracle" id="oracle-a" onclick="openA()">
+          <div class="oracle-dot"></div>
+        </div>
+
+      </div>
+
+      <!-- Sage overlay: full screen, slides up -->
+      <div class="ov-a" id="ov-a">
+        <!-- Pill: tap or pull down to dismiss -->
+        <div class="pill-wrap" onclick="closeA()" title="Tap to close">
+          <div class="pill"></div>
+        </div>
+
+        <div class="so-wrap">
+          <div class="so-head">
+            <span class="so-app">Agent Classroom</span>
+          </div>
+          <div class="so-rule"></div>
+
+          <div class="so-body">
+            <div class="cg">
+              <span class="cg-k">Sage</span>
+              <div class="cg-vr"></div>
+              <span class="cg-v italic">Ask me anything. Or I can —</span>
+            </div>
+            <div class="cg" style="padding-top: 4px; padding-bottom: 4px;">
+              <span class="cg-k"></span>
+              <div class="cg-vr"></div>
+              <div class="qa-list" id="qa-a">
+                <div class="qa" onclick="selectQA('qa-a', this)">— give you a hint</div>
+                <div class="qa" onclick="selectQA('qa-a', this)">— skip this question</div>
+                <div class="qa" onclick="selectQA('qa-a', this)">— walk through the concept</div>
+                <div class="qa" onclick="selectQA('qa-a', this)">— end the session</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="so-spacer"></div>
+          <div class="so-input-rule"></div>
+          <div class="so-input">
+            <div class="input-cg">
+              <span class="input-k">You</span>
+              <div class="input-vr"></div>
+              <span class="input-placeholder">Or ask anything…</span>
+              <span class="input-send">↑</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept A</div>
+      <div class="info-h">The Oracle</div>
+      <div class="info-d">
+        A 46px circle, fixed bottom-right of every screen — the only enclosed form on white. It breathes at 4.5s. Navigation returns to pure ← / → with no Sage mixed in. Tap the circle: it shrinks away as a full-screen Sage overlay rises from below. The arrival is a rising — something emerging from beneath the content. Dismiss: a pill handle at the very top. Pull or tap to send Sage back down, circle reappears.
+      </div>
+      <div class="spec"><span class="sk">Trigger</span><span class="sv">46px circle · bottom-right · always fixed</span></div>
+      <div class="spec"><span class="sk">Entry</span><span class="sv">Slides up · translateY(100→0) · 420ms</span></div>
+      <div class="spec"><span class="sk">Dismiss</span><span class="sv">Pill handle at top · tap or pull down</span></div>
+      <div class="spec"><span class="sk">Circle</span><span class="sv">Hides on open · reappears on close</span></div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       B — THE INTERLOCUTOR
+       Trigger: warm top header (entire strip)
+       Entry:   slides down below the header
+       Dismiss: tap the SAGE header again
+  ══════════════════════════════════════════ -->
+  <div class="col">
+    <span class="col-label">B — The Interlocutor</span>
+
+    <div class="phone" id="phone-b">
+      <div class="screen-b">
+
+        <!-- The warm header — this IS the trigger -->
+        <div class="sage-header" id="sage-hdr" onclick="toggleB()">
+          <div class="sage-header-left">
+            <span class="sage-name">Sage</span>
+            <span class="sage-app-sub">Agent Classroom</span>
+          </div>
+          <span class="sage-header-ctx">3 / 12</span>
+          <span class="sage-murmur" id="murmur-b">interesting choice…</span>
+          <span class="sage-header-dismiss">tap to close ↑</span>
+        </div>
+        <div class="sc-prog" style="margin-top: 0;"></div>
+
+        <!-- Screen content below header -->
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+
+        <div class="nav-pure">
+          <button class="nl dim">← Prev</button>
+          <button class="nl">Next →</button>
+        </div>
+
+        <!-- Sage overlay B — below header, slides down from above -->
+        <div class="ov-b" id="ov-b">
+          <div class="b-no-pill"></div>
+
+          <div class="so-rule" style="margin-top: 0;"></div>
+
+          <div class="so-body">
+            <div class="cg">
+              <span class="cg-k">Sage</span>
+              <div class="cg-vr"></div>
+              <span class="cg-v italic">Ask me anything. Or I can —</span>
+            </div>
+            <div class="cg" style="padding-top: 4px; padding-bottom: 4px;">
+              <span class="cg-k"></span>
+              <div class="cg-vr"></div>
+              <div class="qa-list" id="qa-b">
+                <div class="qa" onclick="selectQA('qa-b', this)">— give you a hint</div>
+                <div class="qa" onclick="selectQA('qa-b', this)">— skip this question</div>
+                <div class="qa" onclick="selectQA('qa-b', this)">— walk through the concept</div>
+                <div class="qa" onclick="selectQA('qa-b', this)">— end the session</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="so-spacer"></div>
+          <div class="so-input-rule"></div>
+          <div class="so-input">
+            <div class="input-cg">
+              <span class="input-k">You</span>
+              <div class="input-vr"></div>
+              <span class="input-placeholder">Or ask anything…</span>
+              <span class="input-send">↑</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept B</div>
+      <div class="info-h">The Interlocutor</div>
+      <div class="info-d">
+        The entire top header strip is Sage's territory. Warm background (#F9F9F7), warmer border (#E4E4DC). "SAGE" takes the name position. Tap the header: the Sage panel descends from directly beneath it, covering the screen content below. The header remains visible — above the threshold is still Sage. A "tap to close ↑" label appears. Tap the header again to retract. The entry moves in the same axis as the trigger: downward.
+      </div>
+      <div class="spec"><span class="sk">Trigger</span><span class="sv">Entire top header · tap anywhere</span></div>
+      <div class="spec"><span class="sk">Entry</span><span class="sv">Descends below header · translateY(-110→0)</span></div>
+      <div class="spec"><span class="sk">Dismiss</span><span class="sv">Tap SAGE header again · same gesture</span></div>
+      <div class="spec"><span class="sk">Header</span><span class="sv">Always visible · shows close hint when open</span></div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       C — THE THREAD
+       Trigger: left margin strip
+       Entry:   slides in full-screen from the left
+       Dismiss: left strip on Sage screen becomes ← back
+  ══════════════════════════════════════════ -->
+  <div class="col">
+    <span class="col-label">C — The Thread</span>
+
+    <div class="phone" id="phone-c">
+      <div class="screen-c">
+
+        <!-- Left margin strip -->
+        <div class="sage-thread" onclick="openC()">
+          <span class="thread-label">sage</span>
+        </div>
+
+        <!-- Content shifted right -->
+        <div class="sc-top-c">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="sc-rule-c"></div>
+        <div class="sc-prog-c"></div>
+
+        <div class="sc-body-c">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+
+        <div class="nav-c">
+          <button class="nl dim">← Prev</button>
+          <button class="nl">Next →</button>
+        </div>
+
+        <!-- Sage overlay C — slides in from left, has its own left strip as back affordance -->
+        <div class="ov-c" id="ov-c">
+
+          <!-- Left strip becomes ← back on the Sage screen -->
+          <div class="ov-c-back" onclick="closeC()">
+            <span class="back-arrow">←</span>
+          </div>
+
+          <!-- Sage content to the right of the back strip -->
+          <div class="ov-c-content">
+            <div class="so-head" style="padding-top: 28px;">
+              <span class="so-app">Agent Classroom</span>
+            </div>
+            <div class="so-rule"></div>
+
+            <div class="so-body">
+              <div class="cg">
+                <span class="cg-k">Sage</span>
+                <div class="cg-vr"></div>
+                <span class="cg-v italic">Ask me anything. Or I can —</span>
+              </div>
+              <div class="cg" style="padding-top: 4px; padding-bottom: 4px;">
+                <span class="cg-k"></span>
+                <div class="cg-vr"></div>
+                <div class="qa-list" id="qa-c">
+                  <div class="qa" onclick="selectQA('qa-c', this)">— give you a hint</div>
+                  <div class="qa" onclick="selectQA('qa-c', this)">— skip this question</div>
+                  <div class="qa" onclick="selectQA('qa-c', this)">— walk through the concept</div>
+                  <div class="qa" onclick="selectQA('qa-c', this)">— end the session</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="so-spacer"></div>
+            <div class="so-input-rule"></div>
+            <div class="so-input">
+              <div class="input-cg" style="grid-template-columns: 52px 1px 1fr auto;">
+                <span class="input-k">You</span>
+                <div class="input-vr"></div>
+                <span class="input-placeholder">Or ask anything…</span>
+                <span class="input-send">↑</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept C</div>
+      <div class="info-h">The Thread</div>
+      <div class="info-d">
+        A 44px left margin strip — always fixed. "sage" written vertically in Cormorant italic. All content shifts right to live beside it. Tap the strip: the Sage experience slides in from the left, covering the full screen. The spatial metaphor is consistent — you entered from the left, the margin returns you. On the Sage screen, the left strip becomes a ← back affordance in the same position. Tap it to slide everything back to the right.
+      </div>
+      <div class="spec"><span class="sk">Trigger</span><span class="sv">Full-height left strip · "sage" vertical label</span></div>
+      <div class="spec"><span class="sk">Entry</span><span class="sv">Slides in from left · translateX(-100→0)</span></div>
+      <div class="spec"><span class="sk">Dismiss</span><span class="sv">Left strip on Sage screen · ← arrow · tap</span></div>
+      <div class="spec"><span class="sk">Spatial logic</span><span class="sv">Entered from left · exits to left · consistent</span></div>
+    </div>
+  </div>
+
+
+</div>
+
+<script>
+  /* ── CONCEPT A: Oracle ── */
+  function openA() {
+    document.getElementById('ov-a').classList.add('open');
+    document.getElementById('oracle-a').classList.add('hidden');
+  }
+  function closeA() {
+    document.getElementById('ov-a').classList.remove('open');
+    setTimeout(() => document.getElementById('oracle-a').classList.remove('hidden'), 300);
+  }
+
+  /* ── CONCEPT B: Interlocutor ── */
+  let bOpen = false;
+  function toggleB() {
+    bOpen = !bOpen;
+    document.getElementById('ov-b').classList.toggle('open', bOpen);
+    document.getElementById('sage-hdr').classList.toggle('sage-open', bOpen);
+
+    if (bOpen) {
+      // Trigger the murmur on first open (remove + re-add class to replay animation)
+      const m = document.getElementById('murmur-b');
+      m.classList.remove('playing');
+      void m.offsetWidth; // reflow
+      m.classList.add('playing');
+    }
+  }
+
+  /* ── CONCEPT C: Thread ── */
+  function openC() {
+    document.getElementById('ov-c').classList.add('open');
+  }
+  function closeC() {
+    document.getElementById('ov-c').classList.remove('open');
+  }
+
+  /* ── Quick action selection (all concepts) ── */
+  function selectQA(listId, el) {
+    const list = document.getElementById(listId);
+    const items = list.querySelectorAll('.qa');
+    items.forEach(item => {
+      item.classList.remove('selected', 'faded');
+      if (item !== el) item.classList.add('faded');
+    });
+    el.classList.add('selected');
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Sage V2 — Full Screen Variations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 54px;
+      background: #111; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bar-left { display: flex; align-items: center; gap: 18px; }
+    .bar-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+    .btn-row { display: flex; gap: 3px; }
+    .cbtn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px; cursor: pointer; transition: all 0.14s; }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+    .state-toggle { display: flex; align-items: center; gap: 8px; }
+    .state-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.22); }
+    .toggle-pill { display: flex; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; }
+    .tpill { background: transparent; border: none; color: rgba(255,255,255,0.35); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; padding: 4px 14px; cursor: pointer; transition: all 0.14s; }
+    .tpill.on { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* ── Stage ── */
+    .stage { padding-top: 76px; padding-bottom: 60px; display: flex; justify-content: center; align-items: flex-start; gap: 32px; min-height: 100vh; }
+    .stage.single { gap: 0; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .col.hide { display: none; }
+    .col-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+    .phone { width: 390px; height: 800px; border-radius: 44px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09); position: relative; }
+    .info { width: 390px; background: #1A1A1A; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 18px; }
+    .info-name { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 7px; }
+    .info-desc { font-size: 12px; color: rgba(255,255,255,0.48); line-height: 1.6; margin-bottom: 10px; }
+    .pills { display: flex; gap: 5px; flex-wrap: wrap; }
+    .pill { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.09); border-radius: 3px; padding: 2px 7px; }
+
+    /* ── show/hide by state ── */
+    .phone.state-fresh .show-selected { display: none; }
+    .phone.state-selected .show-fresh { display: none; }
+
+
+    /* ═══════════════════════════════════════════════
+       SHARED — FULL SCREEN CHROME
+       All 3 use the same top strip, rule, and
+       collapsed question context block.
+    ═══════════════════════════════════════════════ */
+
+    .sage-screen {
+      position: absolute; inset: 0;
+      background: #FFFFFF;
+      display: flex; flex-direction: column;
+    }
+
+    .sage-top {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .sage-top-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .sage-back { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #BBBBBB; cursor: pointer; transition: color 0.12s; }
+    .sage-back:hover { color: #111; }
+
+    .sage-rule { height: 1px; background: #F0F0F0; margin: 20px 28px 0; flex-shrink: 0; }
+
+    /* Column grid turns */
+    .turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 22px 28px 0;
+    }
+    .lbl-col { display: flex; align-items: flex-start; justify-content: flex-end; padding-top: 3px; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; }
+    .rule-v { background: #EFEFEF; width: 1px; }
+    .speech { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; line-height: 1.55; color: #111; }
+    .speech.user { font-style: italic; color: #777; }
+
+    /* Shared input zone */
+    .sage-input-zone {
+      border-top: 1px solid #F2F2F2;
+      flex-shrink: 0;
+      padding: 14px 0 34px;
+    }
+    .input-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 0 28px;
+      align-items: flex-start;
+    }
+    .you-col { display: flex; justify-content: flex-end; padding-top: 5px; }
+    .you-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; }
+    .input-v { background: #EFEFEF; width: 1px; }
+    .ta-col { display: flex; flex-direction: column; gap: 6px; }
+    .ta { background: transparent; border: none; border-bottom: 1px solid #EBEBEB; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 19px; font-weight: 300; color: #111; padding: 4px 0; outline: none; resize: none; line-height: 1.4; min-height: 32px; overflow: hidden; width: 100%; }
+    .ta::placeholder { color: #D4D4D4; }
+    .send-row { display: flex; justify-content: flex-end; }
+    .send-btn { background: transparent; border: none; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #CCCCCC; transition: color 0.14s; }
+    .send-btn:hover { color: #111; }
+
+    .sage-convo { flex: 1; overflow: hidden; }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION 1 — CHIPS
+       After Sage's greeting, a row of horizontal
+       chips appears in the right column — same chip
+       style as the welcome screen's redirect chips.
+       Scannable at a glance, thumb-friendly, and
+       familiar from the session-start screen.
+    ═══════════════════════════════════════════════ */
+
+    .chips-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 14px 28px 0;
+    }
+    .chips-lbl-col { /* empty spacer */ }
+    .chips-rule-v { background: #EFEFEF; width: 1px; }
+    .chips-col {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      padding-top: 2px;
+    }
+    .chip {
+      background: transparent; border: 1px solid #EAEAEA;
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #AAAAAA; padding: 5px 11px; cursor: pointer;
+      white-space: nowrap; transition: all 0.12s;
+    }
+    .chip:hover { border-color: #999; color: #111; }
+    .chip.selected { border-color: #111; color: #111; }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION 2 — COMMAND LIST
+       A "── Quick actions ──" B-Break below Sage's
+       greeting introduces a list of full-width
+       tappable rows. Each row is IBM Plex Mono
+       uppercase with a leading arrow — sparse,
+       intentional, like a command palette.
+    ═══════════════════════════════════════════════ */
+
+    .cmd-break {
+      display: flex; align-items: center;
+      padding: 20px 28px 0;
+    }
+    .cmd-break-line { flex: 1; height: 1px; background: #F0F0F0; }
+    .cmd-break-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #D8D8D8; padding: 0 12px; }
+
+    .cmd-list { margin-top: 0; }
+    .cmd-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 28px;
+      border-bottom: 1px solid #F6F6F6;
+      cursor: pointer; transition: background 0.12s;
+    }
+    .cmd-row:first-child { border-top: none; }
+    .cmd-row:hover { background: #FAFAFA; }
+    .cmd-arrow { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #DEDEDE; transition: color 0.12s; flex-shrink: 0; }
+    .cmd-row:hover .cmd-arrow { color: #111; }
+    .cmd-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #AAAAAA; transition: color 0.12s; }
+    .cmd-row:hover .cmd-label { color: #111; }
+    .cmd-row.selected .cmd-arrow { color: #111; }
+    .cmd-row.selected .cmd-label { color: #111; }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION 3 — SAGE OFFERS
+       Sage itself presents the quick actions as part
+       of its opening speech — Cormorant italic phrases
+       stacked in the right column, each visually
+       marked with a thin left rule on hover. The
+       dialogue and the actions share one voice.
+       Nothing feels like a separate UI component.
+    ═══════════════════════════════════════════════ */
+
+    .offers-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 6px 28px 0;
+    }
+    .offers-lbl-col { /* empty */ }
+    .offers-rule-v { background: #EFEFEF; width: 1px; }
+
+    .offer-list { display: flex; flex-direction: column; margin-top: 4px; }
+    .offer-item {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 18px; font-weight: 300; color: #BBBBBB; line-height: 1.45;
+      padding: 7px 0; cursor: pointer;
+      border-bottom: 1px solid #F8F8F8;
+      position: relative; transition: color 0.12s; padding-left: 2px;
+    }
+    .offer-item:last-child { border-bottom: none; }
+    .offer-item:hover { color: #111; }
+    .offer-item::before {
+      content: '—'; font-style: normal; color: #E4E4E4;
+      margin-right: 8px; font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; transition: color 0.12s;
+    }
+    .offer-item:hover::before { color: #111; }
+    .offer-item.selected { color: #111; }
+    .offer-item.selected::before { color: #111; }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Bar ── -->
+<div class="bar">
+  <div class="bar-left">
+    <span class="bar-title">Ask Sage — Full Screen Variations</span>
+    <div class="bar-sep"></div>
+    <div class="btn-row" id="viewBtns">
+      <button class="cbtn on" data-v="all">All 3</button>
+      <button class="cbtn" data-v="1">Chips</button>
+      <button class="cbtn" data-v="2">Commands</button>
+      <button class="cbtn" data-v="3">Sage Offers</button>
+    </div>
+  </div>
+  <div class="state-toggle">
+    <span class="state-lbl">State</span>
+    <div class="toggle-pill">
+      <button class="tpill on" data-s="fresh">Fresh</button>
+      <button class="tpill" data-s="selected">Selected</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Stage ── -->
+<div class="stage" id="stage">
+
+
+  <!-- ══ 1: CHIPS ══ -->
+  <div class="col" id="col-1">
+    <span class="col-label">1 — Chips</span>
+    <div class="phone state-fresh" id="phone-1">
+      <div class="sage-screen">
+
+        <div class="sage-top">
+          <span class="sage-top-app">Agent Classroom</span>
+          <span class="sage-back">← Question</span>
+        </div>
+        <div class="sage-rule"></div>
+
+        <div class="sage-convo">
+
+          <!-- Fresh state -->
+          <div class="show-fresh">
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">Ask me anything. Or jump straight to —</div>
+            </div>
+            <div class="chips-turn">
+              <div class="chips-lbl-col"></div>
+              <div class="chips-rule-v"></div>
+              <div class="chips-col">
+                <button class="chip">Give me a hint</button>
+                <button class="chip">Skip this question</button>
+                <button class="chip">Explain the concept</button>
+                <button class="chip">End session</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected state -->
+          <div class="show-selected">
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">Ask me anything. Or jump straight to —</div>
+            </div>
+            <div class="chips-turn">
+              <div class="chips-lbl-col"></div>
+              <div class="chips-rule-v"></div>
+              <div class="chips-col">
+                <button class="chip selected">Give me a hint</button>
+                <button class="chip" style="opacity:0.38">Skip this question</button>
+                <button class="chip" style="opacity:0.38">Explain the concept</button>
+                <button class="chip" style="opacity:0.38">End session</button>
+              </div>
+            </div>
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">You</span></div>
+              <div class="rule-v"></div>
+              <div class="speech user">Give me a hint.</div>
+            </div>
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">The velocity function factors neatly. Try setting v(t) = 0 and pulling out the common term first.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="sage-input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="Or ask anything…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">1 — Chips</div>
+      <div class="info-desc">After Sage's greeting, a row of horizontal chips sits in the right column — echoing the welcome screen's redirect chip style. Scannable at a glance, easy to tap, and familiar. Tapping a chip fires it as a query, marks it selected, and fades the rest. Free-text input stays available below.</div>
+      <div class="pills">
+        <span class="pill">Chip row in grid</span>
+        <span class="pill">Welcome screen echo</span>
+        <span class="pill">Wraps on small screen</span>
+        <span class="pill">Input still open</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ 2: COMMANDS ══ -->
+  <div class="col" id="col-2">
+    <span class="col-label">2 — Commands</span>
+    <div class="phone state-fresh" id="phone-2">
+      <div class="sage-screen">
+
+        <div class="sage-top">
+          <span class="sage-top-app">Agent Classroom</span>
+          <span class="sage-back">← Question</span>
+        </div>
+        <div class="sage-rule"></div>
+
+        <div class="sage-convo">
+
+          <!-- Fresh state -->
+          <div class="show-fresh">
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">Ask me anything.</div>
+            </div>
+            <div class="cmd-break">
+              <div class="cmd-break-line"></div>
+              <span class="cmd-break-lbl">Quick actions</span>
+              <div class="cmd-break-line"></div>
+            </div>
+            <div class="cmd-list">
+              <div class="cmd-row"><span class="cmd-arrow">→</span><span class="cmd-label">Give me a hint</span></div>
+              <div class="cmd-row"><span class="cmd-arrow">→</span><span class="cmd-label">Skip this question</span></div>
+              <div class="cmd-row"><span class="cmd-arrow">→</span><span class="cmd-label">Explain the concept</span></div>
+              <div class="cmd-row"><span class="cmd-arrow">→</span><span class="cmd-label">End session</span></div>
+            </div>
+          </div>
+
+          <!-- Selected state -->
+          <div class="show-selected">
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">Ask me anything.</div>
+            </div>
+            <div class="cmd-break">
+              <div class="cmd-break-line"></div>
+              <span class="cmd-break-lbl">Quick actions</span>
+              <div class="cmd-break-line"></div>
+            </div>
+            <div class="cmd-list">
+              <div class="cmd-row selected"><span class="cmd-arrow">→</span><span class="cmd-label">Give me a hint</span></div>
+              <div class="cmd-row" style="opacity:0.28"><span class="cmd-arrow">→</span><span class="cmd-label">Skip this question</span></div>
+              <div class="cmd-row" style="opacity:0.28"><span class="cmd-arrow">→</span><span class="cmd-label">Explain the concept</span></div>
+              <div class="cmd-row" style="opacity:0.28"><span class="cmd-arrow">→</span><span class="cmd-label">End session</span></div>
+            </div>
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">The velocity function factors neatly. Try setting v(t) = 0 and pulling out the common term first.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="sage-input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="Or ask anything…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">2 — Commands</div>
+      <div class="info-desc">A "── Quick actions ──" B-Break divider below Sage's greeting introduces full-width tappable rows. Each row is IBM Plex Mono uppercase with a leading →. Sparse, intentional, command-palette energy. The B-Break makes the section feel like a structural shift — Sage speaking, then a list of things the system can do.</div>
+      <div class="pills">
+        <span class="pill">B-Break divider</span>
+        <span class="pill">Full-width rows</span>
+        <span class="pill">Command palette feel</span>
+        <span class="pill">→ leading mark</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ 3: SAGE OFFERS ══ -->
+  <div class="col" id="col-3">
+    <span class="col-label">3 — Sage Offers</span>
+    <div class="phone state-fresh" id="phone-3">
+      <div class="sage-screen">
+
+        <div class="sage-top">
+          <span class="sage-top-app">Agent Classroom</span>
+          <span class="sage-back">← Question</span>
+        </div>
+        <div class="sage-rule"></div>
+
+        <div class="sage-convo">
+
+          <!-- Fresh state -->
+          <div class="show-fresh">
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">Ask me anything. Or I can —</div>
+            </div>
+            <div class="offers-turn">
+              <div class="offers-lbl-col"></div>
+              <div class="offers-rule-v"></div>
+              <div class="offer-list">
+                <div class="offer-item">give you a hint</div>
+                <div class="offer-item">skip this question</div>
+                <div class="offer-item">walk through the concept</div>
+                <div class="offer-item">end the session</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected state -->
+          <div class="show-selected">
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">Ask me anything. Or I can —</div>
+            </div>
+            <div class="offers-turn">
+              <div class="offers-lbl-col"></div>
+              <div class="offers-rule-v"></div>
+              <div class="offer-list">
+                <div class="offer-item selected">give you a hint</div>
+                <div class="offer-item" style="opacity:0.28">skip this question</div>
+                <div class="offer-item" style="opacity:0.28">walk through the concept</div>
+                <div class="offer-item" style="opacity:0.28">end the session</div>
+              </div>
+            </div>
+            <div class="turn">
+              <div class="lbl-col"><span class="lbl">Sage</span></div>
+              <div class="rule-v"></div>
+              <div class="speech">The velocity function factors neatly. Try setting v(t) = 0 and pulling out the common term first.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="sage-input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="Or ask anything…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">3 — Sage Offers</div>
+      <div class="info-desc">Sage presents the quick actions as its own words — Cormorant italic phrases continuing the opening sentence. "Ask me anything. Or I can —" followed by a list of lowercase italic options. No system chrome, no borders, no arrows. The actions feel like Sage speaking, not a UI menu. Tapping one selects it; the rest fade.</div>
+      <div class="pills">
+        <span class="pill">Sage's own voice</span>
+        <span class="pill">Cormorant italic</span>
+        <span class="pill">No system chrome</span>
+        <span class="pill">Continues the sentence</span>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<script>
+  /* ── View toggle ── */
+  const viewBtns = document.querySelectorAll('#viewBtns .cbtn');
+  const stage = document.getElementById('stage');
+
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      viewBtns.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      const v = btn.dataset.v;
+      const cols = ['col-1','col-2','col-3'];
+      if (v === 'all') {
+        stage.classList.remove('single');
+        cols.forEach(id => document.getElementById(id).classList.remove('hide'));
+      } else {
+        stage.classList.add('single');
+        cols.forEach((id, i) => document.getElementById(id).classList.toggle('hide', String(i+1) !== v));
+      }
+    });
+  });
+
+  /* ── State toggle ── */
+  const statePills = document.querySelectorAll('.tpill');
+  statePills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      statePills.forEach(p => p.classList.remove('on'));
+      pill.classList.add('on');
+      const s = pill.dataset.s;
+      ['phone-1','phone-2','phone-3'].forEach(id => {
+        const p = document.getElementById(id);
+        p.classList.remove('state-fresh','state-selected');
+        p.classList.add('state-' + s);
+      });
+    });
+  });
+
+  /* ── Textarea resize ── */
+  document.querySelectorAll('textarea').forEach(ta => {
+    ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
+  });
+</script>
+</body>
+</html>

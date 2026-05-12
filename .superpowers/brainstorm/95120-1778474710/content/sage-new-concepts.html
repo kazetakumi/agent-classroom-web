@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sage — Three New Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0A0A0A; min-height: 100vh; font-family: 'DM Sans', sans-serif; padding-bottom: 80px; }
+
+  /* ── Bar ── */
+  .bar {
+    position: fixed; top: 0; left: 0; right: 0; height: 50px;
+    background: #0A0A0A; border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; align-items: center; gap: 14px; padding: 0 32px; z-index: 100;
+  }
+  .bar-a { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+  .bar-b { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.08); }
+  .bar-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+
+  /* ── Stage ── */
+  .stage { padding: 80px 40px 0; display: flex; justify-content: center; align-items: flex-start; gap: 44px; flex-wrap: nowrap; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+  /* ── Phone ── */
+  .phone {
+    width: 340px; height: 700px; border-radius: 40px; overflow: hidden; flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 40px 100px rgba(0,0,0,0.72), 0 8px 24px rgba(0,0,0,0.36);
+    cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+  }
+  .phone.selected {
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.4), 0 40px 100px rgba(0,0,0,0.72), 0 8px 24px rgba(0,0,0,0.36);
+    transform: translateY(-4px);
+  }
+  .phone-label {
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: rgba(255,255,255,0.18); z-index: 10;
+    background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 20px;
+  }
+
+  /* ── Info card ── */
+  .info { width: 340px; background: #111; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 22px 24px; }
+  .info-n { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.16); margin-bottom: 10px; }
+  .info-h { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.65); margin-bottom: 12px; }
+  .info-d { font-size: 12px; line-height: 1.75; color: rgba(255,255,255,0.28); border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px; margin-bottom: 14px; }
+  .spec { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+  .spec:last-child { margin-bottom: 0; }
+  .sk { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.15); }
+  .sv { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3); text-align: right; max-width: 180px; line-height: 1.4; }
+
+  /* ── Selection ring ── */
+  .phone::after {
+    content: ''; position: absolute; inset: 0; border-radius: 40px;
+    border: 2px solid rgba(255,255,255,0); transition: border-color 0.2s ease;
+    pointer-events: none;
+  }
+  .phone.selected::after { border-color: rgba(255,255,255,0.5); }
+
+  /* ── Selection indicator bar at bottom ── */
+  .selection-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
+    background: #0A0A0A; border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center; gap: 32px; z-index: 200;
+  }
+  .sel-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.18); }
+  .sel-value { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; color: rgba(255,255,255,0.5); }
+  .sel-none { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.1); }
+
+  /* ══════════════════════════════════
+     SHARED screen skeleton
+  ══════════════════════════════════ */
+  .screen { background: #FFF; height: 100%; display: flex; flex-direction: column; }
+  .sc-top { display: flex; align-items: center; justify-content: space-between; padding: 22px 24px 0; flex-shrink: 0; }
+  .sc-app { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+  .sc-num { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D4D4D4; }
+  .sc-rule { height: 1px; background: #F0F0F0; margin: 14px 24px 0; flex-shrink: 0; }
+  .sc-prog { height: 1px; background: #C0C0C0; margin: 0 24px; width: 25%; flex-shrink: 0; }
+  .sc-body { flex: 1; padding: 22px 24px 0; overflow: hidden; }
+  .sc-subj { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: #C0C0C0; margin-bottom: 16px; }
+  .sc-q { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 300; line-height: 1.55; color: #111; margin-bottom: 20px; }
+  .sc-div { height: 1px; background: #F0F0F0; margin-bottom: 18px; }
+  .sc-opt { display: flex; gap: 12px; align-items: baseline; margin-bottom: 15px; }
+  .sc-opt.dim { opacity: 0.28; }
+  .sc-opt.sel .ol { color: #111; }
+  .sc-opt.sel .ot { color: #111; }
+  .sc-opt.wrong .ot { color: #C0A080; }
+  .ol { font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: #D0D0D0; width: 10px; flex-shrink: 0; }
+  .ot { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 300; color: #999; line-height: 1.3; }
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 44px; flex-shrink: 0; border-top: 1px solid #F5F5F5; }
+  .nl { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #DADADA; }
+  .nc { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #BDBDBD; }
+
+  /* column grid */
+  .col-grid { display: grid; grid-template-columns: 60px 1px 1fr; gap: 14px; align-items: start; padding: 10px 0; }
+  .cg-key { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8; line-height: 1.5; padding-top: 2px; }
+  .cg-rule { width: 1px; background: #F0F0F0; align-self: stretch; }
+  .cg-val { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 300; line-height: 1.5; color: #333; }
+  .cg-val.sage { color: #888; font-style: italic; }
+  .cg-val.sage-lead { color: #555; font-style: italic; }
+
+  /* ══════════════════════════════════
+     CONCEPT 1 — THE WITNESS
+     Sage remembers. Presence deepens
+     with each session.
+  ══════════════════════════════════ */
+  .witness-footer { border-top: 1px solid #F5F5F5; padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .witness-sage { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .witness-sage-label { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 0.18em; text-transform: uppercase; color: #C0C0C0; }
+  .witness-memory { font-family: 'IBM Plex Mono', monospace; font-size: 7px; color: #D8B88A; letter-spacing: 0.06em; }
+  .witness-sheet { position: absolute; inset: 0; background: white; display: flex; flex-direction: column; }
+  .ws-pill { width: 36px; height: 4px; background: #E8E8E8; border-radius: 2px; margin: 12px auto 0; flex-shrink: 0; }
+  .ws-top { padding: 16px 24px 12px; border-bottom: 1px solid #F0F0F0; flex-shrink: 0; }
+  .ws-sage-name { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: #C0C0C0; margin-bottom: 8px; }
+  .ws-memory-tag { display: inline-flex; align-items: center; gap: 6px; background: #FBF7F0; border: 1px solid #E8D8C0; border-radius: 4px; padding: 4px 10px; margin-bottom: 10px; }
+  .ws-memory-dot { width: 5px; height: 5px; border-radius: 50%; background: #C8A070; }
+  .ws-memory-text { font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: #A08060; letter-spacing: 0.08em; }
+  .ws-opening { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; font-style: italic; color: #333; line-height: 1.55; }
+  .ws-body { flex: 1; padding: 16px 24px; overflow: hidden; }
+  .ws-input-row { border-top: 1px solid #F0F0F0; padding: 10px 24px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; }
+  .ws-input { flex: 1; font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 300; color: #555; font-style: italic; }
+  .ws-hint { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 0.1em; text-transform: uppercase; color: #D0D0D0; }
+
+  /* ══════════════════════════════════
+     CONCEPT 2 — THE THREAD
+     Sage's voice appears inline,
+     without being summoned.
+  ══════════════════════════════════ */
+  .thread-whisper { margin-top: 8px; padding: 10px 0 10px 14px; border-left: 2px solid #E8E0D4; }
+  .tw-sage { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8B89A; margin-bottom: 5px; }
+  .tw-text { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-style: italic; font-weight: 300; color: #888; line-height: 1.5; }
+  .tw-expand { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; margin-top: 6px; cursor: pointer; }
+  .thread-footer { border-top: 1px solid #F5F5F5; padding: 0 24px; height: 44px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+
+  /* ══════════════════════════════════
+     CONCEPT 3 — THE STUDY PARTNER
+     Sage thinks alongside you.
+     We, not You.
+  ══════════════════════════════════ */
+  .partner-footer { border-top: 1px solid #F5F5F5; padding: 0 24px; height: 44px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .partner-sage { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #C0C0C0; }
+  .thinking-state { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+  .thinking-dots { display: flex; gap: 4px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; background: #D0C0B0; }
+  .dot:nth-child(2) { opacity: 0.6; }
+  .dot:nth-child(3) { opacity: 0.3; }
+  .thinking-label { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 0.14em; text-transform: uppercase; color: #D0C0B0; }
+  .partner-sheet { position: absolute; inset: 0; background: white; display: flex; flex-direction: column; }
+  .ps-pill { width: 36px; height: 4px; background: #E8E8E8; border-radius: 2px; margin: 12px auto 0; flex-shrink: 0; }
+  .ps-top { padding: 16px 24px 14px; border-bottom: 1px solid #F0F0F0; flex-shrink: 0; }
+  .ps-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: #C0C0C0; margin-bottom: 8px; }
+  .ps-opening { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; font-style: italic; color: #333; line-height: 1.55; }
+  .ps-body { flex: 1; padding: 14px 24px; overflow: hidden; }
+  .ps-turn { display: grid; grid-template-columns: 48px 1px 1fr; gap: 12px; align-items: start; margin-bottom: 14px; }
+  .ps-who { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8; padding-top: 2px; }
+  .ps-who.sage { color: #C8B89A; }
+  .ps-line { width: 1px; background: #F0F0F0; align-self: stretch; }
+  .ps-msg { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 300; line-height: 1.5; color: #444; }
+  .ps-msg.sage { font-style: italic; color: #777; }
+  .ps-input-row { border-top: 1px solid #F0F0F0; padding: 10px 24px; flex-shrink: 0; display: flex; align-items: center; }
+  .ps-input { flex: 1; font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 300; color: #555; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="bar-a">Agent Classroom</span>
+  <div class="bar-dot"></div>
+  <span class="bar-b">Sage · Three New Concepts</span>
+</div>
+
+<div class="stage">
+
+  <!-- ══════════════ CONCEPT 1: THE WITNESS ══════════════ -->
+  <div class="col">
+    <div class="phone" id="phone-a" onclick="select('a')">
+      <div class="phone-label">Concept A</div>
+      <div class="screen">
+        <!-- The sheet is open, showing Sage's memory-aware opening -->
+        <div class="witness-sheet">
+          <div class="ws-pill"></div>
+          <div class="ws-top">
+            <div class="ws-sage-name">Sage</div>
+            <div class="ws-memory-tag">
+              <div class="ws-memory-dot"></div>
+              <div class="ws-memory-text">Remembers · 3 sessions</div>
+            </div>
+            <div class="ws-opening">You've hesitated on syntax questions twice now. Want to talk through why that one felt uncertain?</div>
+          </div>
+          <div class="ws-body">
+            <div class="col-grid" style="margin-bottom: 14px;">
+              <div class="cg-key">Sage</div>
+              <div class="cg-rule"></div>
+              <div class="cg-val sage">I noticed you moved quickly past the first three — then slowed down here. That's usually a signal.</div>
+            </div>
+            <div class="col-grid">
+              <div class="cg-key">Options</div>
+              <div class="cg-rule"></div>
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="font-family:'Cormorant Garamond',serif; font-size:15px; font-weight:300; font-style:italic; color:#C0C0C0;">— walk me through it</div>
+                <div style="font-family:'Cormorant Garamond',serif; font-size:15px; font-weight:300; font-style:italic; color:#C0C0C0;">— show what I keep missing</div>
+                <div style="font-family:'Cormorant Garamond',serif; font-size:15px; font-weight:300; font-style:italic; color:#C0C0C0;">— skip for now</div>
+              </div>
+            </div>
+          </div>
+          <div class="ws-input-row">
+            <div class="ws-input" style="color:#CCCCCC;">Ask anything…</div>
+            <div class="ws-hint">↑ send</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info" id="info-a">
+      <div class="info-n">Concept A</div>
+      <div class="info-h">The Witness</div>
+      <div class="info-d">Sage is memory-aware. It doesn't greet you — it continues where it noticed you last. The trigger in the footer shows a subtle session count after the first quiz. When the sheet opens, Sage leads with a specific, earned observation — not a generic invitation. The quick-action phrases shift with each session to match your actual patterns.</div>
+      <div class="spec"><span class="sk">Trigger</span><span class="sv">↑ / ASK SAGE · 3 sessions (faint amber count)</span></div>
+      <div class="spec"><span class="sk">Sheet open</span><span class="sv">Memory tag + pattern-aware opening</span></div>
+      <div class="spec"><span class="sk">Trust arc</span><span class="sv">Session 1: transparent · Session 5+: predictive</span></div>
+      <div class="spec"><span class="sk">Agentic layer</span><span class="sv">Cross-session memory · pattern recognition</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ CONCEPT 2: THE THREAD ══════════════ -->
+  <div class="col">
+    <div class="phone" id="phone-b" onclick="select('b')">
+      <div class="phone-label">Concept B</div>
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">4 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Python · Syntax</div>
+          <div class="sc-q">Which method returns the number of items in a list?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">count()</span></div>
+          <div class="sc-opt wrong"><span class="ol">B</span><span class="ot">size()</span></div>
+          <div class="sc-opt sel"><span class="ol" style="color:#111">C</span><span class="ot" style="color:#111">len()</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">length()</span></div>
+
+          <!-- THE THREAD: Sage speaks up inline, no button needed -->
+          <div class="thread-whisper">
+            <div class="tw-sage">Sage</div>
+            <div class="tw-text">Good instinct. <em>len()</em> is one of those functions worth knowing cold — it works on strings, dicts, and tuples too.</div>
+            <div class="tw-expand">Go deeper ↗</div>
+          </div>
+        </div>
+        <div class="thread-footer">
+          <span class="nl" style="color:#DADADA;">← Prev</span>
+          <span class="nl" style="color:#DADADA;">Next →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info" id="info-b">
+      <div class="info-n">Concept B</div>
+      <div class="info-h">The Thread</div>
+      <div class="info-d">Sage doesn't wait to be summoned. After you answer, Sage's voice surfaces inline — a short observation, a connection, a note — threaded directly into the content. It fades after a few seconds unless you tap "Go deeper." The footer loses the Ask Sage trigger: Sage is already in the conversation. The sheet exists for depth, not initiation.</div>
+      <div class="spec"><span class="sk">Trigger</span><span class="sv">None — Sage appears after answer submission</span></div>
+      <div class="spec"><span class="sk">Placement</span><span class="sv">Inline, below selected answer, border-left rule</span></div>
+      <div class="spec"><span class="sk">Footer</span><span class="sv">Prev / Next only — Sage lives in content</span></div>
+      <div class="spec"><span class="sk">Agentic layer</span><span class="sv">Proactive · context-sensitive · no friction</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ CONCEPT 3: THE STUDY PARTNER ══════════════ -->
+  <div class="col">
+    <div class="phone" id="phone-c" onclick="select('c')">
+      <div class="phone-label">Concept C</div>
+      <div class="screen">
+        <div class="partner-sheet">
+          <div class="ps-pill"></div>
+          <div class="ps-top">
+            <div class="ps-label">Thinking with Sage</div>
+            <div class="ps-opening">We got that one. Want to look at why <em>size()</em> trips people — or keep moving?</div>
+          </div>
+          <div class="ps-body">
+            <div class="ps-turn">
+              <div class="ps-who">Kaze</div>
+              <div class="ps-line"></div>
+              <div class="ps-msg">I wasn't totally sure. I eliminated A and D but size() felt possible.</div>
+            </div>
+            <div class="ps-turn">
+              <div class="ps-who sage">Sage</div>
+              <div class="ps-line"></div>
+              <div class="ps-msg sage">That's the right instinct. <em>size()</em> comes from other languages — it leaks in. The fact you got to <em>len()</em> means you're thinking in Python now, not around it.</div>
+            </div>
+            <div class="ps-turn">
+              <div class="ps-who">Kaze</div>
+              <div class="ps-line"></div>
+              <div class="ps-msg" style="color:#CCCCCC; font-style:italic;">keep moving</div>
+            </div>
+          </div>
+          <div class="ps-input-row">
+            <div class="ps-input" style="color:#CCCCCC;">Say something…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info" id="info-c">
+      <div class="info-n">Concept C</div>
+      <div class="info-h">The Study Partner</div>
+      <div class="info-d">Sage shifts from AI tutor to thinking companion. The language changes from "you" to "we." Sage reasons alongside the learner — validating their process, not just their answer. The sheet opens as a debrief, not a help request. On the question screen, a brief "Sage is thinking…" micro-state appears after submission before Sage speaks. The trigger becomes "Think with Sage" — a fundamentally different relationship model.</div>
+      <div class="spec"><span class="sk">Trigger</span><span class="sv">Think with Sage (replaces Ask Sage)</span></div>
+      <div class="spec"><span class="sk">Language</span><span class="sv">"We" not "You" — peer register</span></div>
+      <div class="spec"><span class="sk">Sheet frame</span><span class="sv">Debrief / co-reasoning, not Q&amp;A</span></div>
+      <div class="spec"><span class="sk">Agentic layer</span><span class="sv">Relationship model shift · collaborative trust</span></div>
+    </div>
+  </div>
+
+</div><!-- /stage -->
+
+<!-- Selection bar -->
+<div class="selection-bar">
+  <span class="sel-label">Selected</span>
+  <span class="sel-value" id="sel-display"><span class="sel-none">— tap a concept —</span></span>
+</div>
+
+<script>
+  let current = null;
+  const names = { a: 'A · The Witness', b: 'B · The Thread', c: 'C · The Study Partner' };
+
+  function select(id) {
+    if (current) {
+      document.getElementById('phone-' + current).classList.remove('selected');
+    }
+    if (current === id) {
+      current = null;
+      document.getElementById('sel-display').innerHTML = '<span class="sel-none">— tap a concept —</span>';
+      if (window.__selectOption) window.__selectOption(null, null);
+      return;
+    }
+    current = id;
+    document.getElementById('phone-' + id).classList.add('selected');
+    document.getElementById('sel-display').textContent = names[id];
+    if (window.__selectOption) window.__selectOption(id, names[id]);
+  }
+</script>
+</body>
+</html>

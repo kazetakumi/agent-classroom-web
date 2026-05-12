@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Sage — Rethink Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 54px;
+      background: #111;
+      display: flex; align-items: center; gap: 18px;
+      padding: 0 28px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bar-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
+    .btn-row { display: flex; gap: 3px; }
+    .cbtn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px; cursor: pointer; transition: all 0.14s; }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+
+    /* ── Stage ── */
+    .stage { padding-top: 76px; padding-bottom: 60px; display: flex; justify-content: center; align-items: flex-start; gap: 40px; min-height: 100vh; }
+    .stage.single { gap: 0; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .col.hide { display: none; }
+
+    /* ── Labels ── */
+    .col-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+
+    /* ── Phone ── */
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09);
+    }
+
+    /* ── Info card ── */
+    .info { width: 390px; background: #1A1A1A; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 18px 20px; }
+    .info-name { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 9px; }
+    .info-desc { font-size: 12.5px; color: rgba(255,255,255,0.44); line-height: 1.65; margin-bottom: 12px; }
+    .info-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .info-row-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.2); margin-bottom: 5px; }
+    .info-row-text { font-size: 12px; color: rgba(255,255,255,0.32); line-height: 1.6; }
+    .pills { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+    .pill { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.09); border-radius: 3px; padding: 2px 7px; }
+
+
+    /* ════════════════════════════════════════════════════
+       SHARED SCREEN FOUNDATION — Question card body
+       Same across all three concepts.
+    ════════════════════════════════════════════════════ */
+
+    .screen { background: #FFFFFF; height: 100%; display: flex; flex-direction: column; }
+
+    .top-strip { padding: 32px 28px 0; display: flex; align-items: baseline; justify-content: space-between; flex-shrink: 0; }
+    .top-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .top-counter { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: #D0D0D0; }
+
+    .progress-row { position: relative; margin: 20px 28px 0; flex-shrink: 0; }
+    .progress-track { height: 1px; background: #F0F0F0; }
+    .progress-fill { position: absolute; top: 0; left: 0; height: 1px; background: #BDBDBD; }
+
+    .c-body { flex: 1; overflow: hidden; padding: 26px 28px 0; }
+    .c-subject { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #CFCFCF; margin-bottom: 18px; }
+    .c-question { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 300; line-height: 1.52; color: #111; }
+    .c-rule { height: 1px; background: #EFEFEF; margin: 24px 0 6px; }
+    .c-options { display: flex; flex-direction: column; }
+    .c-option { display: flex; align-items: flex-start; gap: 18px; padding: 12px 0; border-bottom: 1px solid #F6F6F6; }
+    .c-option:last-child { border-bottom: none; }
+    .c-opt-letter { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #CFCFCF; min-width: 14px; padding-top: 5px; flex-shrink: 0; }
+    .c-opt-text { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; color: #888; line-height: 1.4; }
+
+
+    /* ════════════════════════════════════════════════════
+       CONCEPT 1 — THE INITIAL
+       A single italic S in Cormorant — Sage's sigil,
+       not a button. It sits between ← Prev and Next →
+       as an equal, not a widget. The letter itself is
+       the affordance. No arrow. No label. No border.
+       The I in the serif type IS the invitation.
+    ════════════════════════════════════════════════════ */
+
+    .initial-footer {
+      border-top: 1px solid #F0F0F0;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+    }
+    .initial-nav {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #B8B8B8; background: none; border: none; cursor: pointer;
+      transition: color 0.14s; padding: 8px 0;
+    }
+    .initial-nav:hover { color: #111; }
+    .initial-nav.dim { color: #E0E0E0; pointer-events: none; }
+    .initial-s {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 300;
+      font-size: 28px; color: #C4C4C4; line-height: 1;
+      cursor: pointer; user-select: none;
+      transition: color 0.18s;
+      letter-spacing: -0.01em;
+    }
+    .initial-s:hover { color: #111; }
+
+
+    /* ════════════════════════════════════════════════════
+       CONCEPT 2 — THE ASIDE
+       All three footer elements — prev, ask sage, next —
+       rendered in the same typographic register:
+       Cormorant italic, 15px, lowercase. No hierarchy.
+       Sage is not more important than navigation; it
+       just sits there, whispering. The whole footer
+       reads as a quiet continuation of the dialogue.
+    ════════════════════════════════════════════════════ */
+
+    .aside-footer {
+      border-top: 1px solid #F4F4F4;
+      height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+    }
+    .aside-nav {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 300;
+      font-size: 16px; color: #C0C0C0;
+      background: none; border: none; cursor: pointer;
+      transition: color 0.14s; padding: 6px 0;
+    }
+    .aside-nav:hover { color: #333; }
+    .aside-nav.dim { color: #E0E0E0; pointer-events: none; }
+    .aside-sage {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 300;
+      font-size: 16px; color: #BBBBBB;
+      cursor: pointer; user-select: none;
+      transition: color 0.14s;
+    }
+    .aside-sage:hover { color: #333; }
+
+
+    /* ════════════════════════════════════════════════════
+       CONCEPT 3 — THE VESSEL
+       A 42px circle — pure geometry, empty inside except
+       for a single 3px dot. No text, no arrow, no label.
+       The circle is the only enclosed form on the screen.
+       It holds the invitation. Navigation arrows shrink
+       to bare glyphs; the circle commands the centre.
+       On screens without nav: it stands alone.
+    ════════════════════════════════════════════════════ */
+
+    .vessel-footer {
+      border-top: 1px solid #F0F0F0;
+      height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      flex-shrink: 0;
+    }
+    .vessel-arrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 18px; color: #D4D4D4; line-height: 1;
+      background: none; border: none; cursor: pointer;
+      transition: color 0.14s; padding: 8px;
+      margin: -8px;
+    }
+    .vessel-arrow:hover { color: #111; }
+    .vessel-arrow.dim { color: #ECECEC; pointer-events: none; }
+    .vessel-circle {
+      width: 42px; height: 42px; border-radius: 50%;
+      border: 1px solid #E0E0E0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      transition: border-color 0.2s, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .vessel-circle:hover {
+      border-color: #AAAAAA;
+      transform: scale(1.08);
+    }
+    .vessel-dot {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: #C8C8C8;
+      transition: background 0.2s;
+    }
+    .vessel-circle:hover .vessel-dot { background: #555; }
+
+  </style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="bar-title">Ask Sage — Rethink</span>
+  <div class="bar-sep"></div>
+  <div class="btn-row" id="viewBtns">
+    <button class="cbtn on" data-v="all">All 3</button>
+    <button class="cbtn" data-v="1">1 — The Initial</button>
+    <button class="cbtn" data-v="2">2 — The Aside</button>
+    <button class="cbtn" data-v="3">3 — The Vessel</button>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+
+
+  <!-- ══ 1: THE INITIAL ══ -->
+  <div class="col" id="col-1">
+    <span class="col-label">1 — The Initial</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-counter">3 / 12</span>
+        </div>
+        <div class="progress-row">
+          <div class="progress-track"></div>
+          <div class="progress-fill" style="width: 25%"></div>
+        </div>
+
+        <div class="c-body">
+          <div class="c-subject">Calculus Foundations</div>
+          <div class="c-question">
+            A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?
+          </div>
+          <div class="c-rule"></div>
+          <div class="c-options">
+            <div class="c-option">
+              <span class="c-opt-letter">A</span>
+              <span class="c-opt-text">t = 0 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">B</span>
+              <span class="c-opt-text">t = 2 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">C</span>
+              <span class="c-opt-text">t = 0 and t = 2</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">D</span>
+              <span class="c-opt-text">t = 1 and t = 3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="initial-footer">
+          <button class="initial-nav dim">← Prev</button>
+          <span class="initial-s">S</span>
+          <button class="initial-nav">Next →</button>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">1 — The Initial</div>
+      <div class="info-desc">Sage's name initial — a single italic <em>S</em> in Cormorant Garamond, 28px, light. It sits between the nav controls as an equal, not a labelled button. No arrow, no border, no label. The letter itself is the invitation. Hovering darkens it to ink. Tap, and Sage arrives.</div>
+      <div class="info-row">
+        <div class="info-row-label">Other screens</div>
+        <div class="info-row-text">Results: the <em>S</em> alone, centred. Welcome: the redirect textarea already invites Sage — the <em>S</em> does not appear. Review / Explanation: same three-part footer, <em>S</em> at centre.</div>
+      </div>
+      <div class="pills">
+        <span class="pill">Sigil, not widget</span>
+        <span class="pill">Cormorant italic</span>
+        <span class="pill">No label</span>
+        <span class="pill">Literary</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ 2: THE ASIDE ══ -->
+  <div class="col" id="col-2">
+    <span class="col-label">2 — The Aside</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-counter">3 / 12</span>
+        </div>
+        <div class="progress-row">
+          <div class="progress-track"></div>
+          <div class="progress-fill" style="width: 25%"></div>
+        </div>
+
+        <div class="c-body">
+          <div class="c-subject">Calculus Foundations</div>
+          <div class="c-question">
+            A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?
+          </div>
+          <div class="c-rule"></div>
+          <div class="c-options">
+            <div class="c-option">
+              <span class="c-opt-letter">A</span>
+              <span class="c-opt-text">t = 0 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">B</span>
+              <span class="c-opt-text">t = 2 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">C</span>
+              <span class="c-opt-text">t = 0 and t = 2</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">D</span>
+              <span class="c-opt-text">t = 1 and t = 3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="aside-footer">
+          <button class="aside-nav dim">← prev</button>
+          <span class="aside-sage">ask sage</span>
+          <button class="aside-nav">next →</button>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">2 — The Aside</div>
+      <div class="info-desc">All three footer elements — prev, ask sage, next — share the same Cormorant italic, 16px, lowercase. No hierarchy between navigation and Sage. The footer reads as a single quiet sentence: <em>← prev · ask sage · next →</em>. Sage is not elevated above movement; it just sits there, whispering.</div>
+      <div class="info-row">
+        <div class="info-row-label">Other screens</div>
+        <div class="info-row-text">Results: <em>ask sage</em> alone, centred — same italic, same weight. Review / Explanation: same three-part whisper. Welcome: not needed; redirect textarea already speaks in the same register.</div>
+      </div>
+      <div class="pills">
+        <span class="pill">Uniform register</span>
+        <span class="pill">Cormorant italic</span>
+        <span class="pill">No hierarchy</span>
+        <span class="pill">Conversational</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ 3: THE VESSEL ══ -->
+  <div class="col" id="col-3">
+    <span class="col-label">3 — The Vessel</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-counter">3 / 12</span>
+        </div>
+        <div class="progress-row">
+          <div class="progress-track"></div>
+          <div class="progress-fill" style="width: 25%"></div>
+        </div>
+
+        <div class="c-body">
+          <div class="c-subject">Calculus Foundations</div>
+          <div class="c-question">
+            A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?
+          </div>
+          <div class="c-rule"></div>
+          <div class="c-options">
+            <div class="c-option">
+              <span class="c-opt-letter">A</span>
+              <span class="c-opt-text">t = 0 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">B</span>
+              <span class="c-opt-text">t = 2 only</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">C</span>
+              <span class="c-opt-text">t = 0 and t = 2</span>
+            </div>
+            <div class="c-option">
+              <span class="c-opt-letter">D</span>
+              <span class="c-opt-text">t = 1 and t = 3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="vessel-footer">
+          <button class="vessel-arrow dim">←</button>
+          <div class="vessel-circle">
+            <div class="vessel-dot"></div>
+          </div>
+          <button class="vessel-arrow">→</button>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">3 — The Vessel</div>
+      <div class="info-desc">A 42px circle — the only enclosed form on the screen. A single 3px dot at its centre. No text, no arrow, no label. Navigation shrinks to bare glyphs: ← and →, small and dim. The circle holds the invitation. Hover: it breathes outward slightly, the dot darkens. The shape's emptiness is the point.</div>
+      <div class="info-row">
+        <div class="info-row-label">Other screens</div>
+        <div class="info-row-text">Results: the circle alone, centred, full width to tap. Review / Explanation: same — circle between ← and →. Welcome: not needed; the redirect textarea is Sage's vessel on that screen.</div>
+      </div>
+      <div class="pills">
+        <span class="pill">Pure geometry</span>
+        <span class="pill">No typography</span>
+        <span class="pill">Breathing hover</span>
+        <span class="pill">Architectural</span>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<script>
+  const btns  = document.querySelectorAll('#viewBtns .cbtn');
+  const stage = document.getElementById('stage');
+  const cols  = { 1: 'col-1', 2: 'col-2', 3: 'col-3' };
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      const v = btn.dataset.v;
+      if (v === 'all') {
+        stage.classList.remove('single');
+        Object.values(cols).forEach(id => document.getElementById(id).classList.remove('hide'));
+      } else {
+        stage.classList.add('single');
+        Object.entries(cols).forEach(([k, id]) => {
+          document.getElementById(id).classList.toggle('hide', k !== v);
+        });
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+
+<style>
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 16px;
+  }
+
+  .palette-card {
+    border: 2px solid transparent;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .palette-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.13); }
+  .palette-card.selected { border-color: #555; box-shadow: 0 6px 24px rgba(0,0,0,0.18); }
+
+  /* The mini screen mock inside each card */
+  .screen-mock {
+    padding: 22px 20px 18px;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mock-meta {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .mock-progress {
+    height: 3px;
+    border-radius: 2px;
+    width: 100%;
+    margin: 2px 0 6px;
+    background: rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .mock-progress-fill {
+    height: 100%;
+    width: 35%;
+    border-radius: 2px;
+  }
+
+  .mock-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    line-height: 1.45;
+    flex: 1;
+  }
+
+  .mock-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: 4px;
+  }
+
+  .mock-option {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    padding: 6px 0;
+    border-bottom: 1px solid;
+    display: flex;
+    gap: 8px;
+  }
+
+  .mock-letter {
+    font-size: 10px;
+    font-weight: 500;
+    min-width: 12px;
+  }
+
+  /* Swatches strip at bottom */
+  .swatch-strip {
+    display: flex;
+    height: 40px;
+  }
+  .swatch { flex: 1; }
+
+  /* Palette label */
+  .palette-label-row {
+    padding: 12px 16px;
+    background: #fff;
+    border-top: 1px solid #e8e4e0;
+  }
+  .palette-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #1a1714;
+    margin-bottom: 2px;
+  }
+  .palette-desc {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #888;
+  }
+
+  /* === PALETTE A: Warm Parchment === */
+  .pa-screen { background: #f5f0e8; }
+  .pa-meta { color: #9a8e82; }
+  .pa-progress { background: #e8e0d4; }
+  .pa-fill { background: #c96842; }
+  .pa-question { color: #1a1714; }
+  .pa-option { color: #4a4541; border-bottom-color: #e2d9ce; }
+  .pa-letter { color: #c96842; }
+
+  /* === PALETTE B: Warm White === */
+  .pb-screen { background: #fdfcf9; }
+  .pb-meta { color: #a09890; }
+  .pb-progress { background: #ede9e2; }
+  .pb-fill { background: #b85c3a; }
+  .pb-question { color: #141210; }
+  .pb-option { color: #52473f; border-bottom-color: #ede9e2; }
+  .pb-letter { color: #b85c3a; }
+
+  /* === PALETTE C: Warm Stone === */
+  .pc-screen { background: #ede8df; }
+  .pc-meta { color: #8e8279; }
+  .pc-progress { background: #d9d0c4; }
+  .pc-fill { background: #7c6e5b; }
+  .pc-question { color: #18140f; }
+  .pc-option { color: #45403a; border-bottom-color: #d6cec4; }
+  .pc-letter { color: #7c6e5b; }
+</style>
+
+<h2>Color Palette</h2>
+<p class="subtitle">All three use warm backgrounds with the DM Serif Display + DM Sans pairing. They differ in base warmth and accent intensity. The swatch strip shows the full palette.</p>
+
+<div class="palette-grid">
+
+  <!-- Palette A: Warm Parchment -->
+  <div class="palette-card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="screen-mock pa-screen">
+      <div class="mock-meta pa-meta">Mathematics · Q6 of 17</div>
+      <div class="mock-progress pa-progress">
+        <div class="mock-progress-fill pa-fill"></div>
+      </div>
+      <div class="mock-question pa-question">Find the derivative of f(x) = 3x³ − 2x + 5.</div>
+      <div class="mock-options">
+        <div class="mock-option pa-option"><span class="mock-letter pa-letter">A</span> 9x² − 2</div>
+        <div class="mock-option pa-option"><span class="mock-letter pa-letter">B</span> 3x² − 2</div>
+        <div class="mock-option pa-option"><span class="mock-letter pa-letter">C</span> 9x² + 5</div>
+        <div class="mock-option pa-option"><span class="mock-letter pa-letter">D</span> 6x − 2</div>
+      </div>
+    </div>
+    <div class="swatch-strip">
+      <div class="swatch" style="background:#f5f0e8"></div>
+      <div class="swatch" style="background:#1a1714"></div>
+      <div class="swatch" style="background:#c96842"></div>
+      <div class="swatch" style="background:#4a4541"></div>
+      <div class="swatch" style="background:#e2d9ce"></div>
+    </div>
+    <div class="palette-label-row">
+      <div class="palette-name">A — Warm Parchment</div>
+      <div class="palette-desc">Cream bg · Terracotta accent · Ink black text</div>
+    </div>
+  </div>
+
+  <!-- Palette B: Warm White -->
+  <div class="palette-card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="screen-mock pb-screen">
+      <div class="mock-meta pb-meta">Mathematics · Q6 of 17</div>
+      <div class="mock-progress pb-progress">
+        <div class="mock-progress-fill pb-fill"></div>
+      </div>
+      <div class="mock-question pb-question">Find the derivative of f(x) = 3x³ − 2x + 5.</div>
+      <div class="mock-options">
+        <div class="mock-option pb-option"><span class="mock-letter pb-letter">A</span> 9x² − 2</div>
+        <div class="mock-option pb-option"><span class="mock-letter pb-letter">B</span> 3x² − 2</div>
+        <div class="mock-option pb-option"><span class="mock-letter pb-letter">C</span> 9x² + 5</div>
+        <div class="mock-option pb-option"><span class="mock-letter pb-letter">D</span> 6x − 2</div>
+      </div>
+    </div>
+    <div class="swatch-strip">
+      <div class="swatch" style="background:#fdfcf9"></div>
+      <div class="swatch" style="background:#141210"></div>
+      <div class="swatch" style="background:#b85c3a"></div>
+      <div class="swatch" style="background:#52473f"></div>
+      <div class="swatch" style="background:#ede9e2"></div>
+    </div>
+    <div class="palette-label-row">
+      <div class="palette-name">B — Warm White</div>
+      <div class="palette-desc">Near-white bg · Deep terracotta accent · Near-black text</div>
+    </div>
+  </div>
+
+  <!-- Palette C: Warm Stone -->
+  <div class="palette-card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="screen-mock pc-screen">
+      <div class="mock-meta pc-meta">Mathematics · Q6 of 17</div>
+      <div class="mock-progress pc-progress">
+        <div class="mock-progress-fill pc-fill"></div>
+      </div>
+      <div class="mock-question pc-question">Find the derivative of f(x) = 3x³ − 2x + 5.</div>
+      <div class="mock-options">
+        <div class="mock-option pc-option"><span class="mock-letter pc-letter">A</span> 9x² − 2</div>
+        <div class="mock-option pc-option"><span class="mock-letter pc-letter">B</span> 3x² − 2</div>
+        <div class="mock-option pc-option"><span class="mock-letter pc-letter">C</span> 9x² + 5</div>
+        <div class="mock-option pc-option"><span class="mock-letter pc-letter">D</span> 6x − 2</div>
+      </div>
+    </div>
+    <div class="swatch-strip">
+      <div class="swatch" style="background:#ede8df"></div>
+      <div class="swatch" style="background:#18140f"></div>
+      <div class="swatch" style="background:#7c6e5b"></div>
+      <div class="swatch" style="background:#45403a"></div>
+      <div class="swatch" style="background:#d6cec4"></div>
+    </div>
+    <div class="palette-label-row">
+      <div class="palette-name">C — Warm Stone</div>
+      <div class="palette-desc">Greige bg · Warm brown accent · No color pop</div>
+    </div>
+  </div>
+
+</div>

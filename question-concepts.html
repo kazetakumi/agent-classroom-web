@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Card — Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 54px;
+      background: #111;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bar-left { display: flex; align-items: center; gap: 18px; }
+    .bar-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+    .btn-row { display: flex; gap: 3px; }
+    .cbtn {
+      background: transparent; border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px;
+      cursor: pointer; transition: all 0.14s;
+    }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+
+    /* ── State toggle ── */
+    .state-toggle { display: flex; align-items: center; gap: 8px; }
+    .state-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.22);
+    }
+    .toggle-pill {
+      display: flex; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden;
+    }
+    .tpill {
+      background: transparent; border: none;
+      color: rgba(255,255,255,0.35); font-family: 'DM Sans', sans-serif;
+      font-size: 11px; font-weight: 500; padding: 4px 14px;
+      cursor: pointer; transition: all 0.14s; white-space: nowrap;
+    }
+    .tpill.on { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* ── Stage ── */
+    .stage {
+      padding-top: 76px; padding-bottom: 60px;
+      display: flex; justify-content: center; align-items: flex-start;
+      gap: 32px; min-height: 100vh;
+    }
+    .stage.single { gap: 0; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .col.hide { display: none; }
+    .col-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #888;
+    }
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09);
+    }
+    .info {
+      width: 390px; background: #1A1A1A;
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 18px;
+    }
+    .info-name {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.28); margin-bottom: 7px;
+    }
+    .info-desc { font-size: 12px; color: rgba(255,255,255,0.48); line-height: 1.6; margin-bottom: 10px; }
+    .pills { display: flex; gap: 5px; flex-wrap: wrap; }
+    .pill {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.09); border-radius: 3px; padding: 2px 7px;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       SHARED SCREEN FOUNDATION
+    ═══════════════════════════════════════════════ */
+
+    .screen {
+      background: #FFFFFF; height: 100%;
+      display: flex; flex-direction: column;
+    }
+
+    /* Top strip */
+    .top-strip {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .top-app {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .top-counter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.06em; color: #D0D0D0;
+    }
+
+    /* Progress track (overlaid on the horizontal rule) */
+    .progress-row { position: relative; margin: 20px 28px 0; flex-shrink: 0; }
+    .progress-track { height: 1px; background: #F0F0F0; }
+    .progress-fill {
+      position: absolute; top: 0; left: 0; height: 1px;
+      background: #C0C0C0; transition: width 300ms ease;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT A — TRANSCRIPT
+       Question and options live entirely inside the
+       3-column grid as a single Sage turn. The left
+       column shows "Sage" once, a vertical rule runs
+       through both question and option rows. Options
+       are A/B/C/D labelled rows in the right column.
+       Nothing breaks — the grid holds everything.
+    ═══════════════════════════════════════════════ */
+
+    .a-body { flex: 1; overflow: hidden; }
+
+    .a-question-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 26px 28px 0;
+    }
+    .a-lbl-col {
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-top: 4px;
+    }
+    .a-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .a-rule-v { background: #EFEFEF; width: 1px; }
+    .a-speech {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 300; line-height: 1.55; color: #111;
+    }
+
+    /* Options row — continues the grid, no label repeat */
+    .a-opts-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 0 28px;
+    }
+    .a-opts-lbl-col { /* empty spacer */ }
+    .a-opts-rule-v { background: #EFEFEF; width: 1px; }
+
+    .a-options {
+      border-top: 1px solid #F2F2F2;
+      margin-top: 20px;
+    }
+    .a-option {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #F8F8F8;
+      cursor: pointer; transition: background 0.12s;
+      position: relative;
+    }
+    .a-option:last-child { border-bottom: none; }
+    .a-option:hover { background: #FAFAFA; }
+    .a-opt-letter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #CFCFCF; flex-shrink: 0; padding-top: 4px;
+      transition: color 0.15s;
+    }
+    .a-opt-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 300; color: #888; line-height: 1.45;
+      transition: color 0.15s;
+    }
+
+    .a-option[data-selected] { background: transparent; }
+    .a-option[data-selected]::before {
+      content: ''; position: absolute;
+      left: -1px; top: 0; bottom: 0; width: 2px; background: #111;
+    }
+    .a-option[data-selected] .a-opt-letter { color: #111; }
+    .a-option[data-selected] .a-opt-text { color: #111; }
+
+    .a-options[data-picked] .a-option:not([data-selected]) {
+      opacity: 0.32; pointer-events: none;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT B — BREAK
+       Question is a Sage turn in the column grid.
+       Then a "Your answer" B-Break collapses the grid.
+       Options appear as full-width touchable rows, each
+       echoing the grid's vertical rule inside them:
+       [letter] | [rule] | [option text]. Exactly mirrors
+       the welcome screen's B-Break structural shift.
+    ═══════════════════════════════════════════════ */
+
+    .b-body { flex: 1; overflow: hidden; }
+
+    .b-question-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 26px 28px 0;
+    }
+    .b-lbl-col {
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-top: 4px;
+    }
+    .b-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .b-rule-v { background: #EFEFEF; width: 1px; }
+    .b-speech {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 300; line-height: 1.55; color: #111;
+    }
+
+    /* B-Break divider — identical pattern to welcome screen */
+    .b-break-section { margin: 24px 0 0; flex-shrink: 0; }
+    .b-break-divider {
+      display: flex; align-items: center;
+      padding: 0 28px;
+    }
+    .b-break-line { flex: 1; height: 1px; background: #EFEFEF; }
+    .b-break-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #D4D4D4; padding: 0 12px;
+    }
+
+    /* Full-width option rows */
+    .b-options { margin-top: 0; }
+
+    .b-option {
+      display: flex; align-items: stretch;
+      border-bottom: 1px solid #F4F4F4;
+      cursor: pointer; transition: background 0.12s;
+      position: relative;
+    }
+    .b-option:first-child { border-top: 1px solid #F4F4F4; margin-top: 6px; }
+    .b-option:hover { background: #FAFAFA; }
+
+    .b-opt-badge {
+      width: 56px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 16px 0 16px;
+    }
+    .b-opt-letter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #C8C8C8; transition: color 0.15s;
+    }
+    .b-opt-rule {
+      width: 1px; background: #EFEFEF; flex-shrink: 0;
+      margin: 0 16px; align-self: stretch;
+      transition: background 0.15s;
+    }
+    .b-opt-text-col {
+      flex: 1; padding: 15px 28px 15px 0;
+      display: flex; align-items: center;
+    }
+    .b-opt-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 300; color: #888; line-height: 1.4;
+      transition: color 0.15s;
+    }
+
+    .b-option[data-selected] { background: #F7F7F7; }
+    .b-option[data-selected] .b-opt-letter { color: #111; }
+    .b-option[data-selected] .b-opt-rule { background: #222; }
+    .b-option[data-selected] .b-opt-text { color: #111; }
+
+    .b-options[data-picked] .b-option:not([data-selected]) {
+      opacity: 0.3; pointer-events: none;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT C — ANNOTATED
+       No column grid — the question takes the full
+       content width in large Cormorant. A single rule
+       separates question from answer choices. Options
+       are purely typographic: IBM Plex Mono letter on
+       the left, Cormorant text to its right. Nothing
+       else. Like a carefully typeset exam paper.
+    ═══════════════════════════════════════════════ */
+
+    .c-body {
+      flex: 1; overflow: hidden;
+      padding: 28px 28px 0;
+    }
+
+    .c-subject {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #CFCFCF; margin-bottom: 18px;
+    }
+    .c-question {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 300; line-height: 1.52; color: #111;
+    }
+    .c-rule { height: 1px; background: #EFEFEF; margin: 26px 0 6px; }
+
+    .c-options { display: flex; flex-direction: column; }
+    .c-option {
+      display: flex; align-items: flex-start; gap: 18px;
+      padding: 13px 0;
+      border-bottom: 1px solid #F6F6F6;
+      cursor: pointer; transition: opacity 0.12s;
+    }
+    .c-option:last-child { border-bottom: none; }
+    .c-opt-letter {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #CFCFCF; min-width: 14px; padding-top: 5px; flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .c-opt-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 300; color: #888; line-height: 1.4;
+      transition: color 0.15s;
+    }
+
+    .c-option[data-selected] .c-opt-letter { color: #111; font-weight: 500; }
+    .c-option[data-selected] .c-opt-text { color: #111; }
+
+    .c-options[data-picked] .c-option:not([data-selected]) {
+      opacity: 0.3; pointer-events: none;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Bar ── -->
+<div class="bar">
+  <div class="bar-left">
+    <span class="bar-title">Question Card — Concepts</span>
+    <div class="bar-sep"></div>
+    <div class="btn-row" id="viewBtns">
+      <button class="cbtn on" data-v="all">All 3</button>
+      <button class="cbtn" data-v="a">Transcript</button>
+      <button class="cbtn" data-v="b">Break</button>
+      <button class="cbtn" data-v="c">Annotated</button>
+    </div>
+  </div>
+  <div class="state-toggle">
+    <span class="state-lbl">State</span>
+    <div class="toggle-pill">
+      <button class="tpill on" data-s="idle">Idle</button>
+      <button class="tpill" data-s="selected">Selected</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Stage ── -->
+<div class="stage" id="stage">
+
+
+  <!-- ══ A: TRANSCRIPT ══ -->
+  <div class="col" id="col-a">
+    <span class="col-label">A — Transcript</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-counter">3 / 12</span>
+        </div>
+        <div class="progress-row">
+          <div class="progress-track"></div>
+          <div class="progress-fill" style="width: 25%"></div>
+        </div>
+
+        <div class="a-body">
+
+          <!-- Sage question turn -->
+          <div class="a-question-turn">
+            <div class="a-lbl-col"><span class="a-lbl">Sage</span></div>
+            <div class="a-rule-v"></div>
+            <div class="a-speech">
+              A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?
+            </div>
+          </div>
+
+          <!-- Options — same grid, no label -->
+          <div class="a-opts-turn">
+            <div class="a-opts-lbl-col"></div>
+            <div class="a-opts-rule-v"></div>
+            <div class="a-options" id="a-options">
+              <div class="a-option" data-opt="A">
+                <span class="a-opt-letter">A</span>
+                <span class="a-opt-text">t = 0 only</span>
+              </div>
+              <div class="a-option" data-opt="B">
+                <span class="a-opt-letter">B</span>
+                <span class="a-opt-text">t = 2 only</span>
+              </div>
+              <div class="a-option" data-opt="C">
+                <span class="a-opt-letter">C</span>
+                <span class="a-opt-text">t = 0 and t = 2</span>
+              </div>
+              <div class="a-option" data-opt="D">
+                <span class="a-opt-letter">D</span>
+                <span class="a-opt-text">t = 1 and t = 3</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">A — Transcript</div>
+      <div class="info-desc">Question and all four options live inside the column grid as one continuous Sage turn. The vertical rule runs through both. Options follow the question in the right column — letter label plus Cormorant text. Selecting marks that row with a 2px dark left bar and fades the rest. The grid never breaks. Zero mode shift.</div>
+      <div class="pills">
+        <span class="pill">Grid stays intact</span>
+        <span class="pill">No structural break</span>
+        <span class="pill">Options in right col</span>
+        <span class="pill">Dark left-edge mark</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ B: BREAK ══ -->
+  <div class="col" id="col-b">
+    <span class="col-label">B — Break</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-counter">3 / 12</span>
+        </div>
+        <div class="progress-row">
+          <div class="progress-track"></div>
+          <div class="progress-fill" style="width: 25%"></div>
+        </div>
+
+        <div class="b-body">
+
+          <!-- Sage question turn -->
+          <div class="b-question-turn">
+            <div class="b-lbl-col"><span class="b-lbl">Sage</span></div>
+            <div class="b-rule-v"></div>
+            <div class="b-speech">
+              A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?
+            </div>
+          </div>
+
+        </div>
+
+        <!-- B-Break + full-width options -->
+        <div class="b-break-section">
+          <div class="b-break-divider">
+            <div class="b-break-line"></div>
+            <span class="b-break-label">Your answer</span>
+            <div class="b-break-line"></div>
+          </div>
+          <div class="b-options" id="b-options">
+            <div class="b-option" data-opt="A">
+              <div class="b-opt-badge"><span class="b-opt-letter">A</span></div>
+              <div class="b-opt-rule"></div>
+              <div class="b-opt-text-col"><span class="b-opt-text">t = 0 only</span></div>
+            </div>
+            <div class="b-option" data-opt="B">
+              <div class="b-opt-badge"><span class="b-opt-letter">B</span></div>
+              <div class="b-opt-rule"></div>
+              <div class="b-opt-text-col"><span class="b-opt-text">t = 2 only</span></div>
+            </div>
+            <div class="b-option" data-opt="C">
+              <div class="b-opt-badge"><span class="b-opt-letter">C</span></div>
+              <div class="b-opt-rule"></div>
+              <div class="b-opt-text-col"><span class="b-opt-text">t = 0 and t = 2</span></div>
+            </div>
+            <div class="b-option" data-opt="D">
+              <div class="b-opt-badge"><span class="b-opt-letter">D</span></div>
+              <div class="b-opt-rule"></div>
+              <div class="b-opt-text-col"><span class="b-opt-text">t = 1 and t = 3</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">B — Break</div>
+      <div class="info-desc">The question is a Sage turn in the column grid. Then the grid collapses: "Your answer" marks the transition from reading to deciding. Options appear as full-width rows — each echoing the grid's vertical rule between its letter badge and text. Exactly mirrors the B-Break pattern established in the welcome screen. The structural shift is legible.</div>
+      <div class="pills">
+        <span class="pill">Grid → full-width</span>
+        <span class="pill">"Your answer" marker</span>
+        <span class="pill">Rule inside each option</span>
+        <span class="pill">Welcome screen match</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ C: ANNOTATED ══ -->
+  <div class="col" id="col-c">
+    <span class="col-label">C — Annotated</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-counter">3 / 12</span>
+        </div>
+        <div class="progress-row">
+          <div class="progress-track"></div>
+          <div class="progress-fill" style="width: 25%"></div>
+        </div>
+
+        <div class="c-body">
+          <div class="c-subject">Calculus Foundations</div>
+          <div class="c-question">
+            A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?
+          </div>
+          <div class="c-rule"></div>
+          <div class="c-options" id="c-options">
+            <div class="c-option" data-opt="A">
+              <span class="c-opt-letter">A</span>
+              <span class="c-opt-text">t = 0 only</span>
+            </div>
+            <div class="c-option" data-opt="B">
+              <span class="c-opt-letter">B</span>
+              <span class="c-opt-text">t = 2 only</span>
+            </div>
+            <div class="c-option" data-opt="C">
+              <span class="c-opt-letter">C</span>
+              <span class="c-opt-text">t = 0 and t = 2</span>
+            </div>
+            <div class="c-option" data-opt="D">
+              <span class="c-opt-letter">D</span>
+              <span class="c-opt-text">t = 1 and t = 3</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">C — Annotated</div>
+      <div class="info-desc">No column grid — the question occupies the full content width in large Cormorant. A single horizontal rule divides question from options. Options are purely typographic: an IBM Plex Mono letter beside Cormorant text, nothing else. Selecting darkens the chosen row; the rest fade. Editorial and direct — like a carefully typeset exam paper.</div>
+      <div class="pills">
+        <span class="pill">No grid at all</span>
+        <span class="pill">Full-width question</span>
+        <span class="pill">Letter + text only</span>
+        <span class="pill">Exam paper feel</span>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<script>
+  /* ── View toggle ── */
+  const viewBtns = document.querySelectorAll('#viewBtns .cbtn');
+  const stage = document.getElementById('stage');
+  const colMap = { a: 'col-a', b: 'col-b', c: 'col-c' };
+
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      viewBtns.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      const v = btn.dataset.v;
+      if (v === 'all') {
+        stage.classList.remove('single');
+        Object.values(colMap).forEach(id => document.getElementById(id).classList.remove('hide'));
+      } else {
+        stage.classList.add('single');
+        Object.entries(colMap).forEach(([k, id]) => {
+          document.getElementById(id).classList.toggle('hide', k !== v);
+        });
+      }
+    });
+  });
+
+  /* ── State toggle: idle → selected (option C pre-chosen) ── */
+  const statePills = document.querySelectorAll('.tpill');
+
+  function applyState(state) {
+    const sets = [
+      { opts: document.getElementById('a-options'), cls: 'a-option' },
+      { opts: document.getElementById('b-options'), cls: 'b-option' },
+      { opts: document.getElementById('c-options'), cls: 'c-option' },
+    ];
+    sets.forEach(({ opts, cls }) => {
+      opts.querySelectorAll('.' + cls).forEach(o => o.removeAttribute('data-selected'));
+      opts.removeAttribute('data-picked');
+      if (state === 'selected') {
+        opts.querySelector('[data-opt="C"]').setAttribute('data-selected', '');
+        opts.setAttribute('data-picked', '');
+      }
+    });
+  }
+
+  statePills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      statePills.forEach(p => p.classList.remove('on'));
+      pill.classList.add('on');
+      applyState(pill.dataset.s);
+    });
+  });
+
+  /* ── Live click interaction ── */
+  ['a-options', 'b-options', 'c-options'].forEach(id => {
+    const container = document.getElementById(id);
+    const optClass = id.replace('-options', '-option');
+    container.querySelectorAll('.' + optClass).forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (container.hasAttribute('data-picked')) return;
+        container.querySelectorAll('.' + optClass).forEach(o => o.removeAttribute('data-selected'));
+        opt.setAttribute('data-selected', '');
+        container.setAttribute('data-picked', '');
+        // sync state toggle pill to "selected"
+        statePills.forEach(p => p.classList.toggle('on', p.dataset.s === 'selected'));
+        // sync other containers
+        const chosen = opt.dataset.opt;
+        ['a-options', 'b-options', 'c-options'].forEach(otherId => {
+          if (otherId === id) return;
+          const other = document.getElementById(otherId);
+          const oc = otherId.replace('-options', '-option');
+          other.querySelectorAll('.' + oc).forEach(o => o.removeAttribute('data-selected'));
+          const target = other.querySelector('[data-opt="' + chosen + '"]');
+          if (target) target.setAttribute('data-selected', '');
+          other.setAttribute('data-picked', '');
+        });
+      });
+    });
+  });
+</script>
+</body>
+</html>

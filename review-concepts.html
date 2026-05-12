@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Grid — Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ─────────── BAR ─────────── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 54px;
+      background: #111; display: flex; align-items: center;
+      padding: 0 28px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .bar-left { display: flex; align-items: center; gap: 18px; }
+    .bar-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+    .btn-row { display: flex; gap: 3px; }
+    .cbtn {
+      background: transparent; border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px;
+      cursor: pointer; transition: all 0.14s;
+    }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+
+    /* ─────────── STAGE ─────────── */
+    .stage {
+      padding-top: 76px; padding-bottom: 60px;
+      display: flex; justify-content: center; align-items: flex-start;
+      gap: 32px; min-height: 100vh;
+    }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .col.hide { display: none; }
+    .col-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #888;
+    }
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09);
+    }
+
+    /* ═══════════════════════════════════════════════
+       SHARED FOUNDATION
+    ═══════════════════════════════════════════════ */
+
+    .screen { background: #FFFFFF; height: 100%; display: flex; flex-direction: column; }
+
+    .top-strip {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .top-app {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .top-back {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #C0C0C0;
+      cursor: pointer;
+    }
+    .rule-h     { height: 1px; background: #F0F0F0; margin: 20px 28px 0; flex-shrink: 0; }
+    .rule-flush { height: 1px; background: #F0F0F0; margin: 0;           flex-shrink: 0; }
+
+    /* Filter strip */
+    .filter-strip {
+      display: flex; gap: 20px; align-items: baseline;
+      padding: 14px 28px; flex-shrink: 0;
+    }
+    .ftab {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #D0D0D0; cursor: pointer;
+      display: flex; align-items: baseline; gap: 5px;
+    }
+    .ftab.on { color: #111; }
+    .ftab-count { font-size: 8px; color: #D8D8D8; }
+    .ftab.on .ftab-count { color: #999; }
+
+    /* ── Footer bar — shared across all three ─────
+       Mirrors the Question Card footer exactly:
+       56px, border-top, three zones.
+    ───────────────────────────────────────────── */
+    .footer-bar {
+      flex-shrink: 0; height: 56px;
+      border-top: 1px solid #F0F0F0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+    }
+    .fb-nav {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #ABABAB; background: none; border: none; cursor: pointer;
+    }
+    .fb-nav.dim { color: #DCDCDC; cursor: default; }
+    .fb-sage {
+      display: flex; flex-direction: column; align-items: center; gap: 0px;
+      cursor: pointer;
+    }
+    .fb-sage-arrow {
+      font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #D0D0D0; line-height: 1;
+    }
+    .fb-sage-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #D0D0D0;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT A — ROW TINTS
+       Colour is the row's background wash.
+    ═══════════════════════════════════════════════ */
+
+    .a-list { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .a-row {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 14px 28px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .a-row--correct { background: rgba(117,158,126,0.08); }
+    .a-row--wrong   { background: rgba(171,102,102,0.09); }
+    .a-row--skipped { background: transparent; }
+
+    .a-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+      display: flex; justify-content: flex-end; align-items: flex-start;
+      padding-top: 3px;
+    }
+    .a-row--correct .a-lbl { color: #C0C0C0; }
+    .a-row--wrong   .a-lbl { color: #AAAAAA; }
+    .a-row--skipped .a-lbl { color: #DCDCDC; }
+
+    .a-vr { width: 1px; background: rgba(0,0,0,0.06); }
+
+    .a-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 16px; line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .a-row--correct .a-text { color: #999; }
+    .a-row--wrong   .a-text { color: #111; }
+    .a-row--skipped .a-text { color: #D0D0D0; }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT B — INLINE RAIL
+       A 2px coloured bar at the start of each row.
+    ═══════════════════════════════════════════════ */
+
+    .b-list { flex: 1; display: flex; flex-direction: column; }
+
+    .b-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 28px;
+      border-bottom: 1px solid #F6F6F6;
+      cursor: pointer;
+    }
+    .b-rail { width: 2px; height: 16px; border-radius: 1px; flex-shrink: 0; }
+    .b-row--correct .b-rail { background: #759E7E; }
+    .b-row--wrong   .b-rail { background: #AB6666; }
+    .b-row--skipped .b-rail { background: #DCDCDC; }
+
+    .b-qnum {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+      width: 20px; flex-shrink: 0;
+    }
+    .b-row--correct .b-qnum { color: #CCCCCC; }
+    .b-row--wrong   .b-qnum { color: #AAAAAA; }
+    .b-row--skipped .b-qnum { color: #E0E0E0; }
+
+    .b-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 16px; flex: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .b-row--correct .b-text { color: #999; }
+    .b-row--wrong   .b-text { color: #111; }
+    .b-row--skipped .b-text { color: #D0D0D0; }
+
+    .b-arrow { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #E0E0E0; flex-shrink: 0; }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT C — CARD GRID
+       2-column cards, 3px coloured left border.
+    ═══════════════════════════════════════════════ */
+
+    .c-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 16px 28px 0;
+      align-content: start;
+      overflow: hidden;
+    }
+    .c-card {
+      border: 1px solid #EFEFEF;
+      border-left-width: 3px;
+      padding: 12px 12px 12px 10px;
+      cursor: pointer; display: flex; flex-direction: column; gap: 7px;
+    }
+    .c-card--correct { border-left-color: #759E7E; }
+    .c-card--wrong   { border-left-color: #AB6666; }
+    .c-card--skipped { border-left-color: #D8D8D8; }
+
+    .c-card-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .c-card--correct .c-card-num { color: #C8C8C8; }
+    .c-card--wrong   .c-card-num { color: #AAAAAA; }
+    .c-card--skipped .c-card-num { color: #DCDCDC; }
+
+    .c-card-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 14px; line-height: 1.45;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .c-card--correct .c-card-text { color: #999; }
+    .c-card--wrong   .c-card-text { color: #111; }
+    .c-card--skipped .c-card-text { color: #CECECE; }
+
+
+    /* ═══════════════════════════════════════════════
+       CONCEPT D — SEAT MAP
+       BookMyShow-style: question numbers in coloured
+       circles on a grid. Colour fills the seat.
+       Correct = sage, Wrong = rose, Skipped = ghost.
+    ═══════════════════════════════════════════════ */
+
+    .d-body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 0 28px 8px;
+    }
+    .d-seats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px; width: 100%;
+    }
+    .d-seat {
+      aspect-ratio: 1; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: opacity 0.12s;
+    }
+    .d-seat:hover { opacity: 0.78; }
+    .d-seat--correct { background: rgba(117,158,126,0.18); }
+    .d-seat--wrong   { background: rgba(171,102,102,0.20); }
+    .d-seat--skipped { background: #F3F3F3; }
+
+    .d-seat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 24px; line-height: 1;
+    }
+    .d-seat--correct .d-seat-num { color: #4E7A5A; }
+    .d-seat--wrong   .d-seat-num { color: #8B4848; }
+    .d-seat--skipped .d-seat-num { color: #C8C8C8; }
+
+    .d-legend {
+      display: flex; justify-content: center; gap: 22px; margin-top: 26px;
+    }
+    .d-legend-item {
+      display: flex; align-items: center; gap: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .d-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .d-dot--correct { background: rgba(117,158,126,0.55); }
+    .d-dot--wrong   { background: rgba(171,102,102,0.55); }
+    .d-dot--skipped { background: #DCDCDC; }
+
+  </style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-left">
+    <span class="bar-title">Review Grid — Concepts</span>
+    <div class="bar-sep"></div>
+    <div class="btn-row" id="viewBtns">
+      <button class="cbtn on" data-v="all">All 3</button>
+      <button class="cbtn" data-v="a">A — Row Tints</button>
+      <button class="cbtn" data-v="b">B — Inline Rail</button>
+      <button class="cbtn" data-v="c">C — Card Grid</button>
+      <button class="cbtn" data-v="d">D — Seat Map</button>
+    </div>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+
+
+  <!-- ══ A — ROW TINTS ══ -->
+  <div class="col" id="col-a">
+    <span class="col-label">A — Row Tints</span>
+    <div class="phone">
+      <div class="screen">
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-back">← Results</span>
+        </div>
+        <div class="rule-h"></div>
+        <div class="filter-strip">
+          <div class="ftab on">All <span class="ftab-count">12</span></div>
+          <div class="ftab">Wrong <span class="ftab-count">2</span></div>
+          <div class="ftab">Skipped <span class="ftab-count">1</span></div>
+          <div class="ftab">Correct <span class="ftab-count">9</span></div>
+        </div>
+        <div class="rule-flush"></div>
+
+        <div class="a-list">
+          <div class="a-row a-row--correct">
+            <div class="a-lbl">Q1</div><div class="a-vr"></div>
+            <div class="a-text">What is lim(sin x / x) as x approaches 0?</div>
+          </div>
+          <div class="a-row a-row--correct">
+            <div class="a-lbl">Q2</div><div class="a-vr"></div>
+            <div class="a-text">Find the derivative of f(x) = x³ · sin(x).</div>
+          </div>
+          <div class="a-row a-row--correct">
+            <div class="a-lbl">Q3</div><div class="a-vr"></div>
+            <div class="a-text">If f'(x) > 0 on (a, b), then f is increasing on that interval.</div>
+          </div>
+          <div class="a-row a-row--wrong">
+            <div class="a-lbl">Q4</div><div class="a-vr"></div>
+            <div class="a-text">At what time is the particle at rest given v(t) = 3t² − 6t?</div>
+          </div>
+          <div class="a-row a-row--correct">
+            <div class="a-lbl">Q5</div><div class="a-vr"></div>
+            <div class="a-text">The area under f(x) = x² from 0 to 3 equals?</div>
+          </div>
+          <div class="a-row a-row--correct">
+            <div class="a-lbl">Q6</div><div class="a-vr"></div>
+            <div class="a-text">State the chain rule for composite functions.</div>
+          </div>
+        </div>
+
+        <div class="footer-bar">
+          <button class="fb-nav dim">← Prev</button>
+          <div class="fb-sage">
+            <span class="fb-sage-arrow">↑</span>
+            <span class="fb-sage-label">Ask Sage</span>
+          </div>
+          <button class="fb-nav">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ B — INLINE RAIL ══ -->
+  <div class="col" id="col-b">
+    <span class="col-label">B — Inline Rail</span>
+    <div class="phone">
+      <div class="screen">
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-back">← Results</span>
+        </div>
+        <div class="rule-h"></div>
+        <div class="filter-strip">
+          <div class="ftab on">All <span class="ftab-count">12</span></div>
+          <div class="ftab">Wrong <span class="ftab-count">2</span></div>
+          <div class="ftab">Skipped <span class="ftab-count">1</span></div>
+          <div class="ftab">Correct <span class="ftab-count">9</span></div>
+        </div>
+        <div class="rule-flush"></div>
+
+        <div class="b-list">
+          <div class="b-row b-row--correct">
+            <div class="b-rail"></div>
+            <span class="b-qnum">Q1</span>
+            <span class="b-text">lim(sin x / x) as x → 0</span>
+            <span class="b-arrow">→</span>
+          </div>
+          <div class="b-row b-row--correct">
+            <div class="b-rail"></div>
+            <span class="b-qnum">Q2</span>
+            <span class="b-text">Derivative of f(x) = x³ · sin(x)</span>
+            <span class="b-arrow">→</span>
+          </div>
+          <div class="b-row b-row--correct">
+            <div class="b-rail"></div>
+            <span class="b-qnum">Q3</span>
+            <span class="b-text">If f'(x) > 0, f is increasing on (a, b)</span>
+            <span class="b-arrow">→</span>
+          </div>
+          <div class="b-row b-row--wrong">
+            <div class="b-rail"></div>
+            <span class="b-qnum">Q4</span>
+            <span class="b-text">Particle at rest if v(t) = 3t² − 6t?</span>
+            <span class="b-arrow">→</span>
+          </div>
+          <div class="b-row b-row--correct">
+            <div class="b-rail"></div>
+            <span class="b-qnum">Q5</span>
+            <span class="b-text">Area under x² from 0 to 3</span>
+            <span class="b-arrow">→</span>
+          </div>
+          <div class="b-row b-row--correct">
+            <div class="b-rail"></div>
+            <span class="b-qnum">Q6</span>
+            <span class="b-text">State the chain rule</span>
+            <span class="b-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="footer-bar">
+          <button class="fb-nav dim">← Prev</button>
+          <div class="fb-sage">
+            <span class="fb-sage-arrow">↑</span>
+            <span class="fb-sage-label">Ask Sage</span>
+          </div>
+          <button class="fb-nav">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ C — CARD GRID ══ -->
+  <div class="col" id="col-c">
+    <span class="col-label">C — Card Grid</span>
+    <div class="phone">
+      <div class="screen">
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-back">← Results</span>
+        </div>
+        <div class="rule-h"></div>
+        <div class="filter-strip">
+          <div class="ftab on">All <span class="ftab-count">12</span></div>
+          <div class="ftab">Wrong <span class="ftab-count">2</span></div>
+          <div class="ftab">Skipped <span class="ftab-count">1</span></div>
+          <div class="ftab">Correct <span class="ftab-count">9</span></div>
+        </div>
+        <div class="rule-flush"></div>
+
+        <div class="c-grid">
+          <div class="c-card c-card--correct">
+            <span class="c-card-num">Q1</span>
+            <span class="c-card-text">lim(sin x / x) as x approaches 0?</span>
+          </div>
+          <div class="c-card c-card--correct">
+            <span class="c-card-num">Q2</span>
+            <span class="c-card-text">Derivative of f(x) = x³ · sin(x)</span>
+          </div>
+          <div class="c-card c-card--correct">
+            <span class="c-card-num">Q3</span>
+            <span class="c-card-text">If f'(x) > 0, f is increasing on (a, b)</span>
+          </div>
+          <div class="c-card c-card--wrong">
+            <span class="c-card-num">Q4</span>
+            <span class="c-card-text">Particle at rest if v(t) = 3t² − 6t?</span>
+          </div>
+          <div class="c-card c-card--correct">
+            <span class="c-card-num">Q5</span>
+            <span class="c-card-text">Area under x² from 0 to 3</span>
+          </div>
+          <div class="c-card c-card--skipped">
+            <span class="c-card-num">Q6</span>
+            <span class="c-card-text">State the chain rule for composite functions</span>
+          </div>
+        </div>
+
+        <div class="footer-bar">
+          <button class="fb-nav dim">← Prev</button>
+          <div class="fb-sage">
+            <span class="fb-sage-arrow">↑</span>
+            <span class="fb-sage-label">Ask Sage</span>
+          </div>
+          <button class="fb-nav">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ══ D — SEAT MAP ══ -->
+  <div class="col" id="col-d">
+    <span class="col-label">D — Seat Map</span>
+    <div class="phone">
+      <div class="screen">
+        <div class="top-strip">
+          <span class="top-app">Agent Classroom</span>
+          <span class="top-back">← Results</span>
+        </div>
+        <div class="rule-h"></div>
+        <div class="filter-strip">
+          <div class="ftab on">All <span class="ftab-count">12</span></div>
+          <div class="ftab">Wrong <span class="ftab-count">2</span></div>
+          <div class="ftab">Skipped <span class="ftab-count">1</span></div>
+          <div class="ftab">Correct <span class="ftab-count">9</span></div>
+        </div>
+        <div class="rule-flush"></div>
+
+        <div class="d-body">
+          <div class="d-seats">
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">1</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">2</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">3</span></div>
+            <div class="d-seat d-seat--wrong">  <span class="d-seat-num">4</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">5</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">6</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">7</span></div>
+            <div class="d-seat d-seat--skipped"><span class="d-seat-num">8</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">9</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">10</span></div>
+            <div class="d-seat d-seat--correct"><span class="d-seat-num">11</span></div>
+            <div class="d-seat d-seat--wrong">  <span class="d-seat-num">12</span></div>
+          </div>
+
+          <div class="d-legend">
+            <div class="d-legend-item">
+              <div class="d-dot d-dot--correct"></div>Correct
+            </div>
+            <div class="d-legend-item">
+              <div class="d-dot d-dot--wrong"></div>Wrong
+            </div>
+            <div class="d-legend-item">
+              <div class="d-dot d-dot--skipped"></div>Skipped
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bar">
+          <button class="fb-nav dim">← Prev</button>
+          <div class="fb-sage">
+            <span class="fb-sage-arrow">↑</span>
+            <span class="fb-sage-label">Ask Sage</span>
+          </div>
+          <button class="fb-nav">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<script>
+  const btns = document.querySelectorAll('.cbtn');
+  const colMap = {
+    a: document.getElementById('col-a'),
+    b: document.getElementById('col-b'),
+    c: document.getElementById('col-c'),
+    d: document.getElementById('col-d'),
+  };
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      const v = btn.dataset.v;
+      if (v === 'all') {
+        Object.values(colMap).forEach(el => el.classList.remove('hide'));
+      } else {
+        Object.values(colMap).forEach(el => el.classList.add('hide'));
+        colMap[v].classList.remove('hide');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

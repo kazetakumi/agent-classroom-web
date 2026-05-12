@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Sage — Voice Explorations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0A0A0A;
+      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ── Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 50px;
+      background: #0A0A0A;
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 32px; z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .bar-a {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+    }
+    .bar-b {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.1);
+    }
+    .bar-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+
+    /* ── Stage ── */
+    .stage {
+      padding: 84px 40px 80px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 44px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Column ── */
+    .col {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 24px;
+    }
+
+    /* ── Phone ── */
+    .phone {
+      width: 390px; height: 800px;
+      border-radius: 44px; overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.07),
+        0 40px 100px rgba(0,0,0,0.7),
+        0 8px 24px rgba(0,0,0,0.35);
+      flex-shrink: 0;
+    }
+
+    /* ── Info ── */
+    .info {
+      width: 390px;
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 20px 22px;
+    }
+    .info-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.16); margin-bottom: 10px;
+    }
+    .info-speech {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 300; font-style: italic;
+      color: rgba(255,255,255,0.6); margin-bottom: 12px;
+      letter-spacing: 0.01em;
+    }
+    .info-note {
+      font-size: 12px; line-height: 1.75;
+      color: rgba(255,255,255,0.28);
+    }
+
+
+    /* ════════════════════════════════════════════
+       SHARED SCREEN — Question card
+    ════════════════════════════════════════════ */
+
+    .screen {
+      background: #FFF;
+      height: 100%;
+      display: flex; flex-direction: column;
+    }
+
+    /* Top strip */
+    .sc-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 28px 0; flex-shrink: 0;
+    }
+    .sc-app {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #C8C8C8;
+    }
+    .sc-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; color: #D4D4D4;
+    }
+    .sc-rule { height: 1px; background: #F0F0F0; margin: 16px 28px 0; flex-shrink: 0; }
+    .sc-prog { height: 1px; background: #C0C0C0; margin: 0 28px; width: 25%; flex-shrink: 0; }
+
+    /* Body */
+    .sc-body { flex: 1; padding: 28px 28px 0; overflow: hidden; }
+    .sc-subj {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: #C0C0C0; margin-bottom: 20px;
+    }
+    .sc-q {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px; font-weight: 300; line-height: 1.55; color: #111;
+      margin-bottom: 24px;
+    }
+    .sc-div { height: 1px; background: #F0F0F0; margin-bottom: 22px; }
+
+    .sc-opt {
+      display: flex; gap: 14px; align-items: baseline; margin-bottom: 18px;
+    }
+    .sc-opt.dim { opacity: 0.28; }
+    .sc-opt.sel .ol { color: #111; }
+    .sc-opt.sel .ot { color: #111; }
+    .ol {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; color: #D0D0D0; width: 12px; flex-shrink: 0;
+    }
+    .ot {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 300; color: #999; line-height: 1.35;
+    }
+
+    /* Separate nav — always above Ask Sage */
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; height: 44px; flex-shrink: 0;
+      border-top: 1px solid #F5F5F5;
+    }
+    .nl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #DADADA;
+    }
+
+
+    /* ════════════════════════════════════════════
+       THE COMPONENT — Sage's turn in the grid
+       Same structure across all four variations.
+       Only the speech content changes.
+    ════════════════════════════════════════════ */
+
+    .ask-sage-turn {
+      flex-shrink: 0;
+      height: 72px;
+      border-top: 1px solid #EBEBEB;
+      cursor: pointer;
+
+      /* The column grid — same as everywhere else in the app */
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      align-items: center;
+      padding: 0 28px;
+    }
+
+    /* Speaker label column */
+    .sage-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; font-weight: 400;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: #C8C8C8;
+      text-align: right;
+    }
+
+    /* Vertical rule column */
+    .sage-vr {
+      width: 1px;
+      height: 28px;
+      background: #EFEFEF;
+      justify-self: center;
+    }
+
+    /* Speech column */
+    .sage-speech {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 300; font-style: italic;
+      color: #AAAAAA;
+      line-height: 1;
+    }
+
+    /* The silent variant — no speech, label only */
+    .sage-speech.empty {
+      /* nothing — column exists, speech doesn't */
+    }
+
+    /* Variation — em dash */
+    .sage-speech.emdash {
+      color: #CCCCCC;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+    }
+
+    /* Variation — Hmm */
+    .sage-speech.hmm {
+      color: #AAAAAA;
+    }
+
+    /* Variation — I'm here */
+    .sage-speech.here {
+      color: #AAAAAA;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="bar-a">Agent Classroom</span>
+  <div class="bar-dot"></div>
+  <span class="bar-b">Ask Sage · Voice · What does Sage say?</span>
+</div>
+
+<div class="stage">
+
+
+  <!-- ══════════════════════ 1 — THE EM DASH ══════════════════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+        <div class="nav">
+          <span class="nl">← Prev</span>
+          <span class="nl">Next →</span>
+        </div>
+
+        <!-- The component -->
+        <div class="ask-sage-turn">
+          <span class="sage-lbl">Sage</span>
+          <div class="sage-vr"></div>
+          <span class="sage-speech emdash">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-label">Variation 1</div>
+      <div class="info-speech">SAGE &nbsp;|&nbsp; —</div>
+      <div class="info-note">
+        The em dash Sage already uses before every offer —
+        "— give you a hint / — walk through this." Here it floats
+        alone. Sage is mid-sentence. Not waiting passively.
+        About to say something. The dash is an open door.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════ 2 — HMM ══════════════════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+        <div class="nav">
+          <span class="nl">← Prev</span>
+          <span class="nl">Next →</span>
+        </div>
+
+        <div class="ask-sage-turn">
+          <span class="sage-lbl">Sage</span>
+          <div class="sage-vr"></div>
+          <span class="sage-speech hmm">Hmm.</span>
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-label">Variation 2</div>
+      <div class="info-speech">SAGE &nbsp;|&nbsp; Hmm.</div>
+      <div class="info-note">
+        What a teacher says while watching you think. Not an
+        invitation — an acknowledgment. "I see you working."
+        It's warm. It's human. It gives you room to struggle
+        without making the struggle feel observed.
+        Tap when you're ready to talk.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════ 3 — I'M HERE ══════════════════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+        <div class="nav">
+          <span class="nl">← Prev</span>
+          <span class="nl">Next →</span>
+        </div>
+
+        <div class="ask-sage-turn">
+          <span class="sage-lbl">Sage</span>
+          <div class="sage-vr"></div>
+          <span class="sage-speech here">I'm here.</span>
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-label">Variation 3</div>
+      <div class="info-speech">SAGE &nbsp;|&nbsp; I'm here.</div>
+      <div class="info-note">
+        The plainest possible statement of presence.
+        Not "ask me." Not "need help?" Those put the burden
+        on the student. "I'm here" puts the agency there too —
+        come when you're ready, I'm not going anywhere.
+        Two words. Complete.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════ 4 — SILENCE ══════════════════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="sc-rule"></div>
+        <div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+        <div class="nav">
+          <span class="nl">← Prev</span>
+          <span class="nl">Next →</span>
+        </div>
+
+        <!-- Sage is present. Has nothing to say. -->
+        <div class="ask-sage-turn">
+          <span class="sage-lbl">Sage</span>
+          <div class="sage-vr"></div>
+          <span class="sage-speech empty"></span>
+        </div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-label">Variation 4</div>
+      <div class="info-speech">SAGE &nbsp;|&nbsp; <span style="opacity:0.2">&#x200B;</span></div>
+      <div class="info-note">
+        The label. The rule. Nothing else. Sage is in the
+        conversation — you can see the grid, the speaker slot —
+        but hasn't said anything yet. This is the most demanding
+        version. It trusts the user to understand: the presence
+        is the invitation. The silence is the question.
+      </div>
+    </div>
+  </div>
+
+
+</div>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Sage — Dismiss Variations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E2DFDB; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Bar ── */
+    .bar { position: fixed; top: 0; left: 0; right: 0; height: 54px; background: #111; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .bar-left { display: flex; align-items: center; gap: 18px; }
+    .bar-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+    .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+    .btn-row { display: flex; gap: 3px; }
+    .cbtn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.38); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 5px; cursor: pointer; transition: all 0.14s; }
+    .cbtn:hover { border-color: rgba(255,255,255,0.26); color: rgba(255,255,255,0.65); }
+    .cbtn.on { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.32); color: #fff; }
+
+    /* ── Stage ── */
+    .stage { padding-top: 76px; padding-bottom: 60px; display: flex; justify-content: center; align-items: flex-start; gap: 32px; min-height: 100vh; }
+    .stage.single { gap: 0; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .col.hide { display: none; }
+    .col-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+    .phone { width: 390px; height: 800px; border-radius: 44px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,0.13), 0 28px 72px rgba(0,0,0,0.2), 0 4px 14px rgba(0,0,0,0.09); position: relative; }
+    .info { width: 390px; background: #1A1A1A; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 18px; }
+    .info-name { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 7px; }
+    .info-desc { font-size: 12px; color: rgba(255,255,255,0.48); line-height: 1.6; margin-bottom: 10px; }
+    .pills { display: flex; gap: 5px; flex-wrap: wrap; }
+    .pill { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.09); border-radius: 3px; padding: 2px 7px; }
+
+
+    /* ═══════════════════════════════════════════════
+       SHARED — SAGE SCREEN BODY
+       Identical across all 3 — only the top changes.
+    ═══════════════════════════════════════════════ */
+
+    .sage-screen {
+      position: absolute; inset: 0;
+      background: #FFFFFF;
+      display: flex; flex-direction: column;
+    }
+
+    /* App name strip — shared, but top padding varies per concept */
+    .sage-app-strip {
+      display: flex; align-items: baseline; justify-content: flex-start;
+      padding: 0 28px;
+      flex-shrink: 0;
+    }
+    .sage-app-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8;
+    }
+
+    .sage-rule { height: 1px; background: #F0F0F0; margin: 16px 28px 0; flex-shrink: 0; }
+
+    /* Column grid conversation */
+    .sage-convo { flex: 1; overflow: hidden; }
+
+    .turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 24px 28px 0;
+    }
+    .lbl-col { display: flex; align-items: flex-start; justify-content: flex-end; padding-top: 3px; }
+    .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; }
+    .rule-v { background: #EFEFEF; width: 1px; }
+    .speech { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; line-height: 1.55; color: #111; }
+    .speech.user { font-style: italic; color: #777; }
+
+    /* Sage Offers — quick actions as Sage's own voice */
+    .offers-turn {
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      padding: 6px 28px 0;
+    }
+    .offers-rule-v { background: #EFEFEF; width: 1px; }
+    .offer-list { display: flex; flex-direction: column; margin-top: 4px; }
+    .offer-item {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 18px; font-weight: 300; color: #BBBBBB; line-height: 1.45;
+      padding: 7px 0; cursor: pointer;
+      border-bottom: 1px solid #F8F8F8;
+      transition: color 0.12s;
+    }
+    .offer-item:last-child { border-bottom: none; }
+    .offer-item:hover { color: #111; }
+    .offer-item::before { content: '—'; font-style: normal; color: #E4E4E4; margin-right: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; transition: color 0.12s; }
+    .offer-item:hover::before { color: #111; }
+
+    /* Input zone */
+    .sage-input-zone { border-top: 1px solid #F2F2F2; flex-shrink: 0; padding: 14px 0 34px; }
+    .input-turn { display: grid; grid-template-columns: 72px 1px 1fr; gap: 0 16px; padding: 0 28px; align-items: flex-start; }
+    .you-col { display: flex; justify-content: flex-end; padding-top: 5px; }
+    .you-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C8C8C8; }
+    .input-v { background: #EFEFEF; width: 1px; }
+    .ta-col { display: flex; flex-direction: column; gap: 6px; }
+    .ta { background: transparent; border: none; border-bottom: 1px solid #EBEBEB; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 19px; font-weight: 300; color: #111; padding: 4px 0; outline: none; resize: none; line-height: 1.4; min-height: 32px; overflow: hidden; width: 100%; }
+    .ta::placeholder { color: #D4D4D4; }
+    .send-row { display: flex; justify-content: flex-end; }
+    .send-btn { background: transparent; border: none; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #CCCCCC; transition: color 0.14s; }
+    .send-btn:hover { color: #111; }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION 1 — PILL HANDLE
+       A small centred grey pill sits at the very top
+       of the screen before any content — the standard
+       iOS / Android bottom-sheet drag handle. No
+       label, no arrow. The visual grammar is universal:
+       grab and pull down. The app name below it needs
+       no back button because the gesture is the nav.
+    ═══════════════════════════════════════════════ */
+
+    .v1-handle-zone {
+      display: flex; justify-content: center; align-items: center;
+      padding: 14px 0 10px;
+      flex-shrink: 0; cursor: grab;
+    }
+    .v1-pill {
+      width: 36px; height: 4px;
+      background: #E0E0E0; border-radius: 2px;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION 2 — DISMISS STRIP
+       A full-width tappable/draggable strip occupies
+       the top of the screen. Centred inside it: a
+       downward-pointing arrow with a small IBM Plex
+       Mono label. The strip is visually distinct from
+       the content below — it reads as a dedicated
+       control zone. The app name lives below the rule.
+    ═══════════════════════════════════════════════ */
+
+    .v2-dismiss-strip {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px;
+      padding: 22px 0 14px;
+      flex-shrink: 0; cursor: pointer;
+      transition: opacity 0.12s;
+    }
+    .v2-dismiss-strip:hover { opacity: 0.6; }
+    .v2-dismiss-arrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 16px; color: #D0D0D0; line-height: 1;
+    }
+    .v2-dismiss-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: #DEDEDE;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       VARIATION 3 — GLYPH IN STRIP
+       The dismiss lives inside the top strip itself —
+       a single ↓ glyph on the right side, inline with
+       the app name. No dedicated zone, no label. One
+       tap or drag anywhere on the strip collapses the
+       sheet. The glyph is the only affordance. Minimal,
+       consistent with the top-strip language.
+    ═══════════════════════════════════════════════ */
+
+    .v3-top-strip {
+      padding: 32px 28px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .v3-app-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8;
+    }
+    .v3-dismiss-glyph {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 18px; color: #D8D8D8; cursor: pointer; line-height: 1;
+      transition: color 0.12s;
+    }
+    .v3-dismiss-glyph:hover { color: #111; }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Bar ── -->
+<div class="bar">
+  <div class="bar-left">
+    <span class="bar-title">Ask Sage — Dismiss Variations</span>
+    <div class="bar-sep"></div>
+    <div class="btn-row" id="viewBtns">
+      <button class="cbtn on" data-v="all">All 3</button>
+      <button class="cbtn" data-v="1">Pill Handle</button>
+      <button class="cbtn" data-v="2">Dismiss Strip</button>
+      <button class="cbtn" data-v="3">Glyph in Strip</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Stage ── -->
+<div class="stage" id="stage">
+
+
+  <!-- ══ 1: PILL HANDLE ══ -->
+  <div class="col" id="col-1">
+    <span class="col-label">1 — Pill Handle</span>
+    <div class="phone">
+      <div class="sage-screen">
+
+        <!-- Drag handle -->
+        <div class="v1-handle-zone">
+          <div class="v1-pill"></div>
+        </div>
+
+        <!-- App name — no back button needed -->
+        <div class="sage-app-strip">
+          <span class="sage-app-name">Agent Classroom</span>
+        </div>
+        <div class="sage-rule"></div>
+
+        <div class="sage-convo">
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech">Ask me anything. Or I can —</div>
+          </div>
+          <div class="offers-turn">
+            <div class="lbl-col"></div>
+            <div class="offers-rule-v"></div>
+            <div class="offer-list">
+              <div class="offer-item">give you a hint</div>
+              <div class="offer-item">skip this question</div>
+              <div class="offer-item">walk through the concept</div>
+              <div class="offer-item">end the session</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sage-input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="Or ask anything…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">1 — Pill Handle</div>
+      <div class="info-desc">A small centred grey pill at the very top — the standard iOS/Android bottom-sheet drag handle. No label, no arrow. The grammar is universal: grab and pull down to dismiss. No back button is needed because the gesture is the navigation. Works for any entry point since the sheet has no memory of where it came from.</div>
+      <div class="pills">
+        <span class="pill">Grab & pull down</span>
+        <span class="pill">No label needed</span>
+        <span class="pill">Universal grammar</span>
+        <span class="pill">Entry-point agnostic</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ 2: DISMISS STRIP ══ -->
+  <div class="col" id="col-2">
+    <span class="col-label">2 — Dismiss Strip</span>
+    <div class="phone">
+      <div class="sage-screen">
+
+        <!-- Dismiss strip -->
+        <div class="v2-dismiss-strip">
+          <span class="v2-dismiss-arrow">↓</span>
+          <span class="v2-dismiss-lbl">Dismiss</span>
+        </div>
+
+        <!-- App name below the strip -->
+        <div class="sage-app-strip">
+          <span class="sage-app-name">Agent Classroom</span>
+        </div>
+        <div class="sage-rule"></div>
+
+        <div class="sage-convo">
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech">Ask me anything. Or I can —</div>
+          </div>
+          <div class="offers-turn">
+            <div class="lbl-col"></div>
+            <div class="offers-rule-v"></div>
+            <div class="offer-list">
+              <div class="offer-item">give you a hint</div>
+              <div class="offer-item">skip this question</div>
+              <div class="offer-item">walk through the concept</div>
+              <div class="offer-item">end the session</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sage-input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="Or ask anything…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">2 — Dismiss Strip</div>
+      <div class="info-desc">A dedicated tappable strip at the top holds a ↓ arrow and the label "Dismiss" — explicit about what it does and where it sends you. More verbose than the pill but removes all ambiguity. The arrow communicates direction; the label communicates intent. Good for users unfamiliar with sheet gesture patterns.</div>
+      <div class="pills">
+        <span class="pill">Explicit label</span>
+        <span class="pill">Arrow + text</span>
+        <span class="pill">Full-width tap zone</span>
+        <span class="pill">No gesture required</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ 3: GLYPH IN STRIP ══ -->
+  <div class="col" id="col-3">
+    <span class="col-label">3 — Glyph in Strip</span>
+    <div class="phone">
+      <div class="sage-screen">
+
+        <!-- Top strip with dismiss glyph inline -->
+        <div class="v3-top-strip">
+          <span class="v3-app-name">Agent Classroom</span>
+          <span class="v3-dismiss-glyph">↓</span>
+        </div>
+        <div class="sage-rule"></div>
+
+        <div class="sage-convo">
+          <div class="turn">
+            <div class="lbl-col"><span class="lbl">Sage</span></div>
+            <div class="rule-v"></div>
+            <div class="speech">Ask me anything. Or I can —</div>
+          </div>
+          <div class="offers-turn">
+            <div class="lbl-col"></div>
+            <div class="offers-rule-v"></div>
+            <div class="offer-list">
+              <div class="offer-item">give you a hint</div>
+              <div class="offer-item">skip this question</div>
+              <div class="offer-item">walk through the concept</div>
+              <div class="offer-item">end the session</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sage-input-zone">
+          <div class="input-turn">
+            <div class="you-col"><span class="you-lbl">You</span></div>
+            <div class="input-v"></div>
+            <div class="ta-col">
+              <textarea class="ta" placeholder="Or ask anything…" rows="1"></textarea>
+              <div class="send-row"><button class="send-btn">Send ↑</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="info">
+      <div class="info-name">3 — Glyph in Strip</div>
+      <div class="info-desc">The dismiss lives inside the top strip — a single ↓ glyph on the right, inline with the app name. No dedicated zone, no label. The top strip doubles as the dismiss area. Most minimal of the three: the glyph is the only affordance, consistent with the top-strip language already established across all screens.</div>
+      <div class="pills">
+        <span class="pill">Single glyph</span>
+        <span class="pill">No extra zone</span>
+        <span class="pill">Top strip language</span>
+        <span class="pill">Most minimal</span>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<script>
+  const viewBtns = document.querySelectorAll('#viewBtns .cbtn');
+  const stage = document.getElementById('stage');
+
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      viewBtns.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      const v = btn.dataset.v;
+      const cols = ['col-1','col-2','col-3'];
+      if (v === 'all') {
+        stage.classList.remove('single');
+        cols.forEach(id => document.getElementById(id).classList.remove('hide'));
+      } else {
+        stage.classList.add('single');
+        cols.forEach((id, i) => document.getElementById(id).classList.toggle('hide', String(i+1) !== v));
+      }
+    });
+  });
+
+  document.querySelectorAll('textarea').forEach(ta => {
+    ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
+  });
+</script>
+</body>
+</html>

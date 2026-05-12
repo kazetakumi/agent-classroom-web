@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Sage — Research Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0A0A0A; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Bar ── */
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 50px;
+      background: #0A0A0A; border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex; align-items: center; gap: 14px; padding: 0 32px; z-index: 100;
+    }
+    .bar-a { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+    .bar-b { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.08); }
+    .bar-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+
+    /* ── Stage ── */
+    .stage { padding: 84px 40px 80px; display: flex; justify-content: center; align-items: flex-start; gap: 44px; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+    /* ── Phone ── */
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px; overflow: hidden; flex-shrink: 0;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 40px 100px rgba(0,0,0,0.72), 0 8px 24px rgba(0,0,0,0.36);
+    }
+
+    /* ── Info card ── */
+    .info { width: 390px; background: #111; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 22px 24px; }
+    .info-n { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.16); margin-bottom: 10px; }
+    .info-h { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.65); margin-bottom: 12px; }
+    .info-d { font-size: 12.5px; line-height: 1.75; color: rgba(255,255,255,0.28); border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px; margin-bottom: 14px; }
+    .spec { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+    .spec:last-child { margin-bottom: 0; }
+    .sk { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.15); }
+    .sv { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.3); }
+
+    /* ══════════════════════════════════════════
+       SHARED SCREEN — Question card
+    ══════════════════════════════════════════ */
+    .screen { background: #FFF; height: 100%; display: flex; flex-direction: column; }
+    .sc-top { display: flex; align-items: center; justify-content: space-between; padding: 28px 28px 0; flex-shrink: 0; }
+    .sc-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .sc-num { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D4D4D4; }
+    .sc-rule { height: 1px; background: #F0F0F0; margin: 16px 28px 0; flex-shrink: 0; }
+    .sc-prog { height: 1px; background: #C0C0C0; margin: 0 28px; width: 25%; flex-shrink: 0; }
+    .sc-body { flex: 1; padding: 28px 28px 0; overflow: hidden; }
+    .sc-subj { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #C0C0C0; margin-bottom: 20px; }
+    .sc-q { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 300; line-height: 1.55; color: #111; margin-bottom: 24px; }
+    .sc-div { height: 1px; background: #F0F0F0; margin-bottom: 22px; }
+    .sc-opt { display: flex; gap: 14px; align-items: baseline; margin-bottom: 18px; }
+    .sc-opt.dim { opacity: 0.28; }
+    .sc-opt.sel .ol { color: #111; }
+    .sc-opt.sel .ot { color: #111; }
+    .ol { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D0D0D0; width: 12px; flex-shrink: 0; }
+    .ot { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 300; color: #999; line-height: 1.35; }
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 44px; flex-shrink: 0; border-top: 1px solid #F5F5F5; }
+    .nl { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: #DADADA; }
+
+
+    /* ══════════════════════════════════════════
+       A — THE RIPPLE
+       Inspired by: Dynamic Island resting state,
+       "something is down there" — depth metaphor.
+       A drop lands on still water. Sage is the source.
+    ══════════════════════════════════════════ */
+
+    @keyframes ripple-expand {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        border-color: rgba(0, 0, 0, 0.28);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(9);
+        border-color: rgba(0, 0, 0, 0);
+      }
+    }
+
+    .ask-ripple {
+      flex-shrink: 0;
+      height: 80px;
+      border-top: 1px solid #F0F0F0;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    /* Faint centre dot — the source */
+    .ripple-source {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.15);
+      transform: translate(-50%, -50%);
+    }
+
+    .ripple-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0);
+      transform: translate(-50%, -50%) scale(1);
+      animation: ripple-expand 5.5s ease-out infinite;
+    }
+
+    .ripple-ring:nth-child(2) { animation-delay: 0s; }
+    .ripple-ring:nth-child(3) { animation-delay: 1.85s; }
+    .ripple-ring:nth-child(4) { animation-delay: 3.7s; }
+
+
+    /* ══════════════════════════════════════════
+       B — YOUR TURN
+       Inspired by: Perplexity/Claude "you are
+       already in it." The column grid — but yours.
+       YOU | cursor. No button. Just your turn.
+    ══════════════════════════════════════════ */
+
+    @keyframes cursor-blink {
+      0%, 45%  { opacity: 0.7; }
+      55%, 100% { opacity: 0; }
+    }
+
+    .ask-your-turn {
+      flex-shrink: 0;
+      height: 72px;
+      border-top: 1px solid #EBEBEB;
+      cursor: text;
+
+      display: grid;
+      grid-template-columns: 72px 1px 1fr;
+      gap: 0 16px;
+      align-items: center;
+      padding: 0 28px;
+    }
+
+    .you-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; font-weight: 400;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: #C8C8C8; text-align: right;
+    }
+
+    .you-vr {
+      width: 1px; height: 28px;
+      background: #EFEFEF;
+      justify-self: center;
+    }
+
+    .you-cursor-wrap {
+      display: flex; align-items: center;
+      height: 100%;
+    }
+
+    .you-cursor {
+      display: inline-block;
+      width: 1.5px; height: 19px;
+      background: #C0C0C0;
+      border-radius: 1px;
+      animation: cursor-blink 1.1s ease-in-out infinite;
+    }
+
+
+    /* ══════════════════════════════════════════
+       C — THE QUESTION
+       Inspired by: Japanese Ma (meaningful
+       emptiness). A phrase materialises slowly,
+       holds, dissolves. Presence as rhythm.
+    ══════════════════════════════════════════ */
+
+    @keyframes question-breath {
+      0%, 5%  { opacity: 0; }
+      32%     { opacity: 0.55; }
+      58%     { opacity: 0.55; }
+      90%     { opacity: 0; }
+      100%    { opacity: 0; }
+    }
+
+    .ask-question {
+      flex-shrink: 0;
+      height: 80px;
+      border-top: 1px solid #F2F2F2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .breath-phrase {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 300;
+      font-style: italic;
+      color: #888;
+      letter-spacing: 0.01em;
+      line-height: 1;
+      text-align: center;
+
+      /* Start mid-cycle so phrase is visible immediately */
+      animation: question-breath 20s ease-in-out infinite;
+      animation-delay: -8s;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="bar-a">Agent Classroom</span>
+  <div class="bar-dot"></div>
+  <span class="bar-b">Ask Sage · Research Concepts</span>
+</div>
+
+<div class="stage">
+
+  <!-- ══════════ A — THE RIPPLE ══════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top"><span class="sc-app">Agent Classroom</span><span class="sc-num">3 / 12</span></div>
+        <div class="sc-rule"></div><div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+        <div class="nav"><span class="nl">← Prev</span><span class="nl">Next →</span></div>
+
+        <div class="ask-ripple">
+          <div class="ripple-source"></div>
+          <div class="ripple-ring"></div>
+          <div class="ripple-ring"></div>
+          <div class="ripple-ring"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept A</div>
+      <div class="info-h">The Ripple</div>
+      <div class="info-d">
+        No text. No label. A single drop lands on still water at
+        the bottom of the screen — slow concentric rings expanding
+        from a fixed point, fading as they grow. Sage is the depth
+        beneath the surface. The ripple is proof something is down
+        there. Every other app uses ripples as touch feedback —
+        caused by you. This one happens without you. The source
+        is below. Press anywhere in the zone to open.
+      </div>
+      <div class="spec"><span class="sk">Rings</span><span class="sv">3 · staggered 1.85s · 5.5s cycle</span></div>
+      <div class="spec"><span class="sk">Source</span><span class="sv">4px dot · rgba(0,0,0,0.15)</span></div>
+      <div class="spec"><span class="sk">Ring start</span><span class="sv">10px · border rgba(0,0,0,0.28)</span></div>
+      <div class="spec"><span class="sk">Ring end</span><span class="sv">scale(9) = 90px · opacity 0</span></div>
+      <div class="spec"><span class="sk">Zone</span><span class="sv">80px · full-width tap</span></div>
+    </div>
+  </div>
+
+
+  <!-- ══════════ B — YOUR TURN ══════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top"><span class="sc-app">Agent Classroom</span><span class="sc-num">3 / 12</span></div>
+        <div class="sc-rule"></div><div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+        <div class="nav"><span class="nl">← Prev</span><span class="nl">Next →</span></div>
+
+        <div class="ask-your-turn">
+          <span class="you-lbl">You</span>
+          <div class="you-vr"></div>
+          <div class="you-cursor-wrap">
+            <span class="you-cursor"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept B</div>
+      <div class="info-h">Your Turn</div>
+      <div class="info-d">
+        The column grid — but yours. Not SAGE's turn.
+        Yours. YOU | and a waiting cursor. The conversation
+        is already open. There is no button to press to "enter
+        chat." You are already in it. Tap the cursor and type
+        directly — Sage responds and the sheet rises with the
+        conversation already begun. This removes the intermediate
+        step entirely. The entry point is your own turn in the
+        dialogue, waiting for you to speak.
+      </div>
+      <div class="spec"><span class="sk">Structure</span><span class="sv">Column grid · YOU | cursor</span></div>
+      <div class="spec"><span class="sk">Label</span><span class="sv">IBM Plex Mono 9px · You</span></div>
+      <div class="spec"><span class="sk">Cursor</span><span class="sv">1.5px × 19px · #C0C0C0 · 1.1s blink</span></div>
+      <div class="spec"><span class="sk">On tap</span><span class="sv">Keyboard opens · type directly</span></div>
+      <div class="spec"><span class="sk">On submit</span><span class="sv">Sheet rises · conversation in progress</span></div>
+    </div>
+  </div>
+
+
+  <!-- ══════════ C — THE QUESTION ══════════ -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="sc-top"><span class="sc-app">Agent Classroom</span><span class="sc-num">3 / 12</span></div>
+        <div class="sc-rule"></div><div class="sc-prog"></div>
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+        <div class="nav"><span class="nl">← Prev</span><span class="nl">Next →</span></div>
+
+        <div class="ask-question">
+          <span class="breath-phrase">What are you thinking?</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Concept C</div>
+      <div class="info-h">The Question</div>
+      <div class="info-d">
+        A single phrase breathes in from white, holds, dissolves
+        back. "What are you thinking?" Not Sage's name. Not a
+        label. A question directed at you — the student — from
+        someone who is paying attention. The phrase appears every
+        ~20 seconds: 8s to arrive, 4s to hold, 8s to leave.
+        The silence between appearances is as designed as the
+        phrase itself. Ma: the pause between notes is music too.
+        Press anywhere in the zone — visible or not — to open.
+      </div>
+      <div class="spec"><span class="sk">Phrase</span><span class="sv">Cormorant italic 300 · 18px</span></div>
+      <div class="spec"><span class="sk">Cycle</span><span class="sv">20s · 8s in · 4s hold · 8s out</span></div>
+      <div class="spec"><span class="sk">Peak opacity</span><span class="sv">0.55 — present but not demanding</span></div>
+      <div class="spec"><span class="sk">Tap zone</span><span class="sv">80px · works whether visible or not</span></div>
+      <div class="spec"><span class="sk">Inspiration</span><span class="sv">Japanese Ma · meaningful emptiness</span></div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

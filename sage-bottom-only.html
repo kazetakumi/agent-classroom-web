@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sage — Bottom Only, Nav at Top</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #111; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Top bar ── */
+    .bar {
+      position: sticky; top: 0; left: 0; right: 0; height: 52px;
+      background: #0D0D0D; border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: center; gap: 16px; padding: 0 32px; z-index: 200;
+    }
+    .bar-title { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.22); }
+    .bar-sep { width: 1px; height: 16px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
+    .bar-sub { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.1); }
+    .bar-hint { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: rgba(255,255,255,0.18); margin-left: auto; }
+
+    /* ── Stage ── */
+    .stage { padding: 56px 40px 100px; display: flex; justify-content: center; align-items: flex-start; gap: 52px; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .col-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.22); }
+
+    /* ── Phone shell ── */
+    .phone {
+      width: 390px; height: 800px; border-radius: 44px;
+      overflow: hidden; flex-shrink: 0; position: relative;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 48px 120px rgba(0,0,0,0.82), 0 8px 28px rgba(0,0,0,0.44);
+    }
+
+    /* ── Info card ── */
+    .info { width: 390px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 22px 24px; }
+    .info-n { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.18); margin-bottom: 8px; }
+    .info-h { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.72); margin-bottom: 12px; }
+    .info-d { font-size: 12px; line-height: 1.78; color: rgba(255,255,255,0.28); border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 14px; margin-bottom: 14px; }
+    .spec { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 12px; }
+    .spec:last-child { margin-bottom: 0; }
+    .sk { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.16); flex-shrink: 0; }
+    .sv { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.33); text-align: right; line-height: 1.5; }
+
+
+    /* ════════════════════════════════════════════════════════
+       WHITE SCREEN — shared skeleton
+    ════════════════════════════════════════════════════════ */
+
+    .screen { background: #FFF; height: 100%; display: flex; flex-direction: column; position: relative; }
+
+    /* ── TOP: App identity row ── */
+    .top-identity {
+      display: flex; align-items: baseline; justify-content: space-between;
+      padding: 32px 28px 0; flex-shrink: 0;
+    }
+    .sc-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .sc-num { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: #D0D0D0; }
+
+    /* ── TOP: Nav + progress row ── */
+    .top-nav-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 28px 0; flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: #CCCCCC; background: none; border: none;
+      cursor: pointer; flex-shrink: 0; white-space: nowrap;
+      transition: color 0.14s; padding: 3px 0;
+    }
+    .nav-btn:hover { color: #333; }
+    .nav-btn.dim { color: #E8E8E8; pointer-events: none; }
+    .progress-wrap { flex: 1; position: relative; height: 1px; }
+    .progress-track { height: 1px; background: #F0F0F0; }
+    .progress-fill { position: absolute; top: 0; left: 0; height: 1px; background: #BDBDBD; width: 25%; }
+
+    /* ── Question body ── */
+    .sc-body { flex: 1; padding: 28px 28px 0; overflow: hidden; }
+    .sc-subj { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #CFCFCF; margin-bottom: 18px; }
+    .sc-q { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 300; line-height: 1.55; color: #111; }
+    .sc-div { height: 1px; background: #F0F0F0; margin: 22px 0 18px; }
+    .sc-opt { display: flex; gap: 14px; align-items: baseline; margin-bottom: 16px; }
+    .sc-opt.dim { opacity: 0.26; }
+    .sc-opt.sel .ol { color: #111; }
+    .sc-opt.sel .ot { color: #111; }
+    .ol { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #D0D0D0; width: 12px; flex-shrink: 0; }
+    .ot { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; color: #999; line-height: 1.35; }
+
+
+    /* ════════════════════════════════════════════════════════
+       SAGE BOTTOM — Treatment 1: THE WHISPER
+       Just the name. Italic. Centred. Barely there.
+       Full-width zone is the tap target.
+    ════════════════════════════════════════════════════════ */
+
+    .sage-whisper-bar {
+      height: 60px; flex-shrink: 0;
+      border-top: 1px solid #F0F0F0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; position: relative;
+      transition: background 0.2s;
+    }
+    .sage-whisper-bar:hover { background: #FAFAFA; }
+
+    .sage-whisper-text {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-weight: 300; font-size: 17px; color: #C8C8C8;
+      user-select: none; transition: color 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .sage-whisper-bar:hover .sage-whisper-text { color: #555; }
+
+
+    /* ════════════════════════════════════════════════════════
+       SAGE BOTTOM — Treatment 2: THE VESSEL
+       The circle, centred. Given the full bottom to itself
+       it reads as an intentional object, not a floating FAB.
+    ════════════════════════════════════════════════════════ */
+
+    @keyframes vessel-breathe {
+      0%, 100% { border-color: #E4E4E4; }
+      50%       { border-color: #BEBEBE; }
+    }
+
+    .sage-vessel-bar {
+      height: 68px; flex-shrink: 0;
+      border-top: 1px solid #F0F0F0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .sage-circle {
+      width: 46px; height: 46px; border-radius: 50%;
+      border: 1px solid #E4E4E4; background: #FFF;
+      display: flex; align-items: center; justify-content: center;
+      animation: vessel-breathe 4.5s ease-in-out infinite;
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.22s, box-shadow 0.22s;
+    }
+    .sage-vessel-bar:hover .sage-circle {
+      transform: scale(1.12); border-color: #999;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    }
+    .sage-circle-dot { width: 4px; height: 4px; border-radius: 50%; background: #D0D0D0; transition: background 0.2s; }
+    .sage-vessel-bar:hover .sage-circle-dot { background: #444; }
+
+
+    /* ════════════════════════════════════════════════════════
+       SAGE BOTTOM — Treatment 3: THE INVITATION
+       A warm strip. Column grid. Cormorant italic placeholder.
+       Feels like the beginning of a conversation, not a button.
+    ════════════════════════════════════════════════════════ */
+
+    .sage-invite-bar {
+      flex-shrink: 0;
+      background: #F9F9F7;
+      border-top: 1px solid #E8E8E0;
+      display: grid;
+      grid-template-columns: auto 1px 1fr auto;
+      gap: 0 14px;
+      align-items: center;
+      padding: 0 28px;
+      height: 64px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .sage-invite-bar:hover { background: #F5F5F2; }
+
+    .sage-invite-label {
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+      letter-spacing: 0.12em; text-transform: uppercase; color: #BBBBBB;
+      flex-shrink: 0;
+    }
+    .sage-invite-vr { width: 1px; height: 22px; background: #E0E0D8; }
+    .sage-invite-placeholder {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-weight: 300; font-size: 17px; color: #C4C4C4;
+      user-select: none; transition: color 0.2s;
+    }
+    .sage-invite-bar:hover .sage-invite-placeholder { color: #888; }
+    .sage-invite-send {
+      font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+      color: #D0D0D0; transition: color 0.2s;
+    }
+    .sage-invite-bar:hover .sage-invite-send { color: #888; }
+
+
+    /* ════════════════════════════════════════════════════════
+       SAGE OVERLAY — same for all three
+       Full screen, rises from below. Pill handle dismisses.
+    ════════════════════════════════════════════════════════ */
+
+    .sage-ov {
+      position: absolute; inset: 0; background: #FFF;
+      display: flex; flex-direction: column; z-index: 20;
+      transform: translateY(100%);
+      transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .sage-ov.open { transform: translateY(0); }
+
+    /* Pill handle */
+    .pill-wrap {
+      display: flex; justify-content: center;
+      padding-top: 14px; padding-bottom: 4px; flex-shrink: 0;
+      cursor: pointer;
+    }
+    .pill { width: 36px; height: 4px; background: #E0E0E0; border-radius: 2px; transition: background 0.18s; }
+    .pill-wrap:hover .pill { background: #AAAAAA; }
+
+    /* Sage content */
+    .so-head { padding: 20px 28px 0; flex-shrink: 0; }
+    .so-app { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8C8C8; }
+    .so-rule { height: 1px; background: #F0F0F0; margin: 16px 28px 0; flex-shrink: 0; }
+
+    .so-body { flex: 1; padding: 20px 28px 0; display: flex; flex-direction: column; overflow: hidden; }
+    .cg { display: grid; grid-template-columns: 52px 1px 1fr; gap: 0 14px; align-items: start; padding: 12px 0; }
+    .cg + .cg { border-top: 1px solid #F8F8F8; }
+    .cg-k { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8; padding-top: 1px; }
+    .cg-vr { width: 1px; background: #EBEBEB; align-self: stretch; }
+    .cg-v { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; line-height: 1.52; color: #888; font-style: italic; }
+
+    .qa-list { display: flex; flex-direction: column; }
+    .qa {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 18px; font-weight: 300; color: #AAAAAA;
+      padding: 9px 0; cursor: pointer; user-select: none;
+      transition: color 0.16s, opacity 0.22s;
+      border-bottom: 1px solid #F6F6F6;
+    }
+    .qa:last-child { border-bottom: none; }
+    .qa:hover { color: #333; }
+    .qa.selected { color: #111; }
+    .qa.faded { opacity: 0.22; pointer-events: none; }
+
+    .so-spacer { flex: 1; min-height: 20px; }
+
+    .so-input-rule { height: 1px; background: #F0F0F0; margin: 0 28px; flex-shrink: 0; }
+    .so-input { flex-shrink: 0; }
+    .input-cg {
+      display: grid; grid-template-columns: 52px 1px 1fr auto;
+      gap: 0 14px; align-items: center; height: 60px; padding: 0 28px;
+    }
+    .input-k { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8C8C8; }
+    .input-vr { width: 1px; height: 22px; background: #EBEBEB; }
+    .input-ph { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 17px; font-weight: 300; color: #D0D0D0; }
+    .input-send { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: #D0D0D0; cursor: pointer; transition: color 0.16s; }
+    .input-send:hover { color: #555; }
+
+  </style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="bar-title">Sage — Bottom Only</span>
+  <div class="bar-sep"></div>
+  <span class="bar-sub">Nav at top · Sage at bottom · Three treatments</span>
+  <span class="bar-hint">tap the bottom zone on each phone</span>
+</div>
+
+<div class="stage">
+
+
+  <!-- ══════════════════════════════════════════
+       1 — THE WHISPER
+       Sage: italic name, centred, barely there
+  ══════════════════════════════════════════ -->
+  <div class="col">
+    <span class="col-label">1 — The Whisper</span>
+    <div class="phone">
+      <div class="screen">
+
+        <!-- TOP: app identity -->
+        <div class="top-identity">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+
+        <!-- TOP: nav flanking the progress bar -->
+        <div class="top-nav-row">
+          <button class="nav-btn dim">← Prev</button>
+          <div class="progress-wrap">
+            <div class="progress-track"></div>
+            <div class="progress-fill"></div>
+          </div>
+          <button class="nav-btn">Next →</button>
+        </div>
+
+        <!-- Content -->
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+
+        <!-- BOTTOM: Sage — just the name -->
+        <div class="sage-whisper-bar" onclick="openOv('ov-1')">
+          <span class="sage-whisper-text">sage</span>
+        </div>
+
+      </div>
+
+      <!-- Sage overlay -->
+      <div class="sage-ov" id="ov-1">
+        <div class="pill-wrap" onclick="closeOv('ov-1')"><div class="pill"></div></div>
+        <div class="so-head"><span class="so-app">Agent Classroom</span></div>
+        <div class="so-rule"></div>
+        <div class="so-body">
+          <div class="cg">
+            <span class="cg-k">Sage</span>
+            <div class="cg-vr"></div>
+            <span class="cg-v">Ask me anything. Or I can —</span>
+          </div>
+          <div class="cg" style="padding: 6px 0;">
+            <span class="cg-k"></span>
+            <div class="cg-vr"></div>
+            <div class="qa-list" id="qa-1">
+              <div class="qa" onclick="pick('qa-1',this)">— give you a hint</div>
+              <div class="qa" onclick="pick('qa-1',this)">— skip this question</div>
+              <div class="qa" onclick="pick('qa-1',this)">— walk through the concept</div>
+              <div class="qa" onclick="pick('qa-1',this)">— end the session</div>
+            </div>
+          </div>
+        </div>
+        <div class="so-spacer"></div>
+        <div class="so-input-rule"></div>
+        <div class="so-input">
+          <div class="input-cg">
+            <span class="input-k">You</span>
+            <div class="input-vr"></div>
+            <span class="input-ph">Or ask anything…</span>
+            <span class="input-send">↑</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Treatment 1</div>
+      <div class="info-h">The Whisper</div>
+      <div class="info-d">
+        The name "sage" in Cormorant italic, centred, 17px, #C8C8C8. The entire 60px bottom strip is the tap zone — no visible border except a 1px #F0F0F0 rule above. On hover the text deepens to #555 and the strip warms faintly. The companion is present without demanding attention. You notice it when you need it; you ignore it when you don't. Maximum restraint.
+      </div>
+      <div class="spec"><span class="sk">Form</span><span class="sv">Italic name · centred · no border · no icon</span></div>
+      <div class="spec"><span class="sk">Height</span><span class="sv">60px · full-width tap target</span></div>
+      <div class="spec"><span class="sk">Resting colour</span><span class="sv">#C8C8C8 · barely present</span></div>
+      <div class="spec"><span class="sk">Hover</span><span class="sv">Text → #555 · background → #FAFAFA</span></div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       2 — THE VESSEL
+       Sage: centred circle, dedicated bar
+  ══════════════════════════════════════════ -->
+  <div class="col">
+    <span class="col-label">2 — The Vessel</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-identity">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="top-nav-row">
+          <button class="nav-btn dim">← Prev</button>
+          <div class="progress-wrap">
+            <div class="progress-track"></div>
+            <div class="progress-fill"></div>
+          </div>
+          <button class="nav-btn">Next →</button>
+        </div>
+
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+
+        <!-- BOTTOM: Sage — centred circle -->
+        <div class="sage-vessel-bar" onclick="openOv('ov-2')">
+          <div class="sage-circle">
+            <div class="sage-circle-dot"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="sage-ov" id="ov-2">
+        <div class="pill-wrap" onclick="closeOv('ov-2')"><div class="pill"></div></div>
+        <div class="so-head"><span class="so-app">Agent Classroom</span></div>
+        <div class="so-rule"></div>
+        <div class="so-body">
+          <div class="cg">
+            <span class="cg-k">Sage</span>
+            <div class="cg-vr"></div>
+            <span class="cg-v">Ask me anything. Or I can —</span>
+          </div>
+          <div class="cg" style="padding: 6px 0;">
+            <span class="cg-k"></span>
+            <div class="cg-vr"></div>
+            <div class="qa-list" id="qa-2">
+              <div class="qa" onclick="pick('qa-2',this)">— give you a hint</div>
+              <div class="qa" onclick="pick('qa-2',this)">— skip this question</div>
+              <div class="qa" onclick="pick('qa-2',this)">— walk through the concept</div>
+              <div class="qa" onclick="pick('qa-2',this)">— end the session</div>
+            </div>
+          </div>
+        </div>
+        <div class="so-spacer"></div>
+        <div class="so-input-rule"></div>
+        <div class="so-input">
+          <div class="input-cg">
+            <span class="input-k">You</span>
+            <div class="input-vr"></div>
+            <span class="input-ph">Or ask anything…</span>
+            <span class="input-send">↑</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Treatment 2</div>
+      <div class="info-h">The Vessel</div>
+      <div class="info-d">
+        A 46px breathing circle, centred in a dedicated 68px bottom bar. Previously explored as a floating corner element — here it has its own stage. The circle is the only enclosed form on the screen. Centred and unmoving, it reads less like a FAB and more like a found object. The breathing is the only signal it's alive. On hover it expands slightly, the dot darkens.
+      </div>
+      <div class="spec"><span class="sk">Form</span><span class="sv">46px circle · 1px border · 4px dot · centred</span></div>
+      <div class="spec"><span class="sk">Height</span><span class="sv">68px bar · full-width tap target</span></div>
+      <div class="spec"><span class="sk">Animation</span><span class="sv">Border breathes · #E4E4E4 ↔ #BEBEBE · 4.5s</span></div>
+      <div class="spec"><span class="sk">Hover</span><span class="sv">Scale 1.12 · border → #999 · dot → #444</span></div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       3 — THE INVITATION
+       Sage: warm strip, column grid, italic placeholder
+  ══════════════════════════════════════════ -->
+  <div class="col">
+    <span class="col-label">3 — The Invitation</span>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="top-identity">
+          <span class="sc-app">Agent Classroom</span>
+          <span class="sc-num">3 / 12</span>
+        </div>
+        <div class="top-nav-row">
+          <button class="nav-btn dim">← Prev</button>
+          <div class="progress-wrap">
+            <div class="progress-track"></div>
+            <div class="progress-fill"></div>
+          </div>
+          <button class="nav-btn">Next →</button>
+        </div>
+
+        <div class="sc-body">
+          <div class="sc-subj">Calculus Foundations</div>
+          <div class="sc-q">A particle moves along the x-axis with velocity v(t) = 3t² − 6t. At what time is the particle at rest?</div>
+          <div class="sc-div"></div>
+          <div class="sc-opt dim"><span class="ol">A</span><span class="ot">t = 0 only</span></div>
+          <div class="sc-opt dim"><span class="ol">B</span><span class="ot">t = 2 only</span></div>
+          <div class="sc-opt sel"><span class="ol">C</span><span class="ot">t = 0 and t = 2</span></div>
+          <div class="sc-opt dim"><span class="ol">D</span><span class="ot">t = 1 and t = 3</span></div>
+        </div>
+
+        <!-- BOTTOM: Sage — warm strip, column grid, placeholder -->
+        <div class="sage-invite-bar" onclick="openOv('ov-3')">
+          <span class="sage-invite-label">Sage</span>
+          <div class="sage-invite-vr"></div>
+          <span class="sage-invite-placeholder">Ask me anything…</span>
+          <span class="sage-invite-send">↑</span>
+        </div>
+
+      </div>
+
+      <div class="sage-ov" id="ov-3">
+        <div class="pill-wrap" onclick="closeOv('ov-3')"><div class="pill"></div></div>
+        <div class="so-head"><span class="so-app">Agent Classroom</span></div>
+        <div class="so-rule"></div>
+        <div class="so-body">
+          <div class="cg">
+            <span class="cg-k">Sage</span>
+            <div class="cg-vr"></div>
+            <span class="cg-v">Ask me anything. Or I can —</span>
+          </div>
+          <div class="cg" style="padding: 6px 0;">
+            <span class="cg-k"></span>
+            <div class="cg-vr"></div>
+            <div class="qa-list" id="qa-3">
+              <div class="qa" onclick="pick('qa-3',this)">— give you a hint</div>
+              <div class="qa" onclick="pick('qa-3',this)">— skip this question</div>
+              <div class="qa" onclick="pick('qa-3',this)">— walk through the concept</div>
+              <div class="qa" onclick="pick('qa-3',this)">— end the session</div>
+            </div>
+          </div>
+        </div>
+        <div class="so-spacer"></div>
+        <div class="so-input-rule"></div>
+        <div class="so-input">
+          <div class="input-cg">
+            <span class="input-k">You</span>
+            <div class="input-vr"></div>
+            <span class="input-ph">Or ask anything…</span>
+            <span class="input-send">↑</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-n">Treatment 3</div>
+      <div class="info-h">The Invitation</div>
+      <div class="info-d">
+        A 64px warm strip (#F9F9F7), warmer border (#E8E8E0). Inside: a column grid — "SAGE" label, 1px vertical rule, italic Cormorant placeholder "Ask me anything…", and a ↑ send arrow. It reads like an input field already in progress. The visual grammar matches the Sage overlay's own column grid — tapping it continues the same language. Highest discoverability of the three; most opinionated about Sage's nature.
+      </div>
+      <div class="spec"><span class="sk">Form</span><span class="sv">Column grid · label · rule · italic placeholder · ↑</span></div>
+      <div class="spec"><span class="sk">Height</span><span class="sv">64px · warm background · warm border</span></div>
+      <div class="spec"><span class="sk">Material</span><span class="sv">#F9F9F7 bg · #E8E8E0 border-top</span></div>
+      <div class="spec"><span class="sk">Hover</span><span class="sv">Background → #F5F5F2 · text → #888</span></div>
+    </div>
+  </div>
+
+
+</div>
+
+<script>
+  function openOv(id) {
+    document.getElementById(id).classList.add('open');
+  }
+  function closeOv(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+  function pick(listId, el) {
+    document.querySelectorAll('#' + listId + ' .qa').forEach(q => {
+      q.classList.remove('selected', 'faded');
+      if (q !== el) q.classList.add('faded');
+    });
+    el.classList.add('selected');
+  }
+</script>
+
+</body>
+</html>
