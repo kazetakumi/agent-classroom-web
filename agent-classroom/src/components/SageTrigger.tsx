@@ -1,5 +1,3 @@
-import React from 'react'
-
 interface SageTriggerProps {
   onAskSage: () => void
   onPrev: () => void

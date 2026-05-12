@@ -101,8 +101,8 @@ function App() {
     return (
       <ResultsScreen
         summary={feed.summary!}
-        onStartAgain={() => feed.startAgain()}
-        onReviewQuestions={() => feed.openReview()}
+        onReview={() => feed.openReview()}
+        onAskSage={() => setSheetOpen(true)}
       />
     )
   }
