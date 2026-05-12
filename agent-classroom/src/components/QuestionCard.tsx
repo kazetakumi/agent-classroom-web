@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Question } from '../questionBank/questionBank'
+import { SageTrigger } from './SageTrigger'
 import './QuestionCard.css'
 
 interface Props {
@@ -8,9 +9,25 @@ interface Props {
   onAdvance: () => void
   currentIndex: number
   totalQuestions: number
+  onAskSage: () => void
+  onPrev: () => void
+  onNext: () => void
+  canGoPrev: boolean
+  canGoNext: boolean
 }
 
-export function QuestionCard({ question, onAnswer, onAdvance, currentIndex, totalQuestions }: Props) {
+export function QuestionCard({
+  question,
+  onAnswer,
+  onAdvance,
+  currentIndex,
+  totalQuestions,
+  onAskSage,
+  onPrev,
+  onNext,
+  canGoPrev,
+  canGoNext,
+}: Props) {
   const labels = ['A', 'B', 'C', 'D'] as const
   const [selected, setSelected] = useState<string | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -38,39 +55,37 @@ export function QuestionCard({ question, onAnswer, onAdvance, currentIndex, tota
     }, 1500)
   }
 
-  const progressPct = totalQuestions > 0 ? (currentIndex / totalQuestions) * 100 : 0
+  const progress = totalQuestions > 0 ? currentIndex / totalQuestions : 0
 
   return (
     <div className="screen question-card">
-      <div className="question-progress">
-        <div className="question-progress-meta" data-testid="progress-meta">
-          <span>{question.subject}</span>
-          <span>{currentIndex + 1} / {totalQuestions}</span>
-        </div>
-        <div className="question-progress-track">
-          <div
-            className="question-progress-fill"
-            data-testid="progress-rail"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-      </div>
-      <p className="question-text">{question.question}</p>
-      <div className="options">
+      <span className="question-card__subject">{question.subject}</span>
+      <p className="question-card__text">{question.question}</p>
+      <div className="question-card__options">
         {labels.map((label) => (
           <button
             key={label}
-            className="option-btn"
+            className="question-card__option"
             type="button"
-            disabled={selected !== null}
             data-state={selected === label ? 'selected' : undefined}
             onClick={() => handleOptionClick(label)}
+            style={{ opacity: selected !== null && selected !== label ? 0.3 : 1 }}
           >
-            <span className="option-label">{label}</span>
-            <span className="option-text">{question.options[label]}</span>
+            <span className="question-card__option-letter">{label}</span>
+            <span className="question-card__option-text">{question.options[label]}</span>
           </button>
         ))}
       </div>
+      <div className="question-card__spacer" />
+      <SageTrigger
+        showNav={true}
+        onAskSage={onAskSage}
+        onPrev={onPrev}
+        onNext={onNext}
+        canGoPrev={canGoPrev}
+        canGoNext={canGoNext}
+        progress={progress}
+      />
     </div>
   )
 }

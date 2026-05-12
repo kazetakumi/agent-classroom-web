@@ -16,32 +16,32 @@ describe('Entry guard', () => {
     expect(screen.getByRole('textbox', { name: /first name/i })).toBeInTheDocument()
   })
 
-  it('returning user (localStorage.userName set) skips to Welcome/Idle screen', () => {
+  it('returning user (localStorage.userName set) skips to Welcome screen', () => {
     localStorage.setItem('userName', 'Alice')
-    const { container } = render(<App />)
-    expect(container.querySelector('.idle-screen')).toBeInTheDocument()
+    render(<App />)
+    expect(screen.getByRole('button', { name: /begin/i })).toBeInTheDocument()
   })
 })
 
-describe('Idle Screen (returning user)', () => {
+describe('Welcome screen (returning user)', () => {
   beforeEach(() => {
     localStorage.setItem('userName', 'Alice')
   })
 
-  it('renders with idle-screen class', () => {
-    const { container } = render(<App />)
-    expect(container.querySelector('.idle-screen')).toBeInTheDocument()
-  })
-
-  it('renders the subject chip', () => {
+  it('greets the user by name', () => {
     render(<App />)
-    expect(screen.getByTestId('idle-chip')).toBeInTheDocument()
+    expect(screen.getByText(/Alice/)).toBeInTheDocument()
   })
 
-  it('renders the Start Revision CTA with idle-cta class', () => {
-    const { container } = render(<App />)
-    const btn = container.querySelector('.idle-cta')
-    expect(btn).toBeInTheDocument()
-    expect(btn).toHaveTextContent('Start Revision')
+  it('renders a Begin button', () => {
+    render(<App />)
+    expect(screen.getByRole('button', { name: /begin/i })).toBeInTheDocument()
+  })
+
+  it('renders the redirect input', () => {
+    render(<App />)
+    expect(
+      screen.getByPlaceholderText(/Or tell Sage something different/i)
+    ).toBeInTheDocument()
   })
 })

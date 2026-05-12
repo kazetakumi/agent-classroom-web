@@ -40,7 +40,7 @@
           "id": "US-013",
           "type": "user-story",
           "title": "Welcome screen rewrite",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-010",
             "US-011"
@@ -51,7 +51,7 @@
           "id": "US-014",
           "type": "user-story",
           "title": "Question Card rewrite",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-011"
           ],
@@ -61,7 +61,7 @@
           "id": "US-015",
           "type": "user-story",
           "title": "SageSheet.tsx \u2014 full-screen overlay (replaces CompanionSheet)",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-011"
           ],
@@ -71,7 +71,7 @@
           "id": "US-016",
           "type": "user-story",
           "title": "Results screen rewrite",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-011"
           ],

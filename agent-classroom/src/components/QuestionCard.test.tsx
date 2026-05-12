@@ -11,43 +11,48 @@ const mockQuestion: Question = {
   correctOption: 'B',
 }
 
+const sageTriggerProps = {
+  onAskSage: vi.fn(),
+  onPrev: vi.fn(),
+  onNext: vi.fn(),
+  canGoPrev: true,
+  canGoNext: true,
+}
+
 describe('QuestionCard', () => {
   it('renders the question text', () => {
-    render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} />)
+    render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
     expect(screen.getByText('What is 2 + 2?')).toBeInTheDocument()
   })
 
-  it('renders four option buttons labelled A, B, C, D', () => {
-    render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} />)
-    expect(screen.getByText(/^A\b/)).toBeInTheDocument()
-    expect(screen.getByText(/^B\b/)).toBeInTheDocument()
-    expect(screen.getByText(/^C\b/)).toBeInTheDocument()
-    expect(screen.getByText(/^D\b/)).toBeInTheDocument()
+  it('renders four option letter labels A, B, C, D', () => {
+    render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
+    expect(screen.getByText('A')).toBeInTheDocument()
+    expect(screen.getByText('B')).toBeInTheDocument()
+    expect(screen.getByText('C')).toBeInTheDocument()
+    expect(screen.getByText('D')).toBeInTheDocument()
   })
 
   it('renders each option text', () => {
-    render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} />)
-    expect(screen.getByText(/3/)).toBeInTheDocument()
-    expect(screen.getByText(/4/)).toBeInTheDocument()
-    expect(screen.getByText(/5/)).toBeInTheDocument()
-    expect(screen.getByText(/6/)).toBeInTheDocument()
+    render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
+    expect(screen.getByText('3')).toBeInTheDocument()
+    expect(screen.getByText('4')).toBeInTheDocument()
+    expect(screen.getByText('5')).toBeInTheDocument()
+    expect(screen.getByText('6')).toBeInTheDocument()
   })
 
-  describe('progress rail', () => {
-    it('renders a progress rail element', () => {
-      render(
-        <QuestionCard
-          question={mockQuestion}
-          onAnswer={vi.fn()}
-          onAdvance={vi.fn()}
-          currentIndex={2}
-          totalQuestions={17}
-        />
-      )
-      expect(screen.getByTestId('progress-rail')).toBeInTheDocument()
-    })
+  it('renders the subject label', () => {
+    render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
+    expect(screen.getByText('Mathematics')).toBeInTheDocument()
+  })
 
-    it('sets progress fill width proportional to currentIndex/totalQuestions', () => {
+  it('is scoped under .question-card CSS namespace', () => {
+    const { container } = render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
+    expect(container.querySelector('.question-card')).toBeInTheDocument()
+  })
+
+  describe('progress bar', () => {
+    it('progress bar in SageTrigger reflects currentIndex/totalQuestions', () => {
       render(
         <QuestionCard
           question={mockQuestion}
@@ -55,27 +60,12 @@ describe('QuestionCard', () => {
           onAdvance={vi.fn()}
           currentIndex={4}
           totalQuestions={17}
+          {...sageTriggerProps}
         />
       )
-      const rail = screen.getByTestId('progress-rail')
-      // Width is set as an inline style percentage — verify it contains a %
-      expect(rail.style.width).toMatch(/%$/)
-      expect(parseFloat(rail.style.width)).toBeCloseTo((4 / 17) * 100, 0)
-    })
-
-    it('renders subject and n/total meta', () => {
-      render(
-        <QuestionCard
-          question={mockQuestion}
-          onAnswer={vi.fn()}
-          onAdvance={vi.fn()}
-          currentIndex={5}
-          totalQuestions={17}
-        />
-      )
-      const meta = screen.getByTestId('progress-meta')
-      expect(meta).toHaveTextContent('Mathematics')
-      expect(meta).toHaveTextContent('6 / 17')
+      const bar = screen.getByTestId('progress-bar')
+      expect(bar.style.width).toMatch(/%$/)
+      expect(parseFloat(bar.style.width)).toBeCloseTo((4 / 17) * 100, 0)
     })
   })
 
@@ -84,26 +74,46 @@ describe('QuestionCard', () => {
     afterEach(() => { vi.useRealTimers() })
 
     it('tapping an option puts that button into a data-state="selected" state', () => {
-      render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} />)
+      render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
       fireEvent.click(screen.getByRole('button', { name: /^A/ }))
       expect(screen.getByRole('button', { name: /^A/ })).toHaveAttribute('data-state', 'selected')
     })
 
     it('no other option changes to selected state when one is tapped', () => {
-      render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} />)
+      render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
       fireEvent.click(screen.getByRole('button', { name: /^A/ }))
       expect(screen.getByRole('button', { name: /^B/ })).not.toHaveAttribute('data-state', 'selected')
       expect(screen.getByRole('button', { name: /^C/ })).not.toHaveAttribute('data-state', 'selected')
       expect(screen.getByRole('button', { name: /^D/ })).not.toHaveAttribute('data-state', 'selected')
     })
 
+    it('unselected siblings drop to opacity: 0.3 after a selection', () => {
+      render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
+      fireEvent.click(screen.getByRole('button', { name: /^A/ }))
+      expect(screen.getByRole('button', { name: /^B/ }).style.opacity).toBe('0.3')
+      expect(screen.getByRole('button', { name: /^C/ }).style.opacity).toBe('0.3')
+      expect(screen.getByRole('button', { name: /^D/ }).style.opacity).toBe('0.3')
+    })
+
     it('onAdvance is called after ~1.5s following a tap', () => {
       const onAdvance = vi.fn()
-      render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={onAdvance} currentIndex={0} totalQuestions={17} />)
+      render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={onAdvance} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
       fireEvent.click(screen.getByRole('button', { name: /^A/ }))
       expect(onAdvance).not.toHaveBeenCalled()
       act(() => { vi.advanceTimersByTime(1500) })
       expect(onAdvance).toHaveBeenCalledOnce()
+    })
+  })
+
+  describe('SageTrigger', () => {
+    it('renders SageTrigger sage-strip', () => {
+      render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
+      expect(screen.getByTestId('sage-strip')).toBeInTheDocument()
+    })
+
+    it('renders SageTrigger with showNav={true} — nav-row is present', () => {
+      render(<QuestionCard question={mockQuestion} onAnswer={vi.fn()} onAdvance={vi.fn()} currentIndex={0} totalQuestions={17} {...sageTriggerProps} />)
+      expect(screen.getByTestId('nav-row')).toBeInTheDocument()
     })
   })
 })

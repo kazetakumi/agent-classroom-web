@@ -23,3 +23,51 @@
 2026-05-12T08:39:43.731225 [US-012]
 ────────────────────────────────────────────────────────────
 [US-012] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-12T08:44:03.819040 [US-013]
+────────────────────────────────────────────────────────────
+[US-013] All tests green. Summary of what was done:
+[US-013] 
+[US-013] - Created `WelcomeScreen.tsx` — B-Break structure with col-grid Sage turns (greeting by name, session summary), flex spacer, "Your move" break with "Begin" button and italic redirect input. No `SageTrigger`.
+[US-013] - Created `WelcomeScreen.css` — scoped styles using `--serif`/`--mono` variables and `.col-grid`.
+[US-013] - Updated `App.tsx` — replaced the old inline idle screen with `<WelcomeScreen>`.
+[US-013] - Created `WelcomeScreen.test.tsx` — 5 tests covering all acceptance criteria.
+[US-013] - Updated `App.test.tsx` — migrated idle-screen assertions to welcome-screen assertions.
+[US-013] - Marked all 6 acceptance criteria done in `US-013.md`.
+[US-013] 
+[US-013] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-12T08:44:03.820072 [US-015]
+────────────────────────────────────────────────────────────
+[US-015] The user story file is fully updated. All acceptance criteria are ticked and the status is `done`.
+[US-015] 
+[US-015] ```
+[US-015] <promise>COMPLETE</promise>
+[US-015] ```
+
+────────────────────────────────────────────────────────────
+2026-05-12T08:44:03.819193 [US-016]
+────────────────────────────────────────────────────────────
+[US-016] The user story file is already correct — the frontmatter `status: done` is set and all acceptance criteria are ticked. The file is fully updated.
+[US-016] 
+[US-016] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-12T08:44:03.819143 [US-014]
+────────────────────────────────────────────────────────────
+[US-014] All done. 120/120 tests pass. Here's what was implemented:
+[US-014] 
+[US-014] **QuestionCard.tsx** — full rewrite:
+[US-014] - Subject label (`question-card__subject`) using `var(--mono)`, 9px uppercase
+[US-014] - Question text (`question-card__text`) using `var(--serif)`, 21px weight 300
+[US-014] - Option buttons (`question-card__option`) with separate letter span (IBM Plex Mono 9px `#CFCFCF`) + text span (Cormorant 18px `#888`)
+[US-014] - Inline `opacity: 0.3` on unselected options after a selection (testable via JSDOM)
+[US-014] - `data-state="selected"` on chosen option (letter+text go to `#111` via CSS)
+[US-014] - `SageTrigger` with `showNav={true}` at the bottom; `progress` derived from `currentIndex/totalQuestions`
+[US-014] - New props added: `onAskSage`, `onPrev`, `onNext`, `canGoPrev`, `canGoNext`
+[US-014] 
+[US-014] **App.tsx** — plumbed the 5 new props: `onAskSage → setSheetOpen(true)`, `onPrev → feed.goBack`, `onNext → feed.skip`, `canGoPrev → feed.currentIndex > 0`, `canGoNext → true`
+[US-014] 
+[US-014] <promise>COMPLETE</promise>

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { QuestionCard } from './components/QuestionCard'
 import { SwipeLayer } from './components/SwipeLayer'
-import { CompanionSheet } from './components/CompanionSheet'
+import { SageSheet } from './components/SageSheet'
 import { ResultsScreen } from './components/ResultsScreen'
 import { ReviewGrid } from './components/ReviewGrid'
 import { ExplanationScreen } from './components/ExplanationScreen'
 import { OnboardingName } from './components/OnboardingName'
+import { WelcomeScreen } from './components/WelcomeScreen'
 import { loadExplanations } from './explanations/explanations'
 import { useQuestionFeed } from './questionFeed/useQuestionFeed'
 import './App.css'
@@ -30,25 +31,10 @@ function App() {
 
   if (feed.status === 'idle') {
     return (
-      <div className="screen idle-screen">
-        <span className="idle-chip" data-testid="idle-chip">Mathematics</span>
-        <h1 className="idle-headline">
-          Your next<br />
-          <em>revision</em><br />
-          session.
-        </h1>
-        <p className="idle-sub">
-          17 questions, randomised order. Swipe right to skip, left to go back.
-        </p>
-        <div className="idle-meta">
-          <span>📚 17 questions</span>
-          <span>⏱ ~8 min</span>
-        </div>
-        <button className="idle-cta" onClick={() => feed.startSession()}>
-          Start Revision
-        </button>
-        <p className="idle-hint">Swipe up anytime to pause</p>
-      </div>
+      <WelcomeScreen
+        userName={userName}
+        onBegin={() => feed.startSession()}
+      />
     )
   }
 
@@ -86,33 +72,14 @@ function App() {
   }
 
   const isPaused = feed.status === 'paused'
+  const quickActions = isPaused ? ['Resume'] : ['Pause', 'End Session']
 
-  const activeCommands = [
-    {
-      label: 'Pause',
-      onSelect: () => {
-        feed.pause()
-        setSheetOpen(false)
-      },
-    },
-    {
-      label: 'End Session',
-      onSelect: () => {
-        feed.endSession()
-        setSheetOpen(false)
-      },
-    },
-  ]
-
-  const pausedCommands = [
-    {
-      label: 'Resume',
-      onSelect: () => {
-        feed.resume()
-        setSheetOpen(false)
-      },
-    },
-  ]
+  function handleQuickAction(action: string) {
+    if (action === 'Pause') feed.pause()
+    else if (action === 'End Session') feed.endSession()
+    else if (action === 'Resume') feed.resume()
+    setSheetOpen(false)
+  }
 
   return (
     <>
@@ -128,15 +95,22 @@ function App() {
             onAdvance={feed.advance}
             currentIndex={feed.currentIndex}
             totalQuestions={feed.questions.length}
+            onAskSage={() => setSheetOpen(true)}
+            onPrev={feed.goBack}
+            onNext={feed.skip}
+            canGoPrev={feed.currentIndex > 0}
+            canGoNext={true}
           />
         </div>
       </SwipeLayer>
 
-      <CompanionSheet
-        isOpen={sheetOpen}
-        commands={isPaused ? pausedCommands : activeCommands}
-        onClose={() => setSheetOpen(false)}
-      />
+      {sheetOpen && (
+        <SageSheet
+          quickActions={quickActions}
+          onDismiss={() => setSheetOpen(false)}
+          onQuickAction={handleQuickAction}
+        />
+      )}
     </>
   )
 }
