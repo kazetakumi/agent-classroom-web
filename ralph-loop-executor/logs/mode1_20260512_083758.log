@@ -85,3 +85,17 @@
 [US-017] - **`US-017.md`** — all ACs ticked, status set to `done`.
 [US-017] 
 [US-017] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-12T08:57:48.486916 [US-018]
+────────────────────────────────────────────────────────────
+[US-018] All tasks complete. Here's what was done:
+[US-018] 
+[US-018] - **`ExplanationScreen.tsx`** — fully rewritten with the new 4-field layout (`question: string`, `selectedAnswer: string | null`, etc.), inline styles for SELECTED (`italic, #C0C0C0`) and CORRECT (`#111`), and `SageTrigger` with `showNav={true}`
+[US-018] - **`ExplanationScreen.css`** — rewritten with `.explanation-screen` namespace and clean field/label/value styles
+[US-018] - **`ExplanationScreen.test.tsx`** — replaced with 10 tests covering all 8 AC (four labels present, em dash for null, italic + color assertions, nav row present, pointer-events:none on next, onPrev called, CSS namespace)
+[US-018] - **`App.tsx`** — updated to derive primitive strings from the existing data model, compute the review sequence for prev/next navigation, and mount `SageSheet` in the explanation view
+[US-018] 
+[US-018] 118 / 118 tests pass.
+[US-018] 
+[US-018] <promise>COMPLETE</promise>

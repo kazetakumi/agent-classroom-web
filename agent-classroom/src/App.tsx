@@ -51,15 +51,51 @@ function App() {
     }
     if (feed.view === 'explanation') {
       const selectedQuestion = feed.questions.find(q => q.id === feed.selectedQuestionId)!
-      const explanation = loadExplanations()[feed.selectedQuestionId!]
+      const explanationData = loadExplanations()[feed.selectedQuestionId!]
       const sessionRecord = feed.session.filter(r => r.questionId === feed.selectedQuestionId).at(-1)
+
+      const seenIds = new Set<string>()
+      const reviewSequence = feed.session
+        .map(r => r.questionId)
+        .filter(id => (seenIds.has(id) ? false : (seenIds.add(id), true)))
+      const currentIdx = reviewSequence.indexOf(feed.selectedQuestionId!)
+
+      const selectedOption = sessionRecord?.selectedOption
+      const selectedAnswer =
+        selectedOption && selectedOption !== 'skipped'
+          ? selectedQuestion.options[selectedOption as 'A' | 'B' | 'C' | 'D']
+          : null
+      const correctAnswer = selectedQuestion.options[selectedQuestion.correctOption]
+      const explanationText = explanationData?.steps.join(' ') ?? ''
+
       return (
-        <ExplanationScreen
-          question={selectedQuestion}
-          explanation={explanation}
-          selectedOption={sessionRecord?.selectedOption ?? 'skipped'}
-          onBack={() => feed.closeExplanation()}
-        />
+        <>
+          <ExplanationScreen
+            question={selectedQuestion.question}
+            selectedAnswer={selectedAnswer}
+            correctAnswer={correctAnswer}
+            explanation={explanationText}
+            questionIndex={currentIdx}
+            totalQuestions={reviewSequence.length}
+            onPrev={() => {
+              if (currentIdx > 0) feed.openExplanation(reviewSequence[currentIdx - 1])
+            }}
+            onNext={() => {
+              if (currentIdx < reviewSequence.length - 1)
+                feed.openExplanation(reviewSequence[currentIdx + 1])
+            }}
+            onAskSage={() => setSheetOpen(true)}
+            canGoPrev={currentIdx > 0}
+            canGoNext={currentIdx < reviewSequence.length - 1}
+          />
+          {sheetOpen && (
+            <SageSheet
+              quickActions={['Explain again', 'Give a hint']}
+              onDismiss={() => setSheetOpen(false)}
+              onQuickAction={() => setSheetOpen(false)}
+            />
+          )}
+        </>
       )
     }
     return (

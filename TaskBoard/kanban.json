@@ -92,7 +92,7 @@
           "id": "US-018",
           "type": "user-story",
           "title": "Explanation screen",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-011",
             "US-017"
