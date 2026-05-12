@@ -5,13 +5,28 @@ import { CompanionSheet } from './components/CompanionSheet'
 import { ResultsScreen } from './components/ResultsScreen'
 import { ReviewGrid } from './components/ReviewGrid'
 import { ExplanationScreen } from './components/ExplanationScreen'
+import { OnboardingName } from './components/OnboardingName'
 import { loadExplanations } from './explanations/explanations'
 import { useQuestionFeed } from './questionFeed/useQuestionFeed'
 import './App.css'
 
 function App() {
+  const [userName, setUserName] = useState<string | null>(
+    () => localStorage.getItem('userName')
+  )
   const feed = useQuestionFeed()
   const [sheetOpen, setSheetOpen] = useState(false)
+
+  if (userName === null) {
+    return (
+      <OnboardingName
+        onSubmit={(name) => {
+          localStorage.setItem('userName', name)
+          setUserName(name)
+        }}
+      />
+    )
+  }
 
   if (feed.status === 'idle') {
     return (

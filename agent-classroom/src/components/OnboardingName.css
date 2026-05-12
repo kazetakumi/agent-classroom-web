@@ -1,0 +1,76 @@
+.onboarding-name {
+  background: #fff;
+  padding: 0 28px 0;
+}
+
+.onboarding-name__turn {
+  padding: 24px 0 0;
+}
+
+.onboarding-name__label {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #aaa;
+  padding-top: 4px;
+}
+
+.onboarding-name__rule {
+  background: #e8e8e0;
+  width: 1px;
+  align-self: stretch;
+}
+
+.onboarding-name__text {
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 300;
+  line-height: 1.35;
+  color: #111;
+  margin: 0;
+}
+
+.onboarding-name__spacer {
+  flex: 1;
+}
+
+.onboarding-name__input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0 40px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.onboarding-name__input {
+  flex: 1;
+  font-family: var(--serif);
+  font-size: 21px;
+  font-style: italic;
+  font-weight: 300;
+  color: #111;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+}
+
+.onboarding-name__input::placeholder {
+  color: #ccc;
+}
+
+.onboarding-name__arrow {
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: #111;
+  opacity: 0.2;
+  transition: opacity 150ms;
+}
+
+.onboarding-name__arrow[data-active='true'] {
+  opacity: 1;
+}

@@ -1,8 +1,33 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import App from './App'
 
-describe('Idle Screen', () => {
+beforeEach(() => {
+  localStorage.clear()
+})
+
+afterEach(() => {
+  localStorage.clear()
+})
+
+describe('Entry guard', () => {
+  it('first-time user (no localStorage.userName) sees OnboardingName screen', () => {
+    render(<App />)
+    expect(screen.getByRole('textbox', { name: /first name/i })).toBeInTheDocument()
+  })
+
+  it('returning user (localStorage.userName set) skips to Welcome/Idle screen', () => {
+    localStorage.setItem('userName', 'Alice')
+    const { container } = render(<App />)
+    expect(container.querySelector('.idle-screen')).toBeInTheDocument()
+  })
+})
+
+describe('Idle Screen (returning user)', () => {
+  beforeEach(() => {
+    localStorage.setItem('userName', 'Alice')
+  })
+
   it('renders with idle-screen class', () => {
     const { container } = render(<App />)
     expect(container.querySelector('.idle-screen')).toBeInTheDocument()

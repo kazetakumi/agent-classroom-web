@@ -11,3 +11,15 @@
 [US-010] - All 98 existing tests still pass — no regressions
 [US-010] 
 [US-010] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-12T08:39:43.731165 [US-011]
+────────────────────────────────────────────────────────────
+[US-011] All 8 tests green, 106 total passing, no regressions. `SageTrigger.tsx` is in `src/components/`, all acceptance criteria verified and ticked.
+[US-011] 
+[US-011] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-12T08:39:43.731225 [US-012]
+────────────────────────────────────────────────────────────
+[US-012] <promise>COMPLETE</promise>

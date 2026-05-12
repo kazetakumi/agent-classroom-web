@@ -20,7 +20,7 @@
           "id": "US-011",
           "type": "user-story",
           "title": "SageTrigger.tsx \u2014 shared bottom zone component",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-010"
           ],
@@ -30,7 +30,7 @@
           "id": "US-012",
           "type": "user-story",
           "title": "Onboarding Name screen + App Entry Guard",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-010"
           ],
