@@ -71,3 +71,17 @@
 [US-014] **App.tsx** — plumbed the 5 new props: `onAskSage → setSheetOpen(true)`, `onPrev → feed.goBack`, `onNext → feed.skip`, `canGoPrev → feed.currentIndex > 0`, `canGoNext → true`
 [US-014] 
 [US-014] <promise>COMPLETE</promise>
+
+────────────────────────────────────────────────────────────
+2026-05-12T08:50:26.349410 [US-017]
+────────────────────────────────────────────────────────────
+[US-017] 123/123 tests passing. US-017 complete.
+[US-017] 
+[US-017] **What was done:**
+[US-017] 
+[US-017] - **`ReviewGrid.tsx`** — rewritten to D-Seat Map aesthetic: 4-column circle grid, `.seat--correct/wrong/skipped` outcome classes, legend dots (with `data-testid`s), uppercase IBM Plex Mono filter tabs (ALL/WRONG/SKIPPED/CORRECT), `SageTrigger` with `showNav={true}`. Removed pagination. `onAskSage` is optional (default no-op) to avoid breaking the App.tsx call site.
+[US-017] - **`ReviewGrid.css`** — replaced tile styles with circle styles (`aspect-ratio: 1; border-radius: 50%`), 4-column grid, legend dot colors matching spec (green/red/grey), filter tab styles.
+[US-017] - **`ReviewGrid.test.tsx`** — replaced 3 old tile-label tests with seat-class tests; added 3 new tests: legend dots in DOM, SageTrigger nav-row present, filter-WRONG class verification. Total: 19 tests, all green.
+[US-017] - **`US-017.md`** — all ACs ticked, status set to `done`.
+[US-017] 
+[US-017] <promise>COMPLETE</promise>

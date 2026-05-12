@@ -29,8 +29,8 @@ const questions: Question[] = [
 ]
 
 const session: SessionRecord[] = [
-  { questionId: 'q001', selectedOption: 'A' },    // correct
-  { questionId: 'q002', selectedOption: 'A' },    // wrong (correct is B)
+  { questionId: 'q001', selectedOption: 'A' },       // correct
+  { questionId: 'q002', selectedOption: 'A' },       // wrong (correct is B)
   { questionId: 'q003', selectedOption: 'skipped' }, // skipped
 ]
 
@@ -47,7 +47,7 @@ describe('ReviewGrid', () => {
     expect(screen.getByText('Review')).toBeInTheDocument()
   })
 
-  it('renders one tile per unique attended question', () => {
+  it('renders one seat per unique attended question', () => {
     render(
       <ReviewGrid
         session={session}
@@ -61,7 +61,7 @@ describe('ReviewGrid', () => {
     expect(screen.getByTestId('result-tile-q003')).toBeInTheDocument()
   })
 
-  it('deduplicates: when a question appears twice in session, renders only one tile', () => {
+  it('deduplicates: when a question appears twice in session, renders only one seat', () => {
     const dupSession: SessionRecord[] = [
       { questionId: 'q001', selectedOption: 'B' }, // first attempt — wrong
       { questionId: 'q001', selectedOption: 'A' }, // second attempt — correct (last wins)
@@ -78,7 +78,7 @@ describe('ReviewGrid', () => {
     expect(screen.getByTestId('result-tile-q001')).toBeInTheDocument()
   })
 
-  it('correct tile displays question number and "Correct" label', () => {
+  it('correct seat has class seat--correct', () => {
     render(
       <ReviewGrid
         session={session}
@@ -87,12 +87,10 @@ describe('ReviewGrid', () => {
         onOpenExplanation={vi.fn()}
       />,
     )
-    const tile = screen.getByTestId('result-tile-q001')
-    expect(tile).toHaveTextContent('Q1')
-    expect(tile).toHaveTextContent('Correct')
+    expect(screen.getByTestId('result-tile-q001')).toHaveClass('seat--correct')
   })
 
-  it('wrong tile displays question number and "Wrong" label', () => {
+  it('wrong seat has class seat--wrong', () => {
     render(
       <ReviewGrid
         session={session}
@@ -101,12 +99,10 @@ describe('ReviewGrid', () => {
         onOpenExplanation={vi.fn()}
       />,
     )
-    const tile = screen.getByTestId('result-tile-q002')
-    expect(tile).toHaveTextContent('Q2')
-    expect(tile).toHaveTextContent('Wrong')
+    expect(screen.getByTestId('result-tile-q002')).toHaveClass('seat--wrong')
   })
 
-  it('skipped tile displays question number and "Skipped" label', () => {
+  it('skipped seat has class seat--skipped', () => {
     render(
       <ReviewGrid
         session={session}
@@ -115,12 +111,10 @@ describe('ReviewGrid', () => {
         onOpenExplanation={vi.fn()}
       />,
     )
-    const tile = screen.getByTestId('result-tile-q003')
-    expect(tile).toHaveTextContent('Q3')
-    expect(tile).toHaveTextContent('Skipped')
+    expect(screen.getByTestId('result-tile-q003')).toHaveClass('seat--skipped')
   })
 
-  it('clicking a tile calls onOpenExplanation with the correct questionId', () => {
+  it('clicking a seat calls onOpenExplanation with the correct questionId', () => {
     const onOpenExplanation = vi.fn()
     render(
       <ReviewGrid
@@ -160,7 +154,7 @@ describe('ReviewGrid', () => {
     expect(onBack).toHaveBeenCalledOnce()
   })
 
-  it('renders no tiles when session is empty', () => {
+  it('renders no seats when session is empty', () => {
     render(
       <ReviewGrid
         session={[]}
@@ -172,8 +166,34 @@ describe('ReviewGrid', () => {
     expect(screen.queryAllByTestId(/^result-tile-/)).toHaveLength(0)
   })
 
+  it('legend dots for correct, wrong, and skipped are in the DOM', () => {
+    render(
+      <ReviewGrid
+        session={session}
+        questions={questions}
+        onBack={vi.fn()}
+        onOpenExplanation={vi.fn()}
+      />,
+    )
+    expect(screen.getByTestId('legend-correct')).toBeInTheDocument()
+    expect(screen.getByTestId('legend-wrong')).toBeInTheDocument()
+    expect(screen.getByTestId('legend-skipped')).toBeInTheDocument()
+  })
+
+  it('SageTrigger renders with showNav={true} — nav row is present in DOM', () => {
+    render(
+      <ReviewGrid
+        session={session}
+        questions={questions}
+        onBack={vi.fn()}
+        onOpenExplanation={vi.fn()}
+      />,
+    )
+    expect(screen.getByTestId('nav-row')).toBeInTheDocument()
+  })
+
   describe('filter', () => {
-    it('renders All / Correct / Wrong / Skipped filter buttons', () => {
+    it('renders ALL / WRONG / SKIPPED / CORRECT filter tabs', () => {
       render(
         <ReviewGrid
           session={session}
@@ -188,7 +208,7 @@ describe('ReviewGrid', () => {
       expect(screen.getByTestId('filter-skipped')).toBeInTheDocument()
     })
 
-    it('filtering by Correct shows only correct tiles', () => {
+    it('filtering by CORRECT shows only correct seats', () => {
       render(
         <ReviewGrid
           session={session}
@@ -203,7 +223,7 @@ describe('ReviewGrid', () => {
       expect(screen.queryByTestId('result-tile-q003')).not.toBeInTheDocument()
     })
 
-    it('filtering by Wrong shows only wrong tiles', () => {
+    it('filtering by WRONG shows only wrong seats', () => {
       render(
         <ReviewGrid
           session={session}
@@ -218,7 +238,23 @@ describe('ReviewGrid', () => {
       expect(screen.queryByTestId('result-tile-q003')).not.toBeInTheDocument()
     })
 
-    it('filtering by Skipped shows only skipped tiles', () => {
+    it('filtering by WRONG leaves only circles with seat--wrong class', () => {
+      render(
+        <ReviewGrid
+          session={session}
+          questions={questions}
+          onBack={vi.fn()}
+          onOpenExplanation={vi.fn()}
+        />,
+      )
+      fireEvent.click(screen.getByTestId('filter-wrong'))
+      const seat = screen.getByTestId('result-tile-q002')
+      expect(seat).toHaveClass('seat--wrong')
+      expect(screen.queryByTestId('result-tile-q001')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('result-tile-q003')).not.toBeInTheDocument()
+    })
+
+    it('filtering by SKIPPED shows only skipped seats', () => {
       render(
         <ReviewGrid
           session={session}
@@ -233,7 +269,7 @@ describe('ReviewGrid', () => {
       expect(screen.getByTestId('result-tile-q003')).toBeInTheDocument()
     })
 
-    it('switching back to All restores all tiles', () => {
+    it('switching back to ALL restores all seats', () => {
       render(
         <ReviewGrid
           session={session}

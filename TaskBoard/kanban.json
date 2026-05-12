@@ -81,7 +81,7 @@
           "id": "US-017",
           "type": "user-story",
           "title": "Review Grid rewrite",
-          "status": "todo",
+          "status": "done",
           "blocked": [
             "US-011",
             "US-016"
